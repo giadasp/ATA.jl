@@ -40,7 +40,7 @@ Install Julia-1.4.1 at `https://julialang.org/downloads/`
 run `Julia.exe` and type:
 
 ```
-] add https://github.com/giadasp/ATAjl
+] add https://github.com/giadasp/ATA.jl
 ```
 
 Load the package by
