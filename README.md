@@ -46,7 +46,7 @@ run `Julia.exe` and type:
 Load the package by
 
 ```
-using ATAjl
+using ATA
 ```
 
 Play with the test files in folder "test".
