@@ -440,7 +440,7 @@ function AddConstr!(ATAmodel::model; constraints_file = "CategoricalConstraints.
 				writedlm("OPT/A_$t.csv", A[t])
 				writedlm("OPT/b_$t.csv", b[t])
 			end
-			writedlm("OPT/x_forced0.jl", x_forced0)
+			writedlm("OPT/x_forced0.txt", x_forced0)
 		end
 		#update model
 		ATAmodel.Settings.forced0 = x_forced0
@@ -468,7 +468,7 @@ function AddOverlaps!(ATAmodel::model; overlap_file = "OverlapMatrix.csv", overl
 			# 	ol_max[t] = opMatrix[t, setdiff(collect(1:T), t)]
 			# end
 			opMatrix = opMatrix[1:T, 1:T]
-			writedlm("OPT/overlap.jl", opMatrix)
+			writedlm("OPT/overlap.txt", opMatrix)
 			ATAmodel.Settings.olMax = opMatrix
 		else
 			ATAmodel.Settings.olMax = ones(ATAmodel.Settings.nItems,ATAmodel.Settings.nItems).*ATAmodel.Settings.nItems
@@ -562,7 +562,7 @@ function GroupByFriendSet!(ATAmodel::model) #last
 		end
 		#update ATAmodel.forced0
 		ATAmodel.Settings.forced0 = x_forced0_new
-		writedlm("OPT/x_forced0.jl", x_forced0_new)
+		writedlm("OPT/x_forced0.txt", x_forced0_new)
 		#item use
 		ItemUse_min = ATAmodel.IU.Min
 		ItemUse_max = ATAmodel.IU.Max

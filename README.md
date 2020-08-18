@@ -11,8 +11,8 @@ Interfaced with Dash or pure Julia code.
 3. Chance-constrained MAXIMIN TIF.
 
 ## Solvers:
-- for 1 and 2: JuMP MILP solvers (see the list at https://jump.dev/JuMP.jl/v0.21.1/installation/). Follow tinstallation manuals for the solver you want to use. For open-source we suggest CBC or GLPK (default). For commercial we suggest Gurobi or CPLEX.
-- for 1, 2 and 3: Simulated Annealing solver, developed by me.
+- for objectives 1 and 2: JuMP MILP solvers (see the list at https://jump.dev/JuMP.jl/v0.21.1/installation/). Follow tinstallation manuals for the solver you want to use. For open-source we suggest CBC or GLPK (default). For commercial we suggest Gurobi or CPLEX.
+- for objectives 1, 2 and 3: Simulated Annealing solver, pure Julia ATA solver.
 
 ## Constraints:
 - parallel tests (one group of tests);
@@ -25,7 +25,7 @@ Interfaced with Dash or pure Julia code.
 - maximum and/or minimum mean of numerical variables (quantitative constraints); (beta)
 - maximum and/or minimum expected score based on the IRT paradigm or by a given column in the pool dataframe;
 - maximum overlap between tests;
-- grouping by units (friend sets);
+- group by units (friend sets);
 - items exclusivity (enemy sets);
 
 ## Report
@@ -49,8 +49,8 @@ Load the package by
 using ATA
 ```
 
-Play with the test files in folder "test".
+Play with the test files in folder "examples".
 
-Set all the specifications by modifying the files in "test" folder and run "test/test.jl" following the manual in the comments.
+Set all the specifications by modifying the files in "test" folder and run "examples/example.jl" following the manual in the comments.
 
-Distributed analysis of the neighbourhoods is available, look at "test/ParallelTest.jl".
+Distributed analysis of the neighbourhoods is available, look at "examples/parallelExample.jl".
