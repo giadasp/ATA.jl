@@ -27,7 +27,7 @@ println(AddFriendSets!(ATAmodel)[2])
 println(AddEnemySets!(ATAmodel)[2])
 
 #4. Add categorical constraints (Optional)
-println(AddConstr!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim=";")[2])
+println(AddConstr!(ATAmodel; constraints_file = "constraints.csv", constraints_delim=";")[2])
 
 #5. Add overlap maxima (Optional)
 println(AddOverlaps!(ATAmodel; overlap_file = "Overlap Matrix.csv", overlap_delim=";")[2])
@@ -64,9 +64,9 @@ geom_temp  = 0.1  #0 <= start_temp <= Inf
 # if a starting_design is supplied, can be setted to 0.
 n_fill = 1
 #Set deep analysis of neighbourhoods, set both to 1 for a shallow analysis.
-n_item_sample = maximum([ATAmodel.Constraints[t].length_max for t=1:ATAmodel.Settings.T])
+n_item_sample = maximum([ATAmodel.constraints[t].length_max for t=1:ATAmodel.settings.T])
 # 1 <= n_item_sample <= Inf
-n_test_sample = ATAmodel.Settings.T
+n_test_sample = ATAmodel.settings.T
 # 1 <= n_test_sample <= Inf
 
 #Number of Feasibility neighbourhoods to explore, set to the minimum if the model is small or not highly constrained
@@ -101,9 +101,9 @@ Assemble!(ATAmodel;
     opt_feas = opt_feas,
     n_fill = n_fill,
     feas_nh = feas_nh,
-    opt_nh = opt_nh,
-    optimizer_attributes = optimizer_constructor,
-    optimizer_constructor =optimizer_attributes
+    opt_nh = opt_nh#,
+    #optimizer_attributes = optimizer_constructor,
+    #optimizer_constructor =optimizer_attributes
     )
 
 # All the settings and outputs from optimization are in ATAmodel object.
@@ -111,7 +111,7 @@ Assemble!(ATAmodel;
 # A summary of the resulting tests is available in results_folder/Results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
-PrintResults(ATAmodel;
+PrintResults!(ATAmodel;
 group_by_fs = true,
-plots_out = false,
+plots_out = true,
 results_folder = "RESULTS")

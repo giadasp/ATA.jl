@@ -8,12 +8,12 @@
 #cd("where your input files are")
 # include("LocalTest.jl")
 
-#[Beta: for running ATAjl with multiple cores do:
+#[Beta: for running ATA with multiple cores do:
 #add julia.exe to the path and run Julia with the command prompt:
 #julia -p numberOfCores]
 
 using Distributed #this is not needed if Julia has been run with numberOfCores>1
-@everywhere   using DataFrames
+@everywhere   using DataFrames.DataFrames
 @everywhere   using Distributed
 @everywhere   cd("folder in which the package is saved")
 @everywhere   using Pkg
@@ -25,9 +25,9 @@ using Distributed #this is not needed if Julia has been run with numberOfCores>1
 #Input files needed: settingsATA.jl, bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
 #settingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...
 #CategoricalConstraints.csv : categorical constraints
-#OverlapMatrix.csv : maximum overlap allowed between test forms, it is a TxT matrix. If the assembly is non parallel (i.e. there is more than one group of parallel tests, nGroups>1)
-#it is a nGroups x nGroups matrix.
-#BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a nItems x R matrix (Matrix{Float64}(.,nItems,R)).
+#OverlapMatrix.csv : maximum overlap allowed between test forms, it is a TxT matrix. If the assembly is non parallel (i.e. there is more than one group of parallel tests, n_groups>1)
+#it is a n_groups x n_groups matrix.
+#BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
 #for resetting the ATA process (Needed)
 ATAmodel = StartATA()
@@ -43,7 +43,7 @@ println(AddFriendSets!(ATAmodel)[2])
 println(AddEnemySets!(ATAmodel)[2])
 
 #4. Add categorical constraints (Optional)
-println(AddConstr!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim=";")[2])
+println(AddConstr!(ATAmodel; constraints_file = "constraints.csv", constraints_delim=";")[2])
 
 #5. Add overlap maxima (Optional)
 println(AddOverlaps!(ATAmodel; overlap_file = "Overlap Matrix.csv", overlap_delim=";")[2])
@@ -80,9 +80,9 @@ geom_temp  = 0.1  #0 <= start_temp <= Inf
 # if a starting_design is supplied, can be setted to 0.
 n_fill = 1
 #Set deep analysis of neighbourhoods, set both to 1 for a shallow analysis.
-n_item_sample = maximum([ATAmodel.Cosntraints[t].length_max for t=1:ATAmodel.Settings.T])
+n_item_sample = maximum([ATAmodel.Cosntraints[t].length_max for t=1:ATAmodel.settings.T])
 # 1 <= n_item_sample <= Inf
-n_test_sample = ATAmodel.Settings.T
+n_test_sample = ATAmodel.settings.T
 # 1 <= n_test_sample <= Inf
 
 #Number of Feasibility neighbourhoods to explore, set to the minimum if the model is small or not highly constrained

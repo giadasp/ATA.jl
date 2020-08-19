@@ -1,5 +1,5 @@
 function RunATA!()
-  global ATAmodel = model()
+  global ATAmodel = Model()
   js_files = [
   Dict(
   "src"=> "https://code.jquery.com/jquery-3.5.1.slim.min.js",
@@ -120,7 +120,7 @@ function RunATA!()
   DashHtmlComponents.html_div(className = "col-md-12", [
   DashHtmlComponents.html_div(className = "row justify-content-center m-1", [
   DashHtmlComponents.html_div(className = "col-md-6 align-self-center text-center", [
-  DashHtmlComponents.html_button("Add Friend Sets"; id="addFS_btn", n_clicks=0, className = "btn btn-primary")
+  DashHtmlComponents.html_button("Add Friend sets"; id="addFS_btn", n_clicks=0, className = "btn btn-primary")
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
   DashHtmlComponents.html_div(id = "addFS_card", className = "card h-100 bg-light", [
@@ -140,7 +140,7 @@ function RunATA!()
 
   DashHtmlComponents.html_div(className = "row justify-content-center m-1", [
   DashHtmlComponents.html_div(className = "col-md-6 align-self-center text-center", [
-  DashHtmlComponents.html_button("Add Enemy Sets"; id="addES_btn", n_clicks=0, className = "btn btn-primary")
+  DashHtmlComponents.html_button("Add Enemy sets"; id="addES_btn", n_clicks=0, className = "btn btn-primary")
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
   DashHtmlComponents.html_div(id = "addES_card", className = "card h-100 bg-light", [
@@ -165,7 +165,7 @@ function RunATA!()
   DashHtmlComponents.html_label("file name:"),
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashCoreComponents.dcc_input(id="constraints_file_txt", value="Constraints.csv", className="form-control", type = "text")
+  DashCoreComponents.dcc_input(id="constraints_file_txt", value="constraints.csv", className="form-control", type = "text")
   ])
   ]),
   DashHtmlComponents.html_div(className = "row justify-content-center m-1", [
@@ -177,7 +177,7 @@ function RunATA!()
   ])
   ]),
   DashHtmlComponents.html_div(className = "row justify-content-center m-1 text-center", [
-  DashHtmlComponents.html_button("Add Constraints"; id="addConstraints_btn", n_clicks=0, className = "btn btn-primary")
+  DashHtmlComponents.html_button("Add constraints"; id="addConstraints_btn", n_clicks=0, className = "btn btn-primary")
   ]),
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
@@ -255,7 +255,7 @@ function RunATA!()
 
   DashHtmlComponents.html_div(className = "row justify-content-center m-1", [
   DashHtmlComponents.html_div(className = "col-md-6 align-self-center text-center", [
-  DashHtmlComponents.html_button("Group By Friend Sets"; id="group_btn", n_clicks=0, className = "btn btn-primary")
+  DashHtmlComponents.html_button("Group By Friend sets"; id="group_btn", n_clicks=0, className = "btn btn-primary")
   ]),
   DashHtmlComponents.html_div(className = "col-md-6 align-self-center", [
   DashHtmlComponents.html_div(id = "group_card", className = "card h-100 bg-light", [
@@ -330,7 +330,7 @@ function RunATA!()
   DashHtmlComponents.html_label("Items to sample:")
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashCoreComponents.dcc_input(value=1,className="form-control", type="number", min=1, max = 1000, step=1, id="n_item_sample_txt")
+  DashCoreComponents.dcc_input(value=1,className="form-control", type="number", min=1, max = 1000, step=1, id="n_item_StatsBase.sample_txt")
 
   ]),
   ]),
@@ -339,7 +339,7 @@ function RunATA!()
   DashHtmlComponents.html_label("Tests to sample:")
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashCoreComponents.dcc_input(value=1,className="form-control", type="number", min=1, max = 1000, step=1, id="n_test_sample_txt")
+  DashCoreComponents.dcc_input(value=1,className="form-control", type="number", min=1, max = 1000, step=1, id="n_test_StatsBase.sample_txt")
   ]),
   ]),
   DashHtmlComponents.html_div(className = "row m-1", [
@@ -433,7 +433,7 @@ function RunATA!()
   DashHtmlComponents.html_label("Starting design file:")
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashCoreComponents.dcc_input(value="Design.csv",className="form-control", type="text",id="starting_design_txt")
+  DashCoreComponents.dcc_input(value="design.csv",className="form-control", type="text",id="starting_design_txt")
   ]),
   ]),
   DashHtmlComponents.html_div(className = "row justify-content-center m-1", [
@@ -504,11 +504,11 @@ function RunATA!()
   ])
 
 
-  Dash.callback!(app, [Dash.Output("results_lbl","children"), Dash.Output("results_card","className")], Dash.Input("assemble_btn", "n_clicks"), [Dash.State("start_temp_txt","value"),
+  Dash.callback!(app, [Dash.output("results_lbl","children"), Dash.output("results_card","className")], Dash.Input("assemble_btn", "n_clicks"), [Dash.State("start_temp_txt","value"),
   Dash.State("geom_temp_txt","value"),
   Dash.State("max_time_txt","value"),
-  Dash.State("n_item_sample_txt","value"),
-  Dash.State("n_test_sample_txt","value"),
+  Dash.State("n_item_StatsBase.sample_txt","value"),
+  Dash.State("n_test_StatsBase.sample_txt","value"),
   Dash.State("conv_max_txt","value"),
   Dash.State("verbosity_txt","value"),
   Dash.State("opt_feas_txt","value"),
@@ -562,7 +562,7 @@ function RunATA!()
         optimizer_constructor = optimizer_constructor #eval(Meta.parse(string(optimizer_constructor,".Optimizer")))
         )
         plots_out = (plots_out == "yes") ? true : false
-        if ATAmodel.Settings.nFS!=ATAmodel.Settings.nItems
+        if ATAmodel.settings.nFS!=ATAmodel.settings.n_items
           PrintResults!(ATAmodel, group_by_fs = true, plots_out = plots_out, results_folder = results_folder)
         else
           PrintResults!(ATAmodel, results_folder = results_folder, plots_out = plots_out)
@@ -581,7 +581,7 @@ function RunATA!()
 
 
 
-  Dash.callback!(app, [Dash.Output("settings_lbl","children"), Dash.Output("settings_card","className")], [Dash.Input("settings_btn", "n_clicks")], [Dash.State("settings_txt","value"), Dash.State("bank_txt","value"), Dash.State("bank_delim_txt","value")]) do n_clicks, settings_file, bank_file, bank_delim
+  Dash.callback!(app, [Dash.output("settings_lbl","children"), Dash.output("settings_card","className")], [Dash.Input("settings_btn", "n_clicks")], [Dash.State("settings_txt","value"), Dash.State("bank_txt","value"), Dash.State("bank_delim_txt","value")]) do n_clicks, settings_file, bank_file, bank_delim
     if n_clicks>0
       message=["success",""]
       try
@@ -598,7 +598,7 @@ function RunATA!()
 
 
 
-  Dash.callback!(app, [Dash.Output("addFS_lbl","children"), Dash.Output("addFS_card","className")], [Dash.Input("addFS_btn", "n_clicks")] , Dash.State("addFS_btn", "n_clicks")) do n_clicks, n_click_state
+  Dash.callback!(app, [Dash.output("addFS_lbl","children"), Dash.output("addFS_card","className")], [Dash.Input("addFS_btn", "n_clicks")] , Dash.State("addFS_btn", "n_clicks")) do n_clicks, n_click_state
     if n_click_state > 0
       message=["success",""]
       try
@@ -613,7 +613,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, [Dash.Output("addES_lbl","children"), Dash.Output("addES_card","className")], [Dash.Input("addES_btn", "n_clicks")], Dash.State("addES_btn", "n_clicks")) do n_clicks, n_click_state
+  Dash.callback!(app, [Dash.output("addES_lbl","children"), Dash.output("addES_card","className")], [Dash.Input("addES_btn", "n_clicks")], Dash.State("addES_btn", "n_clicks")) do n_clicks, n_click_state
     if n_click_state > 0
       message=["success",""]
       try
@@ -628,7 +628,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, [Dash.Output("addConstraints_lbl","children"), Dash.Output("addConstraints_card","className")], [Dash.Input("addConstraints_btn", "n_clicks")], [Dash.State("constraints_file_txt","value"), Dash.State("constraints_delim_txt","value")]) do n_clicks, constraints_file, constraints_delim
+  Dash.callback!(app, [Dash.output("addConstraints_lbl","children"), Dash.output("addConstraints_card","className")], [Dash.Input("addConstraints_btn", "n_clicks")], [Dash.State("constraints_file_txt","value"), Dash.State("constraints_delim_txt","value")]) do n_clicks, constraints_file, constraints_delim
     if n_clicks > 0
       message=["success",""]
       try
@@ -644,7 +644,7 @@ function RunATA!()
   end
 
 
-  Dash.callback!(app, [Dash.Output("ol_lbl","children"), Dash.Output("ol_card","className")], [Dash.Input("addOl_btn", "n_clicks")], [ Dash.State("ol_txt","value"), Dash.State("ol_delim_txt","value")]) do n_clicks, ol_file, ol_delim
+  Dash.callback!(app, [Dash.output("ol_lbl","children"), Dash.output("ol_card","className")], [Dash.Input("addOl_btn", "n_clicks")], [ Dash.State("ol_txt","value"), Dash.State("ol_delim_txt","value")]) do n_clicks, ol_file, ol_delim
     if n_clicks > 0
       message=["success",""]
       try
@@ -660,7 +660,7 @@ function RunATA!()
   end
 
 
-  Dash.callback!(app, [Dash.Output("addExpScore_lbl","children"), Dash.Output("addExpScore_card","className")], [Dash.Input("addExpScore_btn", "n_clicks")]) do n_clicks
+  Dash.callback!(app, [Dash.output("addExpScore_lbl","children"), Dash.output("addExpScore_card","className")], [Dash.Input("addExpScore_btn", "n_clicks")]) do n_clicks
     if n_clicks > 0
       message=["success",""]
       try
@@ -675,7 +675,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, [Dash.Output("group_lbl","children"), Dash.Output("group_card","className")], [Dash.Input("group_btn", "n_clicks")]) do n_clicks
+  Dash.callback!(app, [Dash.output("group_lbl","children"), Dash.output("group_card","className")], [Dash.Input("group_btn", "n_clicks")]) do n_clicks
     if n_clicks > 0
       message=["success",""]
       try
@@ -690,7 +690,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, [Dash.Output("addObj_lbl","children"), Dash.Output("addObj_card","className")], [Dash.Input("addObj_btn", "n_clicks")]) do n_clicks
+  Dash.callback!(app, [Dash.output("addObj_lbl","children"), Dash.output("addObj_card","className")], [Dash.Input("addObj_btn", "n_clicks")]) do n_clicks
     if n_clicks > 0
       message=["success",""]
       try
@@ -705,7 +705,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, [Dash.Output("start_lbl","children"), Dash.Output("restart_card" ,"className")], Dash.Input("start_btn", "n_clicks"), [Dash.State("folder_txt","value")]) do n_clicks, folder
+  Dash.callback!(app, [Dash.output("start_lbl","children"), Dash.output("restart_card" ,"className")], Dash.Input("start_btn", "n_clicks"), [Dash.State("folder_txt","value")]) do n_clicks, folder
     if n_clicks > 0
       message = ""
       try
@@ -724,15 +724,15 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, [Dash.Output("n_item_sample_txt","value"), Dash.Output("n_test_sample_txt","value")], Dash.Input("settings_card", "className")) do success
+  Dash.callback!(app, [Dash.output("n_item_StatsBase.sample_txt","value"), Dash.output("n_test_StatsBase.sample_txt","value")], Dash.Input("settings_card", "className")) do success
     if success == "card h-100 text-white bg-success"
-      return maximum([ATAmodel.Constraints[t].length_max for t=1:ATAmodel.Settings.T]), ATAmodel.Settings.T
+      return maximum([ATAmodel.constraints[t].length_max for t=1:ATAmodel.settings.T]), ATAmodel.settings.T
     else
       return throw(Dash.PreventUpdate())
     end
   end
   #
-  Dash.callback!(app, Dash.Output("settings_btn", "n_clicks"), Dash.Input("start_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("settings_btn", "n_clicks"), Dash.Input("start_lbl","children")) do starter_lbl
     if starter_lbl=="ATA model successfully initialized"
       return 0
     else
@@ -740,7 +740,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, Dash.Output("addFS_btn", "n_clicks"), Dash.Input("settings_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("addFS_btn", "n_clicks"), Dash.Input("settings_lbl","children")) do starter_lbl
     if starter_lbl==""
       return 0
     else
@@ -748,7 +748,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, Dash.Output("addES_btn", "n_clicks"), Dash.Input("addFS_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("addES_btn", "n_clicks"), Dash.Input("addFS_lbl","children")) do starter_lbl
     if starter_lbl==""
       return 0
     else
@@ -756,7 +756,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, Dash.Output("addConstraints_btn", "n_clicks"), Dash.Input("addES_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("addConstraints_btn", "n_clicks"), Dash.Input("addES_lbl","children")) do starter_lbl
     if starter_lbl==""
       return 0
     else
@@ -764,7 +764,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, Dash.Output("addOl_btn", "n_clicks"), Dash.Input("addConstraints_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("addOl_btn", "n_clicks"), Dash.Input("addConstraints_lbl","children")) do starter_lbl
     if starter_lbl==""
       return 0
     else
@@ -772,7 +772,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, Dash.Output("addExpScore_btn", "n_clicks"), Dash.Input("ol_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("addExpScore_btn", "n_clicks"), Dash.Input("ol_lbl","children")) do starter_lbl
     if starter_lbl==""
       return 0
     else
@@ -780,7 +780,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, Dash.Output("group_btn", "n_clicks"), Dash.Input("addExpScore_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("group_btn", "n_clicks"), Dash.Input("addExpScore_lbl","children")) do starter_lbl
     if starter_lbl==""
       return 0
     else
@@ -788,7 +788,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, Dash.Output("addObj_btn", "n_clicks"), Dash.Input("group_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("addObj_btn", "n_clicks"), Dash.Input("group_lbl","children")) do starter_lbl
     if starter_lbl==""
       return 0
     else
@@ -796,7 +796,7 @@ function RunATA!()
     end
   end
 
-  Dash.callback!(app, Dash.Output("assemble_btn", "n_clicks"), Dash.Input("addObj_lbl","children")) do starter_lbl
+  Dash.callback!(app, Dash.output("assemble_btn", "n_clicks"), Dash.Input("addObj_lbl","children")) do starter_lbl
     if starter_lbl==""
       return 0
     else

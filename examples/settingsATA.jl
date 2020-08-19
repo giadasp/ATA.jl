@@ -1,36 +1,36 @@
 Inputs=InputSettings(
 #T
 [ 8 , 8 , 8 ] ,
-#nItems
+#n_items
 Int(366) ,
-#nGroups
+#n_groups
 Int(3) ,
-#Groups
+#groups
 [ "D" , "C" , "B" ] ,
 ####################################################################
 ########################## IRT #####################################
 ####################################################################
-#IRTmodel
+#IRT_model
 "1PL" ,
-#IRTparameters
+#IRT_parameters
 [ "b" ] ,
-#IRTparametrization
+#IRT_parametrization
 "atb" ,
-#IRTD
+#IRT_D
 1 ,
 ####################################################################
 ######################FRIENDS AND ENEMIES###########################
 ####################################################################
-#EnemySetsVar
+#enemy_sets_var
 [ "ENEMY_SET" ] ,
-#FriendSetsVar
+#friend_sets_var
 [ "UNIT" ] ,
 ####################################################################
 ########################### ITEM USE  ##############################
 ####################################################################
-#ItemUse_min
+#item_use_min
 fill( 0 , 366 ) ,
-#ItemUse_max
+#item_use_max
 fill( 7 , 366 ) ,
 ####################################################################
 ########################## TEST LENGHT #############################
@@ -44,44 +44,44 @@ fill( 7 , 366 ) ,
 ####################################################################
 ####################### EXPECTED SCORE #############################
 ####################################################################
-#ExSVar
+#expected_score_var
 [ "PROP_CORR" , "PROP_CORR" , "PROP_CORR" ] ,
-#ExSPts
+#expected_score_pts
 [ zeros(Float64,1) , zeros(Float64,1) , zeros(Float64,1) ] ,
-#ExS_min
+#expected_score_min
 [ [0.50] , [0.50] , [0.50] ] ,
-#ExS_max
+#expected_score_max
 [ [0.57] , [0.57] , [0.57] ] ,
 ####################################################################
 ###################### GENERIC CONSTRAINTS#################
 ####################################################################
-#meanVars
+#mean_vars
 Vector{Vector{String}}(undef,0) ,  #(future)
-#meanVars_min
+#mean_vars_min
 Vector{Vector{Float64}}(undef,0) , #(future)
-#meanVars_max
+#mean_vars_max
 Vector{Vector{Float64}}(undef,0) , #(future)
-#sumVars
+#sum_vars
 Vector{Vector{String}}(undef,0) ,
-#sumVars_min
+#sum_vars_min
 Vector{Vector{Float64}}(undef,0) ,
-#sumVars_max
+#sum_vars_max
 Vector{Vector{Float64}}(undef,0) ,
 ####################################################################
 ######################### OBJECTIVE ################################
 ####################################################################
-#OptType
+#opt_type
 "MAXIMIN" ,
-#OptPts
+#opt_pts
 [ [ -0.60 ] , [ 0.30 ] , [ 0.60 ] ] ,
-#AuxInt
+#aux_int
 zero(Float64) ,
-#AuxFloat
+#aux_float
 0.05 ,
 ####################################################################
 ######################### OUTPUT ###################################
 ####################################################################
-#CATEGORIES
+#categories
 ["UNIT",
 		"CAT_1",
 		"CAT_2",

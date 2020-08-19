@@ -1,3 +1,12 @@
+function mean(x::Vector{Real})
+	n = size(x, 1)
+	if n > 0
+		return sum(x) / n
+	else
+		return 0
+	end
+end
+
 function exp_c(x::Float64)
 	ccall(:exp, Float64, (Float64,), x)
 end
@@ -69,7 +78,7 @@ function comp_f(NH::Neighbourhood, OptFeas::Float64)
 	return (1 - OptFeas) * (sum(NH.infeas + NH.ol) + NH.iu) - OptFeas * (minimum(NH.obj))
 end
 
-function myqleSimp(x::Vector{Float64}, ind::Vector{Float64})
+function myqle_simp(x::Vector{Float64}, ind::Vector{Float64})
 	R = size(x, 1)
 	alphaR = Int.(ceil.(R .* (ind)))
 	alphaR[findall(alphaR .< 1)] .= 1
@@ -79,9 +88,9 @@ function myqleSimp(x::Vector{Float64}, ind::Vector{Float64})
 	return sort(x)[alphaR]
 end
 
-function gemmblas(A::Matrix{Float64}, B::Matrix{Float64}, olMax::Matrix{Float64})
+function gemmblas(A::Matrix{Float64}, B::Matrix{Float64}, ol_max::Matrix{Float64})
 	sa = size(A)
-	ol = copy(olMax)
+	ol = copy(ol_max)
 	ccall(("dgemm_64_", "libopenblas64_"), Cvoid,
 	(Ref{UInt8}, Ref{UInt8}, Ref{Int64}, Ref{Int64},
 	Ref{Int64}, Ref{Float64}, Ptr{Float64}, Ref{Int64},
@@ -132,19 +141,19 @@ function cutR(x;
 	end
 end
 
-function ItemCharFun(pars::DataFrame, theta;
+function item_char(pars::DataFrames.DataFrame, theta;
 	model = "2PL", #1PL, 2PL, 3PL, grm
 	parametrization = "at-b", #"at-b, at-ab, atb, atab"
 	D = 1) #true, false
-	nItems = size(pars, 1)
+	n_items = size(pars, 1)
 	if (model == "1PL")
 		(:b in names(pars)) || (:d in names(pars)) || error("discrimination parameter b or d not defined")
-		pars.c = zeros(Float64, nItems)
-		pars.a = ones(Float64, nItems)
+		pars.c = zeros(Float64, n_items)
+		pars.a = ones(Float64, n_items)
 	elseif (model == "2PL")
 		(:a in names(pars) || :a in names(pars)) || error("discrimination parameter a1 or a not defined")
 		(:b in names(pars)) || (:d in names(pars)) || error("discrimination parameter b or d not defined")
-		pars.c = zeros(Float64, nItems)
+		pars.c = zeros(Float64, n_items)
 	elseif (model == "3PL")
 		(:a1 in names(pars) || :a in names(pars)) || error("discrimination parameter a1 not defined")
 		(:b in names(pars)) || (:d in names(pars)) || error("discrimination parameter b or d not defined")
@@ -210,19 +219,19 @@ function ItemCharFun(pars::DataFrame, theta;
 	return p, pder
 end
 
-function ItemInfoFun(pars::DataFrame, theta;
+function item_info(pars::DataFrames.DataFrame, theta;
 	model = "2PL", #1PL, 2PL, 3PL, grm
 	parametrization = "at-b", #"at-b, at-ab, atb, atab"
 	D = 1) #true, false
-	nItems = size(pars, 1)
+	n_items = size(pars, 1)
 	if (model == "1PL")
 		(:b in names(pars)) || (:d in names(pars)) || error("discrimination parameter b or d not defined")
-		pars.c = zeros(Float64, nItems)
-		pars.a = ones(Float64, nItems)
+		pars.c = zeros(Float64, n_items)
+		pars.a = ones(Float64, n_items)
 	elseif (model == "2PL")
 		(:a in names(pars) || :a in names(pars)) || error("discrimination parameter a1 or a not defined")
 		(:b in names(pars)) || (:d in names(pars)) || error("discrimination parameter b or d not defined")
-		pars.c = zeros(Float64, nItems)
+		pars.c = zeros(Float64, n_items)
 	elseif (model == "3PL")
 		(:a1 in names(pars) || :a in names(pars)) || error("discrimination parameter a1 not defined")
 		(:b in names(pars)) || (:d in names(pars)) || error("discrimination parameter b or d not defined")
@@ -258,7 +267,7 @@ function ItemInfoFun(pars::DataFrame, theta;
 	elseif parametrization == "atab" #a*theta + b
 		a2 = copy(a)
 	end
-	p, pder = ItemCharFun(pars, theta; model = model, parametrization = parametrization)
+	p, pder = item_char(pars, theta; model = model, parametrization = parametrization)
 	nb = size(p, 3)
 	if model != "grm"
 		i = (a .^ 2) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2
@@ -269,7 +278,7 @@ function ItemInfoFun(pars::DataFrame, theta;
 	return i
 end
 
-function StudentLikeFun(f::Float64, r::Vector{Float64}, iIndex::Vector{Int64}, a::Vector{Float64}, b::Vector{Float64}, θ::Float64;
+function student_likelihood(f::Float64, r::Vector{Float64}, iIndex::Vector{Int64}, a::Vector{Float64}, b::Vector{Float64}, θ::Float64;
 	logL = false)
 	I = size(a, 1)
 	likel = 0
@@ -280,9 +289,9 @@ function StudentLikeFun(f::Float64, r::Vector{Float64}, iIndex::Vector{Int64}, a
 	return likel::Float64
 end
 
-function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, design::Matrix{Float64};
+function resp_gen(f::Vector{Float64}, pars::DataFrames.DataFrame, θ::Vector{Float64}, design::Matrix{Float64};
 	model = "2PL",
-	method = "classicUniform"
+	method = "classic uniform"
 	)
 	if (model == "1PL")
 		(:b in names(pars)) || (:d in names(pars)) || error("discrimination parameter b or d not defined")
@@ -337,7 +346,7 @@ function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, desig
 		end
 	end
 	resp = Matrix(undef, I, N)
-	if method == "cumulatedPersons"
+	if method == "cumulated students"
 		@fastmath @inbounds  for i = 1 : I
 			gapScore = 3
 			while gapScore >= 2
@@ -365,28 +374,28 @@ function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, desig
 			end
 		end
 	end
-	if method == "cumulatedItems"
+	if method == "cumulated items"
 		@fastmath @inbounds  for n = 1 : N#4
 			#gapScore=3
 			#while gapScore>=2
 			p2 = p[:, n]
 			p2 = hcat((1 .- p2) , p2)#2
 			unif = rand(Uniform(0, 1), I)#5
-			samplei = sample(collect(1 : I), I, replace = false)
+			StatsBase.samplei = StatsBase.sample(collect(1 : I), I, replace = false)
 			i = 1#6
 			while i <= I#7
-				csum = p2[samplei[i], 1]#8
+				csum = p2[StatsBase.samplei[i], 1]#8
 				cat = 0#9
-				if design[samplei[i], n] == 0
-					resp[samplei[i], n] = 0#missing
+				if design[StatsBase.samplei[i], n] == 0
+					resp[StatsBase.samplei[i], n] = 0#missing
 					i = i + 1
 				else
-					while csum < unif[samplei[i]]
+					while csum < unif[StatsBase.samplei[i]]
 						cat = cat + 1
 						if (cat == 2) break end
-						csum = csum + p2[samplei[i], cat + 1]
+						csum = csum + p2[StatsBase.samplei[i], cat + 1]
 					end
-					resp[samplei[i], n]=cat
+					resp[StatsBase.samplei[i], n]=cat
 					i = i + 1
 				end
 			end
@@ -397,22 +406,22 @@ function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, desig
 			#end
 		end
 	end
-	if method == "classicUniform"
+	if method == "classic uniform"
 		for n = 1 : N#4
 			#gapScore=2
 			#while gapScore>=0.5
 			unif = rand(Uniform(0, 1), I)#5
-			samplei = sample(collect(1 : I), I, replace = false)
+			StatsBase.samplei = StatsBase.sample(collect(1 : I), I, replace = false)
 			i = 1#6
 			while i <= I#7
-				if design[samplei[i], n] == 0
-					resp[samplei[i], n] = 0#missing
+				if design[StatsBase.samplei[i], n] == 0
+					resp[StatsBase.samplei[i], n] = 0#missing
 					i = i + 1
 				else
-					if unif[samplei[i]] < p[samplei[i], n]
-						resp[samplei[i], n] = 1
+					if unif[StatsBase.samplei[i]] < p[StatsBase.samplei[i], n]
+						resp[StatsBase.samplei[i], n] = 1
 					else
-						resp[samplei[i], n] = 0
+						resp[StatsBase.samplei[i], n] = 0
 					end
 					i = i + 1
 				end
@@ -424,7 +433,7 @@ function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, desig
 			#end
 		end
 	end
-	if method == "cumItemsPattern"
+	if method == "cumulated pattern"
 		for n = 1 : N#4+
 			println("start person ", n)
 			iIndex = iindex[n]
@@ -436,14 +445,14 @@ function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, desig
 			for r = 1:1000
 				respn = Vector{Int64}(undef, IIndex)
 				unif = rand(Uniform(0, 1), IIndex)#5
-				samplei=sample(collect(1 : IIndex), IIndex, replace=false)
+				StatsBase.samplei=StatsBase.sample(collect(1 : IIndex), IIndex, replace=false)
 				for i = 1 : IIndex
-					csum = p2[samplei[i], 1]#8
+					csum = p2[StatsBase.samplei[i], 1]#8
 					cat = 0#9
-					while csum < unif[samplei[i]]
+					while csum < unif[StatsBase.samplei[i]]
 						cat = cat + 1
 						if (cat == 2) break end
-						csum = csum + p2[samplei[i], cat + 1]
+						csum = csum + p2[StatsBase.samplei[i], cat + 1]
 					end
 					respn[i] = cat
 				end
@@ -470,11 +479,11 @@ function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, desig
 			nPatterns = size(patterns, 1)
 			probPatterns = nPattern ./ 1000
 			println(probPatterns)
-			resp[iIndex, n] .= sample(patterns, pweights(probPatterns), 1)
+			resp[iIndex, n] .= StatsBase.sample(patterns, pweights(probPatterns), 1)
 			println("end person ", n)
 		end
 	end
-	if method == "classicUniformPattern"
+	if method == "classic uniform pattern"
 		for n = 1 : N#4+
 			println("start person ", n)
 			iIndex = iindex[n]
@@ -484,9 +493,9 @@ function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, desig
 			for r = 1 : 1000
 				respn = Vector{Int64}(undef, IIndex)
 				unif = rand(Uniform(0, 1) , IIndex)#5
-				samplei = sample(collect(1 : IIndex), IIndex, replace = false)
+				StatsBase.samplei = StatsBase.sample(collect(1 : IIndex), IIndex, replace = false)
 				for  i = 1 : IIndex#7
-					if unif[samplei[i]] < p[samplei[i], n]
+					if unif[StatsBase.samplei[i]] < p[StatsBase.samplei[i], n]
 						respn[i] = 1
 					else
 						respn[i] = 0
@@ -513,7 +522,7 @@ function genResp(f::Vector{Float64}, pars::DataFrame, θ::Vector{Float64}, desig
 			end
 			nPatterns = size(patterns, 1)
 			probPatterns = nPattern ./ 1000
-			resp[iIndex, n] .= sample(patterns, pweights(probPatterns), 1)
+			resp[iIndex, n] .= StatsBase.sample(patterns, pweights(probPatterns), 1)
 			println("end person ", n)
 		end
 	end
