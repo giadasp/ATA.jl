@@ -1,5 +1,5 @@
 
-function PrintResults!(ATAmodel; group_by_fs=false, results_folder="RESULTS", plots_out=false)
+function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", plots_out=false)
 	if plots_out==true
 		pgfplot()
 	end
@@ -11,9 +11,9 @@ function PrintResults!(ATAmodel; group_by_fs=false, results_folder="RESULTS", pl
 		categories=ATAmodel.output.categories
 		#summarize=Main.summarize
 		model=ATAmodel.settings.IRT.model
-		nFS=size(ATAmodel.settings.FS.items,1)
-		if nFS<ATAmodel.settings.n_items
-			n=nFS*T
+		n_FS=size(ATAmodel.settings.FS.items,1)
+		if n_FS<ATAmodel.settings.n_items
+			n=n_FS*T
 		else
 			n=n_items*T
 		end
@@ -29,7 +29,7 @@ function PrintResults!(ATAmodel; group_by_fs=false, results_folder="RESULTS", pl
 			JLD2.@load "OPT/ICF.jld2" ICF
 		end
 		if group_by_fs == true
-			design = reshape(ATAmodel.output.design, nFS, T)
+			design = reshape(ATAmodel.output.design, n_FS, T)
 			new_design = zeros(Float64, n_items, T)
 			for t=1:T
 				new_design[vcat(ATAmodel.settings.FS.items[findall(design[:, t] .== one(Float64))]...), t] .= one(Float64)

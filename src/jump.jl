@@ -12,7 +12,7 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 			JLD2.@load "OPT/IIF.jld2" IIF
 			message *= "- Assembling tests with MAXIMIN..."
 		else
-			message *= "No IIF.jld2 file in OPT folder, Run AddObjFun!() first!"
+			message *= "No IIF.jld2 file in OPT folder, Run add_obj_fun!() first!"
 			return message
 		end
 	elseif ATAmodel.settings.opt_type == "CC"
@@ -23,8 +23,8 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 		message *= "Assembling tests with NO objective function..."
 	end
 
-	if ATAmodel.settings.nFS == 0
-		ATAmodel.settings.nFS = ATAmodel.settings.n_items
+	if ATAmodel.settings.n_FS == 0
+		ATAmodel.settings.n_FS = ATAmodel.settings.n_items
 	end
 
 	#OVERLAP
@@ -46,17 +46,17 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 	#Friend sets groups
 	IIF_new = [zeros(Float64,0,0) for t=1:ATAmodel.settings.T]
 	ICF_new = [zeros(Float64,0,0) for t=1:ATAmodel.settings.T]
-	if ATAmodel.settings.nFS!=ATAmodel.settings.n_items
+	if ATAmodel.settings.n_FS!=ATAmodel.settings.n_items
 		#group IIFs
 		for t = 1:ATAmodel.settings.T
 			if size(IIF, 1)>0
-				IIF_new[t] = Matrix{Float64}(undef, size(IIF[t], 1), ATAmodel.settings.nFS)
+				IIF_new[t] = Matrix{Float64}(undef, size(IIF[t], 1), ATAmodel.settings.n_FS)
 			end
 			if size(ATAmodel.constraints[t].expected_score.val, 1) > 0
-				ICF_new[t] = Matrix{Float64}(undef, size(ATAmodel.constraints[t].expected_score.val, 2), ATAmodel.settings.nFS)
+				ICF_new[t] = Matrix{Float64}(undef, size(ATAmodel.constraints[t].expected_score.val, 2), ATAmodel.settings.n_FS)
 			end
 		end
-		for fs = 1:ATAmodel.settings.nFS
+		for fs = 1:ATAmodel.settings.n_FS
 			for t = 1:ATAmodel.settings.T
 				if size(IIF[t], 1) > 0
 					IIF_new[t][:, fs] = sum(IIF[t][:, ATAmodel.settings.FS.items[fs]], dims = 2)
@@ -142,9 +142,9 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 
 	#starting design check
 	if size(starting_design,1)>0
-		if ATAmodel.settings.nFS != ATAmodel.settings.n_items
-			if (size(starting_design,1) != ATAmodel.settings.nFS || size(starting_design,2) != ATAmodel.settings.T)
-				message *= "- Starting design must be of size: (nFS x T).\n"
+		if ATAmodel.settings.n_FS != ATAmodel.settings.n_items
+			if (size(starting_design,1) != ATAmodel.settings.n_FS || size(starting_design,2) != ATAmodel.settings.T)
+				message *= "- Starting design must be of size: (n_FS x T).\n"
 				return message
 			end
 		else
@@ -158,16 +158,16 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 			return message
 		end
 	else
-		starting_design = zeros(ATAmodel.settings.nFS,ATAmodel.settings.T)
+		starting_design = zeros(ATAmodel.settings.n_FS,ATAmodel.settings.T)
 	end
 
 	#decision variables
-	JuMP.@variable(m, x[i = 1:ATAmodel.settings.nFS , t = 1:ATAmodel.settings.T] <= Int(ATAmodel.settings.forced0[t][i]), Bin,start = starting_design[i, t])
+	JuMP.@variable(m, x[i = 1:ATAmodel.settings.n_FS , t = 1:ATAmodel.settings.T] <= Int(ATAmodel.settings.forced0[t][i]), Bin,start = starting_design[i, t])
 
 	if size(opMatrix,1)>0
 		if maximum(opMatrix)>0
 			#Overlap Vars new
-			JuMP.@variable(m, y[i = 1:ATAmodel.settings.nFS, p = 1:nPairs], Bin)
+			JuMP.@variable(m, y[i = 1:ATAmodel.settings.n_FS, p = 1:nPairs], Bin)
 		end
 	end
 	#constraints vars
@@ -177,18 +177,18 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 	#length
 	# for t=1:ATAmodel.settings.T
 	# 	if ATAmodel.constraints[t].length_max>0
-	# 		JuMP.@constraint(m,  sum(x[i,t]*ATAmodel.settings.FS.counts[i] for i=1:ATAmodel.settings.nFS) - ATAmodel.constraints[t].length_max <= 0) # z[c])
+	# 		JuMP.@constraint(m,  sum(x[i,t]*ATAmodel.settings.FS.counts[i] for i=1:ATAmodel.settings.n_FS) - ATAmodel.constraints[t].length_max <= 0) # z[c])
 	# 		c+=1
 	# 	end
 	# 	if ATAmodel.constraints[t].length_min>0
-	# 		JuMP.@constraint(m,  -sum(x[i,t]*ATAmodel.settings.FS.counts[i] for i=1:ATAmodel.settings.nFS)  + ATAmodel.constraints[t].length_min <=0) # z[c])
+	# 		JuMP.@constraint(m,  -sum(x[i,t]*ATAmodel.settings.FS.counts[i] for i=1:ATAmodel.settings.n_FS)  + ATAmodel.constraints[t].length_min <=0) # z[c])
 	# 		c+=1
 	# 	end
 	# end
 
 
 	# Item Use
-	for i in 1:ATAmodel.settings.nFS
+	for i in 1:ATAmodel.settings.n_FS
 		if ATAmodel.IU.min[i] .> 0
 			JuMP.@constraint(m,  ATAmodel.IU.min[i] - sum(x[i,t] for t=1:ATAmodel.settings.T)  <= 0) # z[c])
 			c+=1
@@ -200,14 +200,14 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 		if maximum(opMatrix)>0
 			#overlap classic
 			for p=1:nPairs
-				JuMP.@constraint(m, sum(y[i,p]*ATAmodel.settings.FS.counts[i] for i=1:ATAmodel.settings.nFS) <= ol_max[p])
-				JuMP.@constraint(m,  [i = 1:ATAmodel.settings.nFS], 2*y[i,p] <= x[i,fInd[p]]+x[i,fIndFirst[p]])
-				JuMP.@constraint(m,  [i = 1:ATAmodel.settings.nFS], y[i,p] >= x[i,fInd[p]]+x[i,fIndFirst[p]]-1)
+				JuMP.@constraint(m, sum(y[i,p]*ATAmodel.settings.FS.counts[i] for i=1:ATAmodel.settings.n_FS) <= ol_max[p])
+				JuMP.@constraint(m,  [i = 1:ATAmodel.settings.n_FS], 2*y[i,p] <= x[i,fInd[p]]+x[i,fIndFirst[p]])
+				JuMP.@constraint(m,  [i = 1:ATAmodel.settings.n_FS], y[i,p] >= x[i,fInd[p]]+x[i,fIndFirst[p]]-1)
 			end
 		else
 			#no overlap
 			for p=1:nPairs
-				for i in 1:ATAmodel.settings.nFS
+				for i in 1:ATAmodel.settings.n_FS
 					JuMP.@constraint(m, x[i,fInd[p]]+x[i,fIndFirst[p]]<=1)
 				end
 			end
@@ -218,11 +218,11 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 		if size(ICF_new[t],1) > 0
 			for k=1:size(ICF_new,1)
 				if ATAmodel.constraints[t].expected_score.min[k] > 0
-					JuMP.@constraint(m, sum(x[i,t] * round(ICF_new[t][k, i]; digits = 3) for i = 1:ATAmodel.settings.nFS) >= round(ATAmodel.constraints[t].expected_score.min[k] * ATAmodel.constraints[t].length_min; digits = 3))
+					JuMP.@constraint(m, sum(x[i,t] * round(ICF_new[t][k, i]; digits = 3) for i = 1:ATAmodel.settings.n_FS) >= round(ATAmodel.constraints[t].expected_score.min[k] * ATAmodel.constraints[t].length_min; digits = 3))
 					c+=1
 				end
 				if ATAmodel.constraints[t].expected_score.max[k] < 1
-					JuMP.@constraint(m, sum(x[i,t] * round(ICF_new[t][k, i]; digits = 3) for i = 1:ATAmodel.settings.nFS)  <= round(ATAmodel.constraints[t].expected_score.max[k] * ATAmodel.constraints[t].length_max; digits = 3))
+					JuMP.@constraint(m, sum(x[i,t] * round(ICF_new[t][k, i]; digits = 3) for i = 1:ATAmodel.settings.n_FS)  <= round(ATAmodel.constraints[t].expected_score.max[k] * ATAmodel.constraints[t].length_max; digits = 3))
 					c+=1
 				end
 			end
@@ -233,7 +233,7 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 	for t=1:ATAmodel.settings.T
 		if size(ATAmodel.constraints[t].constr_A,1)>0
 			for constr=1:size(ATAmodel.constraints[t].constr_A,1)
-				JuMP.@constraint(m, sum(x[i,t]*ATAmodel.constraints[t].constr_A[constr,i] for i=1:ATAmodel.settings.nFS)<=ATAmodel.constraints[t].constr_b[constr]+0) # z[c])
+				JuMP.@constraint(m, sum(x[i,t]*ATAmodel.constraints[t].constr_A[constr,i] for i=1:ATAmodel.settings.n_FS)<=ATAmodel.constraints[t].constr_b[constr]+0) # z[c])
 				c+=1
 			end
 		end
@@ -247,7 +247,7 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 		JuMP.@variable(m, w >= 0)
 		for t = 1:ATAmodel.settings.T
 			for k = 1:size(ATAmodel.obj.opt_pts[t], 1)
-				JuMP.@constraint(m, sum(round(IIF_new[t][k,i];digits = 4)*x[i, t] for i = 1:ATAmodel.settings.nFS) >= w)
+				JuMP.@constraint(m, sum(round(IIF_new[t][k,i];digits = 4)*x[i, t] for i = 1:ATAmodel.settings.n_FS) >= w)
 			end
 		end
 		JuMP.@objective(m, Min, (-w))# + (0.9 * sum(z[c] for c = 1:ncons)))

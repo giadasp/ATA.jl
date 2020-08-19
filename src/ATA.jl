@@ -75,7 +75,8 @@ function __init__()
 
 end
 
-export mean, StartATA, LoadSettings!, AddFriendSets!, AddEnemySets!, AddConstr!, AddOverlaps!, AddExpScore!, GroupByFriendSet!, AddObjFun!, Assemble!, PrintResults!, LoadDesign, RunATA! #mycopy,  fast_sort!, myqle#, optimize
+export mean, start_ATA, load_settings!, add_friends!, add_enemies!, add_constraints!, add_overlap!, add_exp_score!, group_by_friends!, add_obj_fun!, assemble!, print_results!, load_design, run_app! #mycopy,  fast_sort!, myqle#, optimize
 
 ATA
+
 end

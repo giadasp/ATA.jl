@@ -1,6 +1,6 @@
 #cc metho
 
-function StartATA()
+function start_ATA()
 	if "OPT" in readdir()
 		files = readdir("OPT")
 		if size(files, 1)>0
@@ -17,7 +17,7 @@ function StartATA()
 	return ATAmodel
 end
 
-function LoadSettings!(ATAmodel::Model; settings_file = "settingsATA.jl", bank_file = "bank.csv", bank_delim = ";")
+function load_settings!(ATAmodel::Model; settings_file = "settingsATA.jl", bank_file = "bank.csv", bank_delim = ";")
 	message = ["", ""]
 	if isfile(bank_file)
 		ATAmodel.settings.bank = CSV.read(bank_file, delim = bank_delim)
@@ -230,7 +230,7 @@ function LoadSettings!(ATAmodel::Model; settings_file = "settingsATA.jl", bank_f
 				message[2] = message[2] * "- categories for output loaded.\n"
 			end
 		end
-		message[2] = message[2] * string("Assemble ", ATAmodel.settings.T, " forms divided in ", ATAmodel.settings.n_groups, " groups.\n")
+		message[2] = message[2] * string("assemble ", ATAmodel.settings.T, " forms divided in ", ATAmodel.settings.n_groups, " groups.\n")
 		#update model
 		JLD2.@save "OPT/ATAmodel.jld2" ATAmodel
 
@@ -240,16 +240,16 @@ function LoadSettings!(ATAmodel::Model; settings_file = "settingsATA.jl", bank_f
 end
 
 
-function AddFriendSets!(ATAmodel::Model)
+function add_friends!(ATAmodel::Model)
 	message = ["", ""]
 	if !isfile("OPT/Settings.jl")
-		return  ["danger","Run LoadSettings!(model) before!"]
+		return  ["danger","Run load_settings!(model) before!"]
 	else
 		n_items = ATAmodel.settings.n_items
 		FriendSets = string.(unique(vcat([unique(skipmissing(ATAmodel.settings.bank[!, (ATAmodel.settings.FS.var[isv])])) for isv = 1:(size(ATAmodel.settings.FS.var, 1))]...)))
-		nFS = size(FriendSets, 1)
-		FScounts = zeros(Int, nFS)
-		FSItems = [zeros(Int, 0) for i = 1 : nFS]
+		n_FS = size(FriendSets, 1)
+		FS_counts = zeros(Int, n_FS)
+		FSItems = [zeros(Int, 0) for i = 1 : n_FS]
 		single_items = Vector{Union{Missing,String}}([missing for i = 1 : n_items])
 		for i = 1 : n_items
 			units = [ATAmodel.settings.bank[i, ATAmodel.settings.FS.var[isv]] for isv = 1:(size(ATAmodel.settings.FS.var, 1))]
@@ -267,7 +267,7 @@ function AddFriendSets!(ATAmodel::Model)
 				end
 				for f in fs
 					FSItems[f] = vcat(FSItems[f], i)
-					FScounts[f] += 1
+					FS_counts[f] += 1
 				end
 			end
 		end
@@ -276,21 +276,21 @@ function AddFriendSets!(ATAmodel::Model)
 		items_single = findall(.!ismissing.(ATAmodel.settings.bank[!,:SINGLE_FS]))
 		FSItems = vcat(FSItems, [[i] for i in items_single])
 		FriendSets = vcat(FriendSets, ATAmodel.settings.bank[items_single,:SINGLE_FS])
-		FScounts = vcat(FScounts, ones(Int64,size(items_single,1)))
-		nFS = size(FScounts,1)
+		FS_counts = vcat(FS_counts, ones(Int64,size(items_single,1)))
+		n_FS = size(FS_counts,1)
 		DelimitedFiles.writedlm("OPT/FriendSets.csv", FriendSets)
 
 		#update model
-		ATAmodel.settings.nFS = nFS
+		ATAmodel.settings.n_FS = n_FS
 		ATAmodel.settings.FS.sets = FriendSets
 		ATAmodel.settings.FS.items = FSItems
-		ATAmodel.settings.FS.counts = FScounts
+		ATAmodel.settings.FS.counts = FS_counts
 		JLD2.@save "OPT/ATAmodel.jld2" Model
-		return ["success", string("- ",nFS, " friend sets added.")]
+		return ["success", string("- ",n_FS, " friend sets added.")]
 	end
 end
 
-function AddEnemySets!(ATAmodel::Model)
+function add_enemies!(ATAmodel::Model)
 	bank = ATAmodel.settings.bank
 	n_items = ATAmodel.settings.n_items
 	if size(ATAmodel.constraints[1].constr_b, 1)>0
@@ -350,7 +350,7 @@ function AddEnemySets!(ATAmodel::Model)
 	end
 end
 
-function AddConstr!(ATAmodel::Model; constraints_file = "CategoricalConstraints.csv", constraints_delim = ";")
+function add_constraints!(ATAmodel::Model; constraints_file = "CategoricalConstraints.csv", constraints_delim = ";")
 	message=["", ""]
 	n_items = ATAmodel.settings.n_items
 	bank = ATAmodel.settings.bank
@@ -455,7 +455,7 @@ function AddConstr!(ATAmodel::Model; constraints_file = "CategoricalConstraints.
 	return message
 end
 
-function AddOverlaps!(ATAmodel::Model; overlap_file = "OverlapMatrix.csv", overlap_delim=";")
+function add_overlap!(ATAmodel::Model; overlap_file = "OverlapMatrix.csv", overlap_delim=";")
 	T = ATAmodel.settings.T
 	n_items = ATAmodel.settings.n_items
 	if !isfile(overlap_file)
@@ -479,7 +479,7 @@ function AddOverlaps!(ATAmodel::Model; overlap_file = "OverlapMatrix.csv", overl
 	end
 end
 
-function AddExpScore!(ATAmodel::Model)
+function add_exp_score!(ATAmodel::Model)
 	T = ATAmodel.settings.T
 	n_items = ATAmodel.settings.n_items
 	n_groups = ATAmodel.settings.n_groups
@@ -504,14 +504,14 @@ function AddExpScore!(ATAmodel::Model)
 	return ["success", "- Expected Score constrained."]
 end
 
-function GroupByFriendSet!(ATAmodel::Model) #last
+function group_by_friends!(ATAmodel::Model) #last
 	n_items = ATAmodel.settings.n_items
-	#only works for categorical variables and item use, all the other contraitns need expansion by FSitems
-	if ATAmodel.settings.nFS == 0
-		return ["danger", "No friend sets found, run AddFriendSets!(model) before."]
+	#only works for categorical variables and item use, all the other contraitns need expansion by FS_items
+	if ATAmodel.settings.n_FS == 0
+		return ["danger", "No friend sets found, run add_friends!(model) before."]
 	end
 	if size(ATAmodel.constraints[1].constr_b, 1) == 0
-		return ["danger", "No constraints to group, run AddConstr!(model) before."]
+		return ["danger", "No constraints to group, run add_constraints!(model) before."]
 	else
 		A = Vector{Matrix{Float64}}(undef, ATAmodel.settings.T)
 		b = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
@@ -522,11 +522,11 @@ function GroupByFriendSet!(ATAmodel::Model) #last
 				b[t] = ATAmodel.constraints[t].constr_b
 			end
 		end
-		nFS = ATAmodel.settings.nFS
+		n_FS = ATAmodel.settings.n_FS
 		for t = 1:ATAmodel.settings.T
-			A_new[t] = Matrix{Float64}(undef, size(A[t], 1), nFS)
+			A_new[t] = Matrix{Float64}(undef, size(A[t], 1), n_FS)
 		end
-		for fs = 1 : nFS
+		for fs = 1 : n_FS
 			for t = 1:ATAmodel.settings.T
 				A_new[t][:, fs] = sum(A[t][:, ATAmodel.settings.FS.items[fs]], dims = 2)
 			end
@@ -537,8 +537,8 @@ function GroupByFriendSet!(ATAmodel::Model) #last
 			ATAmodel.constraints[t].constr_A = A_new[t]
 		end
 		open("OPT/FSItems.jl", "w") do f
-			write(f, "FSItems = Vector{Vector{Int64}}(undef, $nFS)\n")
-			for fs = 1:nFS
+			write(f, "FSItems = Vector{Vector{Int64}}(undef, $n_FS)\n")
+			for fs = 1:n_FS
 				write(f, string("FSItems[$fs] =", ATAmodel.settings.FS.items[fs], "\n"))
 			end
 		end
@@ -549,10 +549,10 @@ function GroupByFriendSet!(ATAmodel::Model) #last
 		x_forced0 = ATAmodel.settings.forced0
 		x_forced0_new = Vector{Vector{Bool}}(undef, ATAmodel.settings.T)
 		for v = 1 : ATAmodel.settings.T
-			x_forced0_new[v] = fill(true, nFS)
+			x_forced0_new[v] = fill(true, n_FS)
 			for i = 1:ATAmodel.settings.n_items
 				if x_forced0[v][i] == false
-					for fs = 1:nFS
+					for fs = 1:n_FS
 						if any(i .== ATAmodel.settings.FS.items[fs])
 							x_forced0_new[v][fs] = false
 						end
@@ -566,9 +566,9 @@ function GroupByFriendSet!(ATAmodel::Model) #last
 		#item use
 		item_use_min = ATAmodel.IU.min
 		item_use_max = ATAmodel.IU.max
-		item_use_min_new = zeros(Int, nFS)
-		item_use_max_new = zeros(Int, nFS)
-		for fs = 1:nFS
+		item_use_min_new = zeros(Int, n_FS)
+		item_use_max_new = zeros(Int, n_FS)
+		for fs = 1:n_FS
 			item_use_min_new[fs] = Int(maximum(ATAmodel.IU.min[ATAmodel.settings.FS.items[fs]]))
 			item_use_max_new[fs] = Int(minimum(ATAmodel.IU.max[ATAmodel.settings.FS.items[fs]]))
 		end
@@ -581,11 +581,11 @@ function GroupByFriendSet!(ATAmodel::Model) #last
 			write(f, "item_use_min = $item_use_min_new\n\n")
 			write(f, "item_use_max = $item_use_max_new\n\n")
 		end
-		return ["success", string("- Grouped in ", nFS, " Friend sets")]
+		return ["success", string("- Grouped in ", n_FS, " Friend sets")]
 	end
 end
 
-function AddObjFun!(ATAmodel::Model)
+function add_obj_fun!(ATAmodel::Model)
 	message = ["",""]
 	T = ATAmodel.settings.T
 	n_items = ATAmodel.settings.n_items
@@ -648,6 +648,6 @@ function AddObjFun!(ATAmodel::Model)
 	return message
 end
 
-function LoadDesign!(design::Matrix{Any}, ATAmodel::Model)
+function load_design!(design::Matrix{Any}, ATAmodel::Model)
 	ATAmodel.output.design = design
 end

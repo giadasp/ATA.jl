@@ -1,84 +1,85 @@
-function eval_overlapv(x_v::Vector{Float64}, x::Matrix{Float64}, FScounts::Vector{Int64}, ol_max_v::Vector{Float64}, v::Int64)#idx_v::Vector{Int64}, idxnotv::Vector{Vector{Int64}}) #x = I*T , f1 = idx[f1] and f2 = idx[f2]
-	x_v = x_v.*FScounts
-	cons = LinearAlgebra.BLAS.gemv('T', x, x_v)-ol_max_v
+function eval_overlap_v(xᵥ::Vector{Float64}, x::Matrix{Float64}, FS_counts::Vector{Int64}, ol_maxᵥ::Vector{Float64}, v::Int64)
+	xᵥ = xᵥ .* FS_counts
+	cons = LinearAlgebra.BLAS.gemv('T', x, xᵥ) - ol_maxᵥ
 	cons[v] = 0
-	# for testnotv = 1:Tminus1
-	# 	cons[testnotv] = LinearAlgebra.dot(x_v, x[idxnotv[testnotv]])-ol_max_v[testnotv]#x[idx_v]'*(FScounts.*x[idxnotv[testnotv]])-ol_max_v[testnotv] #	cons[testnotv] = ((x[idx_v])'*(FScounts.*x[idxnotv[testnotv]]))-ol_max_v[testnotv]
-	# end
-	return sum(cons[cons.>0])
+	return sum(cons[cons .> 0])
 end
 
-function eval_overlap(x::Matrix{Float64}, FScounts::Matrix{Float64}, ol_max::Matrix{Float64}, T::Int64, ol2::Vector{Float64})
-	FScounts = FScounts.*x
-	ol = gemmblas(x, FScounts, ol_max)
+function eval_overlap(x::Matrix{Float64}, FS_counts::Matrix{Float64}, ol_max::Matrix{Float64}, T::Int64, ol2::Vector{Float64})
+	FS_counts = FS_counts.*x
+	ol = gemmblas(x, FS_counts, ol_max)
 	for v2 = 1:T
-		ol_v = view(ol, : , v2)
-		ol_v[v2] = zero(Float64)
-		ol_v = ol_v[ol_v .> 0]
-		if size(ol_v, 1) == 0
+		olᵥ = view(ol, : , v2)
+		olᵥ[v2] = zero(Float64)
+		olᵥ = olᵥ[olᵥ .> 0]
+		if size(olᵥ, 1) == 0
 			ol2[v2] = 0
 		else
-			ol2[v2] = sum(ol_v)
+			ol2[v2] = sum(olᵥ)
 		end
 	end
 	return ol2::Vector{Float64}
 end
 
-function eval_TIF_CC_v(x_v::Vector{Float64}, IIF::Array{Float64, 3}; α = 0.1) # x = I
+function eval_TIF_CCᵥ(xᵥ::Vector{Float64}, IIF::Array{Float64, 3}; α = 0.1) # x = I
 	K, I, R = size(IIF)
 	alphaR = Int(ceil(R*(α)))
 	αQle = Inf
 	if K>1
 		for k = 1:K
-			αQle = min(αQle, sort(LinearAlgebra.BLAS.gemv('T', IIF[k, :, :], x_v))[alphaR])
+			αQle = min(αQle, sort(LinearAlgebra.BLAS.gemv('T', IIF[k, :, :], xᵥ))[alphaR])
 		end
 	else
-		αQle = sort(gemvblasT(IIF[1, :, :], x_v, R))[alphaR]
+		αQle = sort(gemvblasT(IIF[1, :, :], xᵥ, R))[alphaR]
 	end
 	return αQle
 end
 
-function eval_Exp_Score_v(x_v::Vector{Float64}, FSItems::Vector{Vector{Int64}}, ES::Array{Float64, 1}) #x = I
-	cons = LinearAlgebra.dot(ES, x_v)
-	return cons
+function eval_Exp_Scoreᵥ(x_Iᵥ::Vector{Float64}, ESᵥ::ES) #x = I
+	es = gemvblas(ESᵥ.val, x_Iᵥ, zeros(size(ESᵥ.val,1)),size(x_Iᵥ, 1)) / sum(x_Iᵥ)
+	es = vcat((es - ESᵥ.max)..., (- es + ESᵥ.min)...)
+	return es
 end
 
-function eval_TIF_MM_v(x_v::Vector{Float64}, IIF::Matrix{Float64}) # x = I
+function eval_TIF_MMᵥ(xᵥ::Vector{Float64}, IIF::Matrix{Float64}) # x = I
 	K, I = size(IIF)
 	if K>1
 		TIF = Inf
 		for k = 1:K
-			TIF = min(TIF, LinearAlgebra.dot(IIF[1, :], x_v))#IIF[k, :]'*x) #minimum for all thetasopt
+			TIF = min(TIF, LinearAlgebra.dot(IIF[1, :], xᵥ))#IIF[k, :]'*x) #minimum for all thetasopt
 		end
 	else
-		TIF = LinearAlgebra.BLAS.gemv('N', IIF, x_v)[1]#IIF[1, :]'*x
+		TIF = LinearAlgebra.BLAS.gemv('N', IIF, xᵥ)[1]#IIF[1, :]'*x
 	end
 	return TIF::Float64
 end
 
-function eval_IU(x::Matrix{Float64}, nFS::Int64, T::Int64) #x = I*T
-	ItemUse = x * ones(T)
-	return ItemUse
+# ! not used anymore, item use is evaluated item per item
+# function eval_IU(x::Matrix{Float64}, T::Int64) #x = I*T
+# 	ItemUse = x * ones(T)
+# 	return ItemUse
+# end
+
+function eval_cons(xᵥ::Vector{Float64}, Aᵥ::Matrix{Float64}, bᵥ::Vector{Float64})
+	cons = copy(bᵥ)
+	cons = gemvblas(Aᵥ, xᵥ, cons, size(xᵥ, 1))
+	return cons::Vector{Float64}
 end
 
-
-function check_feas(FS::FS, Consᵥ::Constraint, xᵥ::Vector{Float64}, nFS::Int64, n_items::Int64, v::Int64)
+function check_feas(FS::FS, Consᵥ::Constraint, xᵥ::Vector{Float64}, n_FS::Int64, n_items::Int64)
 	es = 0
 	cons = 0
-	if size(Consᵥ.constr_A, 1)>0
-		cons = copy(Consᵥ.constr_b)
-		cons = gemvblas(Consᵥ.constr_A, xᵥ, cons, size(xᵥ, 1))
+	if size(Consᵥ.constr_A, 1) > 0
+		cons = eval_cons(xᵥ, Consᵥ.constr_A, Consᵥ.constr_b)
 	end
-	if n_items>nFS
-		x_Iᵥ = FS_to_items(nFS, n_items, xᵥ, FS.items)
+	if n_items > n_FS
+		x_Iᵥ = FS_to_items(n_items, xᵥ, FS.items)
 	else
 		x_Iᵥ = copy(xᵥ)
 	end
 	if size(Consᵥ.expected_score.val, 1) > 0
-		es = gemvblas(Consᵥ.expected_score.val, x_Iᵥ, zeros(size(Consᵥ.expected_score.val,1)),size(x_Iᵥ, 1)) / sum(x_Iᵥ)
-		es = vcat((es - Consᵥ.expected_score.max)..., (- es + Consᵥ.expected_score.min)...)
+		cons = vcat(cons, eval_Exp_Scoreᵥ(x_Iᵥ, Consᵥ.expected_score))
 	end
-	cons = vcat(cons, es)#, 0.5 .*ol)
 	cons = cons[cons .> 0]
 	if size(cons, 1) > 0
 		cons = sum(cons)
@@ -88,22 +89,22 @@ function check_feas(FS::FS, Consᵥ::Constraint, xᵥ::Vector{Float64}, nFS::Int
 	return cons::Float64, x_Iᵥ::Vector{Float64}
 end
 
-function FS_to_items(nFS::Int64, n_items::Int64, xᵥ::Vector{Float64}, FSitems::Vector{Vector{Int64}})
+function FS_to_items(n_items::Int64, xᵥ::Vector{Float64}, FS_items::Vector{Vector{Int64}})
 	xᵥ_taken = findall(xᵥ .== one(Float64))
 	x_Iᵥ = zeros(Float64, n_items)
 	for i in xᵥ_taken
-		x_Iᵥ[FSitems[i]].= one(Float64)
+		x_Iᵥ[FS_items[i]] .= one(Float64)
 	end
 	return x_Iᵥ::Vector{Float64}
 end
 
 #warmup feasibility
-function fill_up(NH::Neighbourhood, v::Int64, IU::IU, FS::FS, constraints::Constraint, x_forced0ᵥ::Vector{Bool}, n_items::Int64, nFS::Int64, FScounts::Matrix{Float64}, ol_maxᵥ::Vector{Float64})
+function fill_up(NH::Neighbourhood, v::Int64, IU::IU, FS::FS, constraints::Constraint, x_forced0ᵥ::Vector{Bool}, n_items::Int64, n_FS::Int64, ol_maxᵥ::Vector{Float64})
 	f₀, infeas₀ = Inf, Inf
 	T = size(NH.x, 2)
 	x₀ = copy(NH.x)
 	xᵥ = x₀[:, v]
-	idxᵥ₂ = setdiff(collect(1:nFS), findall(xᵥ .== one(Float64))) #i₂ = 1, ..., I
+	idxᵥ₂ = setdiff(collect(1:n_FS), findall(xᵥ .== one(Float64))) #i₂ = 1, ..., I
 	#idxᵥ₂ = Random.shuffle!(idxᵥ₂) #removed
 	i⁺ = copy(idxᵥ₂[1])
 	iu⁺ = 0
@@ -121,8 +122,8 @@ function fill_up(NH::Neighbourhood, v::Int64, IU::IU, FS::FS, constraints::Const
 				iu = sum(iu)
 			end
 			xᵥ = copy(x₁[:, v])
-			infeas₁, x_Iᵥ = check_feas(FS, constraints, xᵥ, nFS, n_items, v)
-			ol = eval_overlapv(xᵥ, x₁, FS.counts, ol_maxᵥ, v)
+			infeas₁, x_Iᵥ = check_feas(FS, constraints, xᵥ, n_FS, n_items)
+			ol = eval_overlap_v(xᵥ, x₁, FS.counts, ol_maxᵥ, v)
 			f₁ = infeas₁ + iu + ol
 			if (f₁<f₀)
 				f₀, infeas₀ = copy(f₁), copy(infeas₁)
@@ -140,12 +141,12 @@ function fill_up(NH::Neighbourhood, v::Int64, IU::IU, FS::FS, constraints::Const
 end
 
 #warmup MAXIMIN
-function fill_up(NH::Neighbourhood, IIFv::Matrix{Float64}, opt_feas::Float64, v::Int64, IU::IU, FS::FS, constraints::Constraint, x_forced0ᵥ::Vector{Bool}, n_items::Int64, nFS::Int64, FScounts::Matrix{Float64}, ol_maxᵥ::Vector{Float64})
+function fill_up(NH::Neighbourhood, IIFᵥ::Matrix{Float64}, opt_feas::Float64, v::Int64, IU::IU, FS::FS, constraints::Constraint, x_forced0ᵥ::Vector{Bool}, n_items::Int64, n_FS::Int64, ol_maxᵥ::Vector{Float64})
 	f₀, TIF₀, infeas₀ = Inf, copy(NH.obj), Inf
 	T = size(NH.x, 2)
 	x₀ = copy(NH.x)
-	idxᵥ₂ = setdiff(collect(1:nFS), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
-	#idxᵥ₂ = Random.shuffle!(idxᵥ₂) #removed
+	idxᵥ₂ = setdiff(collect(1:n_FS), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
+	#idxᵥ₂ = Random.shuffle!(idxᵥ₂) # !removed
 	i⁺ = 1
 	iu₀ = sum(NH.x, dims = 2) - IU.max
 	ol₀ᵥ = 0
@@ -162,9 +163,9 @@ function fill_up(NH::Neighbourhood, IIFv::Matrix{Float64}, opt_feas::Float64, v:
 			else
 				iu = sum(iu)
 			end
-			infeas₁, x_Iᵥ = check_feas(FS, constraints, xᵥ, nFS, n_items, v)
-			TIF₁[v] = eval_TIF_MM_v(x_Iᵥ, IIFv)
-			ol = eval_overlapv(xᵥ, x₁, FS.counts, ol_maxᵥ, v)
+			infeas₁, x_Iᵥ = check_feas(FS, constraints, xᵥ, n_FS, n_items)
+			TIF₁[v] = eval_TIF_MMᵥ(x_Iᵥ, IIFᵥ)
+			ol = eval_overlap_v(xᵥ, x₁, FS.counts, ol_maxᵥ, v)
 			f₁ = (1-opt_feas) * (infeas₁+iu+ol) - opt_feas * minimum(TIF₁)
 			if (f₁<f₀)
 				i⁺ = copy(i₂)
@@ -183,12 +184,12 @@ function fill_up(NH::Neighbourhood, IIFv::Matrix{Float64}, opt_feas::Float64, v:
 end
 
 #warmup MAXIMIN CC
-function fill_up(NH::Neighbourhood, IIFv::Array{Float64, 3}, α::Float64, opt_feas::Float64, v::Int64, IU::IU, FS::FS, constraints::Constraint, x_forced0ᵥ::Vector{Bool}, n_items::Int64, nFS::Int64, FScounts::Matrix{Float64}, ol_maxᵥ::Vector{Float64})
+function fill_up(NH::Neighbourhood, IIFᵥ::Array{Float64, 3}, α::Float64, opt_feas::Float64, v::Int64, IU::IU, FS::FS, constraints::Constraint, x_forced0ᵥ::Vector{Bool}, n_items::Int64, n_FS::Int64, ol_maxᵥ::Vector{Float64})
 	f₀, TIF₀, infeas₀ = Inf, copy(NH.obj), Inf
 	T = size(NH.x, 2)
 	x₀ = copy(NH.x)
-	idxᵥ₂ = setdiff(collect(1:nFS), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
-	#idxᵥ₂ = Random.shuffle!(idxᵥ₂) #removed
+	idxᵥ₂ = setdiff(collect(1:n_FS), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
+	#idxᵥ₂ = Random.shuffle!(idxᵥ₂) #! removed
 	i⁺ = 1
 	ol₀ᵥ = 0
 	iu₀ = sum(NH.x, dims = 2) - IU.max
@@ -205,9 +206,9 @@ function fill_up(NH::Neighbourhood, IIFv::Array{Float64, 3}, α::Float64, opt_fe
 			else
 				iu = sum(iu)
 			end
-			infeas₁, x_Iᵥ = check_feas(FS, constraints, xᵥ, nFS, n_items, v)
-			TIF₁[v] = eval_TIF_CC_v(x_Iᵥ, IIFv; α = α)
-			ol = eval_overlapv(xᵥ, x₁, FS.counts, ol_maxᵥ, v)
+			infeas₁, x_Iᵥ = check_feas(FS, constraints, xᵥ, n_FS, n_items)
+			TIF₁[v] = eval_TIF_CCᵥ(x_Iᵥ, IIFᵥ; α = α)
+			ol = eval_overlap_v(xᵥ, x₁, FS.counts, ol_maxᵥ, v)
 			f₁ = (1-opt_feas) * (infeas₁ + iu + ol) - opt_feas*minimum(TIF₁)
 			if (f₁ < f₀)
 				i⁺ = copy(i₂)
@@ -239,13 +240,13 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 	t = copy(start_temp)
 	T = ATAmodel.settings.T
 	n_items = ATAmodel.settings.n_items
-	nFS = ATAmodel.settings.nFS
-	FScounts = ATAmodel.settings.FS.counts * ones(Float64, T)'
+	n_FS = ATAmodel.settings.n_FS
+	FS_counts = ATAmodel.settings.FS.counts * ones(Float64, T)'
 	switches = 0
 	removes = 0
 	adds = 0
 	#warm up
-	println("fill-up starting")
+	println("Fill-up starting...")
 	round = 1
 
 	if n_fill>0
@@ -269,16 +270,16 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 				#try to add other items, the first time it goes over n_max it stops
 				if n_t<constraints.length_max
 					if opt_feas == 0 || fF == true
-						NH_add = fill_up(NH₁, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, nFS, FScounts, ATAmodel.settings.ol_max[:, v])
+						NH_add = fill_up(NH₁, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, n_FS,  ATAmodel.settings.ol_max[:, v])
 						NH_add.f = opt_feas * NH_add.f
 					else
 						if ATAmodel.settings.opt_type == "MAXIMIN"
-							NH_add = fill_up(NH₁, IIF[v], opt_feas, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, nFS, FScounts, ATAmodel.settings.ol_max[:, v])
+							NH_add = fill_up(NH₁, IIF[v], opt_feas, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, n_FS, ATAmodel.settings.ol_max[:, v])
 						elseif ATAmodel.settings.opt_type == "CC"
-							NH_add = fill_up(NH₁, IIF[v], ATAmodel.obj.aux_float, opt_feas, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, nFS, FScounts, ATAmodel.settings.ol_max[:, v])
+							NH_add = fill_up(NH₁, IIF[v], ATAmodel.obj.aux_float, opt_feas, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, n_FS, ATAmodel.settings.ol_max[:, v])
 						end
 					end
-					NH_add.ol = eval_overlap(NH_add.x, FScounts, ATAmodel.settings.ol_max, T, NH_add.ol)
+					NH_add.ol = eval_overlap(NH_add.x, FS_counts, ATAmodel.settings.ol_max, T, NH_add.ol)
 					Printf.@printf "."
 					nᵥ = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.FS.counts)
 					#println("length for test ", v, ": ", nᵥ)
@@ -299,7 +300,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 		NH₀.f = comp_f(NH₀, opt_feas)
 	end
 	NH⁺ = mycopy(NH₀, NH⁺)
-	println("end of fill-up")
+	println("End of fill-up")
 	if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
 		println("Feasible solution found in fill-up")
 		fF = false
@@ -386,7 +387,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 					#	taken = 1
 					#end
 					if (add_remove==1 && sum(NH₁.x[:, v] .* ATAmodel.settings.FS.counts) >= Constraintsᵥ.length_min) || (add_remove==2 && sum(NH₁.x[:, v] .* ATAmodel.settings.FS.counts) < Constraintsᵥ.length_max)
-						NH₁.infeas[v], x_Iᵥ = check_feas(ATAmodel.settings.FS, Constraintsᵥ, NH₁.x[:, v], nFS, n_items, v)
+						NH₁.infeas[v], x_Iᵥ = check_feas(ATAmodel.settings.FS, Constraintsᵥ, NH₁.x[:, v], n_FS, n_items)
 						iu = sum(NH₁.x, dims = 2) - ATAmodel.IU.max
 						iu = iu[iu .> 0]
 						if size(iu, 1) == 0
@@ -394,20 +395,20 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 						else
 							NH₁.iu = sum(iu)
 						end
-						NH₁.ol = eval_overlap(NH₁.x, FScounts, ATAmodel.settings.ol_max, T, NH₁.ol)
-						#NH₁.ol[v] = eval_overlapv(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxᵥ, v)
+						NH₁.ol = eval_overlap(NH₁.x, FS_counts, ATAmodel.settings.ol_max, T, NH₁.ol)
+						#NH₁.ol[v] = eval_overlap_v(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxᵥ, v)
 						if fF == false
 							if ATAmodel.settings.opt_type == "MAXIMIN"
-								NH₁.obj[v] = eval_TIF_MM_v(x_Iᵥ, IIFᵥ)
+								NH₁.obj[v] = eval_TIF_MMᵥ(x_Iᵥ, IIFᵥ)
 							elseif ATAmodel.settings.opt_type == "CC"
-								NH₁.obj[v] = eval_TIF_CC_v(x_Iᵥ, IIFᵥ; α = ATAmodel.obj.aux_float)
+								NH₁.obj[v] = eval_TIF_CCᵥ(x_Iᵥ, IIFᵥ; α = ATAmodel.obj.aux_float)
 							end
 						end
 						NH₁.f = comp_f(NH₁, opt_feas)
 						f_evals+= 1
 						if (NH₁.f <= NH₀.f)
 							#switch item
-							#NH₀.ol = eval_overlap(NH₀.x, FScounts, ATAmodel.settings.ol_max, T, NH₀.ol)
+							#NH₀.ol = eval_overlap(NH₀.x, FS_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
 							#NH₀.f = comp_f(NH₀, opt_feas)
 							NH₀ = mycopy(NH₁, NH₀)
 							# println("better to remove, new f₀ = ", NH₀.f)
@@ -429,7 +430,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 								#remove
 								#exit = 1
 								NH₀ = mycopy(NH₁, NH₀)
-								#NH₀.ol = eval_overlap(NH₀.x, FScounts, ATAmodel.settings.ol_max, T, NH₀.ol)
+								#NH₀.ol = eval_overlap(NH₀.x, FS_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
 								#NH₀.f = comp_f(NH₀, opt_feas)
 								if verbosity == 2
 									println("SA: f₀ = ", NH₀.f, ", t = ", v)
@@ -461,21 +462,21 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 							else
 								NH₁.iu = sum(iu)
 							end
-							NH₁.infeas[v], x_Iᵥ = check_feas(ATAmodel.settings.FS, Constraintsᵥ, NH₁.x[:, v], nFS, n_items, v)
+							NH₁.infeas[v], x_Iᵥ = check_feas(ATAmodel.settings.FS, Constraintsᵥ, NH₁.x[:, v], n_FS, n_items)
 							if fF == false
 								if ATAmodel.settings.opt_type == "MAXIMIN"
-									NH₁.obj[v] = eval_TIF_MM_v(x_Iᵥ, IIFᵥ)
+									NH₁.obj[v] = eval_TIF_MMᵥ(x_Iᵥ, IIFᵥ)
 								elseif ATAmodel.settings.opt_type == "CC"
-									NH₁.obj[v] = eval_TIF_CC_v(x_Iᵥ, IIFᵥ; α = ATAmodel.obj.aux_float)
+									NH₁.obj[v] = eval_TIF_CCᵥ(x_Iᵥ, IIFᵥ; α = ATAmodel.obj.aux_float)
 								end
 							end
-							NH₁.ol = eval_overlap(NH₁.x, FScounts, ATAmodel.settings.ol_max, T, NH₁.ol)
-							#NH₁.ol[v] = eval_overlapv(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxᵥ, v)
+							NH₁.ol = eval_overlap(NH₁.x, FS_counts, ATAmodel.settings.ol_max, T, NH₁.ol)
+							#NH₁.ol[v] = eval_overlap_v(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxᵥ, v)
 							NH₁.f = comp_f(NH₁, opt_feas)
 							if (NH₁.f <= NH₀.f)
 								#switch item
 								#NH₀ = mycopy(NH₁, NH₀)
-								# NH₀.ol = eval_overlap(NH₀.x, FScounts, ATAmodel.settings.ol_max, T, NH₀.ol)
+								# NH₀.ol = eval_overlap(NH₀.x, FS_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
 								# NH₀.f = comp_f(NH₀, opt_feas)
 								NH₀ = mycopy(NH₁, NH₀)
 								# println("better to switch, new f₀ = ", NH₀.f)
@@ -496,7 +497,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 								if (rand() < p)
 									#remove
 									NH₀ = mycopy(NH₁, NH₀)
-									# NH₀.ol = eval_overlap(NH₀.x, FScounts, ATAmodel.settings.ol_max, T, NH₀.ol)
+									# NH₀.ol = eval_overlap(NH₀.x, FS_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
 									# NH₀.f = comp_f(NH₀, opt_feas)
 									if verbosity == 2
 										println("SA: f₀ = ", NH₀.f, ", t = ", v)
@@ -514,11 +515,11 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 		if sum(NH₀.infeas + NH₀.ol) + NH₀.iu <= 0 && fF == true
 			fF = false
 			for v = 1:T
-				x_Iᵥ = FS_to_items(ATAmodel.settings.nFS, ATAmodel.settings.n_items, NH₀.x[:, v], ATAmodel.settings.FS.items)
+				x_Iᵥ = FS_to_items(ATAmodel.settings.n_items, NH₀.x[:, v], ATAmodel.settings.FS.items)
 				if ATAmodel.settings.opt_type == "MAXIMIN"
-					NH₀.obj[v] = eval_TIF_MM_v(x_Iᵥ, IIF[v])
+					NH₀.obj[v] = eval_TIF_MMᵥ(x_Iᵥ, IIF[v])
 				elseif ATAmodel.settings.opt_type == "CC"
-					NH₀.obj[v] = eval_TIF_CC_v(x_Iᵥ, IIF[v]; α = ATAmodel.obj.aux_float)
+					NH₀.obj[v] = eval_TIF_CCᵥ(x_Iᵥ, IIF[v]; α = ATAmodel.obj.aux_float)
 				end
 			end
 			NH₀.f = comp_f(NH₀, opt_feas)
@@ -531,7 +532,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 			Printf.@printf("	%16.10f", convergence)
 		end
 		#println("convergence is ", convergence)
-		#how many equal f₀ in the last iterations?
+		# ? how many are equal f₀ in the last iterations?
 		if (f_star[2] == f_star[1] && convergence == conv_max) || time() - start_time>= max_time
 			coverage_ok = 1
 			#t += 1
@@ -562,18 +563,18 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 	NH₁ = mycopy(NH_start, NH₁)
 	NH₀ = Neighbourhood()
 	NH⁺ = Neighbourhood()
-	f_star = ones(2).*Inf
+	f_star = ones(2) .* Inf
 	f_evals = 0
 	t = copy(start_temp)
 	T = ATAmodel.settings.T
 	n_items = ATAmodel.settings.n_items
-	nFS = ATAmodel.settings.nFS
-	FScounts = ATAmodel.settings.FS.counts*ones(Float64, T)'
-	#warm up
-	println("Fill-up starting")
+	n_FS = ATAmodel.settings.n_FS
+	FS_counts = ATAmodel.settings.FS.counts * ones(Float64, T)'
+	#Fill up
+	println("Fill-up starting...")
 	round = 1
 
-	if n_fill>0
+	if n_fill > 0
 		for round = 1:n_fill
 			NH₁ = mycopy(NH_start, NH₁)
 			warmup = fill(true, T)
@@ -595,14 +596,14 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 				#try to add other items, the first time it goes over n_max it stops
 				if n_t<constraints.length_max
 					if opt_feas == 0 || fF == true
-						NH_add = fill_up(NH₁, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, nFS, FScounts, ATAmodel.settings.ol_max[:, v])
+						NH_add = fill_up(NH₁, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, n_FS, FS_counts, ATAmodel.settings.ol_max[:, v])
 						NH_add.f = opt_feas * NH_add.f
 					else
 						if ATAmodel.settings.opt_type == "MAXIMIN"
-							NH_add = fill_up(NH₁, IIF[v], opt_feas, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, nFS, FScounts, ATAmodel.settings.ol_max[:, v])
+							NH_add = fill_up(NH₁, IIF[v], opt_feas, v, ATAmodel.IU, ATAmodel.settings.FS, constraints, ATAmodel.settings.forced0[v], n_items, n_FS, FS_counts, ATAmodel.settings.ol_max[:, v])
 						end
 					end
-					NH_add.ol = eval_overlap(NH_add.x, FScounts, ATAmodel.settings.ol_max, T, NH_add.ol)
+					NH_add.ol = eval_overlap(NH_add.x, FS_counts, ATAmodel.settings.ol_max, T, NH_add.ol)
 					Printf.@printf "."
 					nᵥ = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.FS.counts)
 					#println("length for test ", v, ": ", nᵥ)
@@ -624,8 +625,8 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 		NH₀.f = comp_f(NH₀, opt_feas)
 	end
 	NH⁺ = mycopy(NH₀, NH⁺)
-	println("end of fill-up")
-	if sum(NH₀.infeas+NH₀.ol)+NH₀.iu == 0
+	println("End of fill-up")
+	if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
 		println("Feasible solution found in fill-up")
 		fF = false
 	else
@@ -635,7 +636,6 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 	println("infeas = ", NH⁺.infeas)
 	println("ol = ", NH⁺.ol)
 	println("iu = ", NH⁺.iu)
-	# statistics to repogeom_temp at each temp change, set back to zero
 	coverage_ok = 0
 	if n_test_sample > T
 		n_test_sample = T
@@ -706,7 +706,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 				#	taken = 1
 				#end
 				if sum(NH₁.x[:, v].*ATAmodel.settings.FS.counts)>= Constraintsᵥ.length_min
-					NH₁.infeas[v], x_Iᵥ = check_feas(ATAmodel.settings.FS, Constraintsᵥ, NH₁.x[:, v], nFS, n_items, v)
+					NH₁.infeas[v], x_Iᵥ = check_feas(ATAmodel.settings.FS, Constraintsᵥ, NH₁.x[:, v], n_FS, n_items)
 					iu = sum(NH₁.x, dims = 2) - ATAmodel.IU.max
 					iu = iu[iu .> 0]
 					if size(iu, 1) == 0
@@ -714,18 +714,18 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 					else
 						NH₁.iu = sum(iu)
 					end
-					NH₁.ol = eval_overlap(NH₁.x, FScounts, ATAmodel.settings.ol_max, T, NH₁.ol)
-					#NH₁.ol[v] = eval_overlapv(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxᵥ, v)
+					NH₁.ol = eval_overlap(NH₁.x, FS_counts, ATAmodel.settings.ol_max, T, NH₁.ol)
+					#NH₁.ol[v] = eval_overlap_v(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxᵥ, v)
 					if fF == false
 						if ATAmodel.settings.opt_type == "MAXIMIN"
-							NH₁.obj[v] = eval_TIF_MM_v(x_Iᵥ, IIFᵥ)
+							NH₁.obj[v] = eval_TIF_MMᵥ(x_Iᵥ, IIFᵥ)
 						end
 					end
 					NH₁.f = comp_f(NH₁, opt_feas)
 					f_evals+= 1
 					if (NH₁.f <= NH₀.f)
 						#switch item
-						#NH₀.ol = eval_overlap(NH₀.x, FScounts, ATAmodel.settings.ol_max, T, NH₀.ol)
+						#NH₀.ol = eval_overlap(NH₀.x, FS_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
 						#NH₀.f = comp_f(NH₀, opt_feas)
 						NH₀ = mycopy(NH₁, NH₀)
 						# println("better to remove, new f₀ = ", NH₀.f)
@@ -746,7 +746,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 							#remove
 							#exit = 1
 							NH₀ = mycopy(NH₁, NH₀)
-							#NH₀.ol = eval_overlap(NH₀.x, FScounts, ATAmodel.settings.ol_max, T, NH₀.ol)
+							#NH₀.ol = eval_overlap(NH₀.x, FS_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
 							#NH₀.f = comp_f(NH₀, opt_feas)
 							if verbosity == 2
 								println("SA: f₀ = ", NH₀.f, ", t = ", v)
@@ -779,19 +779,19 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 						else
 							NH₁.iu = sum(iu)
 						end
-						NH₁.infeas[v], x_Iᵥ = check_feas(ATAmodel.settings.FS, Constraintsᵥ, NH₁.x[:, v], nFS, n_items, v)
+						NH₁.infeas[v], x_Iᵥ = check_feas(ATAmodel.settings.FS, Constraintsᵥ, NH₁.x[:, v], n_FS, n_items)
 						if fF == false
 							if ATAmodel.settings.opt_type == "MAXIMIN"
-								NH₁.obj[v] = eval_TIF_MM_v(x_Iᵥ, IIFᵥ)
+								NH₁.obj[v] = eval_TIF_MMᵥ(x_Iᵥ, IIFᵥ)
 							end
 						end
-						NH₁.ol = eval_overlap(NH₁.x, FScounts, ATAmodel.settings.ol_max, T, NH₁.ol)
-						#NH₁.ol[v] = eval_overlapv(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxᵥ, v)
+						NH₁.ol = eval_overlap(NH₁.x, FS_counts, ATAmodel.settings.ol_max, T, NH₁.ol)
+						#NH₁.ol[v] = eval_overlap_v(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxᵥ, v)
 						NH₁.f = comp_f(NH₁, opt_feas)
 						if (NH₁.f <= NH₀.f)
 							#switch item
 							#NH₀ = mycopy(NH₁, NH₀)
-							# NH₀.ol = eval_overlap(NH₀.x, FScounts, ATAmodel.settings.ol_max, T, NH₀.ol)
+							# NH₀.ol = eval_overlap(NH₀.x, FS_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
 							# NH₀.f = comp_f(NH₀, opt_feas)
 							NH₀ = mycopy(NH₁, NH₀)
 							# println("better to switch, new f₀ = ", NH₀.f)
@@ -812,7 +812,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 							if (rand() < p)
 								#remove
 								NH₀ = mycopy(NH₁, NH₀)
-								# NH₀.ol = eval_overlap(NH₀.x, FScounts, ATAmodel.settings.ol_max, T, NH₀.ol)
+								# NH₀.ol = eval_overlap(NH₀.x, FS_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
 								# NH₀.f = comp_f(NH₀, opt_feas)
 								if verbosity == 2
 									println("SA: f₀ = ", NH₀.f, ", t = ", v)
@@ -829,9 +829,9 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 		if sum(NH₀.infeas+NH₀.ol)+NH₀.iu<= 0 && fF == true
 			fF = false
 			for v = 1:T
-				x_Iᵥ = FS_to_items(ATAmodel.settings.nFS, ATAmodel.settings.n_items, NH₀.x[:, v], ATAmodel.settings.FS.items)
+				x_Iᵥ = FS_to_items(ATAmodel.settings.n_items, NH₀.x[:, v], ATAmodel.settings.FS.items)
 				if ATAmodel.settings.opt_type == "MAXIMIN"
-					NH₀.obj[v] = eval_TIF_MM_v(x_Iᵥ, IIF[v])
+					NH₀.obj[v] = eval_TIF_MMᵥ(x_Iᵥ, IIF[v])
 				end
 			end
 			NH₀.f = comp_f(NH₀, opt_feas)

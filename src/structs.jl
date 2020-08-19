@@ -101,7 +101,7 @@ end
 
 mutable struct Settings
 	n_items::Int64
-	nFS::Int64
+	n_FS::Int64
 	bank::DataFrames.DataFrame
 	IRT::IRT
 	thetaBounds::Vector{Vector{Float64}}
@@ -113,7 +113,7 @@ mutable struct Settings
 	FS::FS #friend Sets
 	ES::ES #enemy Sets
 	ol_max::Matrix{Float64}
-	Settings(n_items, nFS, bank, IRT, thetaBounds, forced0, n_groups, T, Tg, opt_type, FS, ES, ol_max) = new(n_items, nFS, bank, IRT, thetaBounds, forced0, n_groups, T, Tg, opt_type, FS, ES, ol_max) #no pattern mode
+	Settings(n_items, n_FS, bank, IRT, thetaBounds, forced0, n_groups, T, Tg, opt_type, FS, ES, ol_max) = new(n_items, n_FS, bank, IRT, thetaBounds, forced0, n_groups, T, Tg, opt_type, FS, ES, ol_max) #no pattern mode
 	Settings() = new(0, 0, DataFrames.DataFrame(), IRT(), [[-6.0,6.0]], Vector{Vector{Bool}}(undef, 0), 1, 1, [1], "MAXIMIN", FS(), ES(), zeros(Int64, 0, 0))
 end
 

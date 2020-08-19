@@ -30,32 +30,32 @@ using Distributed #this is not needed if Julia has been run with numberOfCores>1
 #BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
 #for resetting the ATA process (Needed)
-ATAmodel = StartATA()
+ATAmodel = start_ATA()
 
 #Each of the following commands returns a string vector, the second element is a message describing the result.
 #1. Add file with custom settings (Needed)
-println(LoadSettings!(ATAmodel; settings_file = "settingsATA.jl", bank_file = "bank.csv", bank_delim = ";")[2])
+println(load_settings!(ATAmodel; settings_file = "settingsATA.jl", bank_file = "bank.csv", bank_delim = ";")[2])
 
 #2. Add friend set variables (Optional)
-println(AddFriendSets!(ATAmodel)[2])
+println(add_friends!(ATAmodel)[2])
 
 #3. Add enemy set variables (Optional)
-println(AddEnemySets!(ATAmodel)[2])
+println(add_enemies!(ATAmodel)[2])
 
 #4. Add categorical constraints (Optional)
-println(AddConstr!(ATAmodel; constraints_file = "constraints.csv", constraints_delim=";")[2])
+println(add_constraints!(ATAmodel; constraints_file = "constraints.csv", constraints_delim=";")[2])
 
 #5. Add overlap maxima (Optional)
-println(AddOverlaps!(ATAmodel; overlap_file = "Overlap Matrix.csv", overlap_delim=";")[2])
+println(add_overlap!(ATAmodel; overlap_file = "Overlap Matrix.csv", overlap_delim=";")[2])
 
 #6. Add expected score constraints (Optional)
-println(AddExpScore!(ATAmodel)[2])
+println(add_exp_score!(ATAmodel)[2])
 
-#7. Add overlap maxima (Optional, Needed if AddFriendSets!(model) hase been run)
-println(GroupByFriendSet!(ATAmodel)[2])
+#7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
+println(group_by_friends!(ATAmodel)[2])
 
 #8. Add objective function (Optional)
-println(AddObjFun!(ATAmodel)[2])
+println(add_obj_fun!(ATAmodel)[2])
 
 #Assembly settings
 
@@ -98,8 +98,8 @@ verbosity = 2 # 1 = minimal, 2 = detailed.
 
 #MILP (Look at test.jl for use MILP solvers)
 
-#9. Assemble
-Assemble!(ATAmodel;
+#9. assemble
+assemble!(ATAmodel;
     solver = solver,
     max_time = max_time,
     start_temp = start_temp,
@@ -121,7 +121,7 @@ Assemble!(ATAmodel;
 # A summary of the resulting tests is available in results_folder/Results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
-PrintResults(ATAmodel;
+print_results(ATAmodel;
 group_by_fs = true,
 plots_out = false,
 results_folder = "RESULTS")

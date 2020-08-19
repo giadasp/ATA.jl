@@ -1,4 +1,4 @@
-function RunATA!()
+function run_app!()
   global ATAmodel = Model()
   js_files = [
   Dict(
@@ -291,7 +291,7 @@ function RunATA!()
 
   ])
   ]),
-  DashCoreComponents.dcc_tab(label = "Assemble!", children = [
+  DashCoreComponents.dcc_tab(label = "assemble!", children = [
   DashHtmlComponents.html_div(className = "container-fluid", [
   DashHtmlComponents.html_div(className = "row m-3", [
   DashHtmlComponents.html_div(className = "col-md-12 align-self-center", [
@@ -475,7 +475,7 @@ function RunATA!()
   ]),
   ]),
   DashHtmlComponents.html_div(className = "row justify-content-center m-1", [
-  DashHtmlComponents.html_button("Assemble!"; id="assemble_btn", n_clicks=0, className = "btn btn-success")
+  DashHtmlComponents.html_button("assemble!"; id="assemble_btn", n_clicks=0, className = "btn btn-success")
   ])
   ])
   ])
@@ -544,7 +544,7 @@ function RunATA!()
         ,n_fill," "
         ,feas_nh," "
         ,opt_nh," ")
-        message = Assemble!(ATAmodel, solver = solver,
+        message = assemble!(ATAmodel, solver = solver,
         starting_design = starting_design,
         start_temp = Float64(start_temp),
         geom_temp = Float64(geom_temp),
@@ -562,10 +562,10 @@ function RunATA!()
         optimizer_constructor = optimizer_constructor #eval(Meta.parse(string(optimizer_constructor,".Optimizer")))
         )
         plots_out = (plots_out == "yes") ? true : false
-        if ATAmodel.settings.nFS!=ATAmodel.settings.n_items
-          PrintResults!(ATAmodel, group_by_fs = true, plots_out = plots_out, results_folder = results_folder)
+        if ATAmodel.settings.n_FS!=ATAmodel.settings.n_items
+          print_results!(ATAmodel, group_by_fs = true, plots_out = plots_out, results_folder = results_folder)
         else
-          PrintResults!(ATAmodel, results_folder = results_folder, plots_out = plots_out)
+          print_results!(ATAmodel, results_folder = results_folder, plots_out = plots_out)
         end
         output = read(string(results_folder,"/Results.txt"), String)
       catch e
@@ -585,7 +585,7 @@ function RunATA!()
     if n_clicks>0
       message=["success",""]
       try
-        message = LoadSettings!(ATAmodel; settings_file = settings_file, bank_file = bank_file, bank_delim = bank_delim)
+        message = load_settings!(ATAmodel; settings_file = settings_file, bank_file = bank_file, bank_delim = bank_delim)
       catch e
         message[1] = "danger"
         message[2] = sprint(showerror,e)
@@ -602,7 +602,7 @@ function RunATA!()
     if n_click_state > 0
       message=["success",""]
       try
-        message = AddFriendSets!(ATAmodel)
+        message = add_friends!(ATAmodel)
       catch e
         message[1] = "danger"
         message[2] = sprint(showerror,e)
@@ -617,7 +617,7 @@ function RunATA!()
     if n_click_state > 0
       message=["success",""]
       try
-        message = AddEnemySets!(ATAmodel)
+        message = add_enemies!(ATAmodel)
       catch e
         message[1] = "danger"
         message[2] = sprint(showerror,e)
@@ -632,7 +632,7 @@ function RunATA!()
     if n_clicks > 0
       message=["success",""]
       try
-        message = AddConstr!(ATAmodel; constraints_file = constraints_file, constraints_delim = constraints_delim)
+        message = add_constraints!(ATAmodel; constraints_file = constraints_file, constraints_delim = constraints_delim)
       catch e
         message[1] = "danger"
         message[2] = sprint(showerror,e)
@@ -648,7 +648,7 @@ function RunATA!()
     if n_clicks > 0
       message=["success",""]
       try
-        message = AddOverlaps!(ATAmodel; overlap_file = ol_file, overlap_delim = ol_delim)
+        message = add_overlap!(ATAmodel; overlap_file = ol_file, overlap_delim = ol_delim)
       catch e
         message[1] = "danger"
         message[2] = sprint(showerror,e)
@@ -664,7 +664,7 @@ function RunATA!()
     if n_clicks > 0
       message=["success",""]
       try
-        message = AddExpScore!(ATAmodel)
+        message = add_exp_score!(ATAmodel)
       catch e
         message[1] = "danger"
         message[2] = sprint(showerror,e)
@@ -679,7 +679,7 @@ function RunATA!()
     if n_clicks > 0
       message=["success",""]
       try
-        message = GroupByFriendSet!(ATAmodel)
+        message = group_by_friends!(ATAmodel)
       catch e
         message[1] = "danger"
         message[2] = sprint(showerror,e)
@@ -694,7 +694,7 @@ function RunATA!()
     if n_clicks > 0
       message=["success",""]
       try
-        message = AddObjFun!(ATAmodel)
+        message = add_obj_fun!(ATAmodel)
       catch e
         message[1] = "danger"
         message[2] = sprint(showerror,e)
@@ -710,7 +710,7 @@ function RunATA!()
       message = ""
       try
         cd(folder)
-        global ATAmodel = StartATA()
+        global ATAmodel = start_ATA()
       catch e
         message = sprint(showerror,e)
       end
