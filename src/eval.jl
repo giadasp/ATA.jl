@@ -175,7 +175,7 @@ function WarmUp(NH::Neighbourhood, IIFv::Matrix{Float64}, opt_feas::Float64, v::
 			end
 		end
 	end
-	NH.ol[v] = copy(ol₀ᵥ)
+	NH.ol[v] = copy(ol₀ᵥ)#0
 	NH.infeas[v] = copy(infeas₀)
 	NH.iu = copy(iu⁺)
 	NH.obj = copy(TIF₀)
