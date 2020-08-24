@@ -1,87 +1,103 @@
-Inputs=InputSettings(
-#T
+Inputs = InputSettings(
+
+# 1. T
 [ 8 , 8 , 8 ] ,
-#n_items
+# 2. n_items
 Int(366) ,
-#n_groups
+# 3. n_groups
 Int(3) ,
-#groups
+# 4. groups
 [ "D" , "C" , "B" ] ,
+
 ####################################################################
 ########################## IRT #####################################
 ####################################################################
-#IRT_model
+
+# 5. IRT_model
 "1PL" ,
-#IRT_parameters
+# 6. IRT_parameters
 [ "b" ] ,
-#IRT_parametrization
+# 7. IRT_parametrization
 "atb" ,
-#IRT_D
+# 8. IRT_D
 1 ,
+
 ####################################################################
 ######################FRIENDS AND ENEMIES###########################
 ####################################################################
-#enemy_sets_var
+
+# 9. enemy_sets_var
 [ "ENEMY_SET" ] ,
-#friend_sets_var
+# 10. friend_sets_var
 [ "UNIT" ] ,
+
 ####################################################################
 ########################### ITEM USE  ##############################
 ####################################################################
-#item_use_min
+
+# 11. item_use_min
 fill( 0 , 366 ) ,
-#item_use_max
+# 12. item_use_max
 fill( 7 , 366 ) ,
+
 ####################################################################
 ########################## TEST LENGHT #############################
 ####################################################################
-#lenght_min
+
+# 13. lenght_min
 [ 36 , 36 , 36 ] ,
-#lenght_max
+# 14. lenght_max
 [ 40 , 40 , 40 ] ,
-#lenght_weight
+# 15. lenght_weight
 [ 1.0 , 1.0 , 1.0 ] ,
+
 ####################################################################
 ####################### EXPECTED SCORE #############################
 ####################################################################
-#expected_score_var
+
+# 16. expected_score_var
 [ "PROP_CORR" , "PROP_CORR" , "PROP_CORR" ] ,
-#expected_score_pts
-[ zeros(Float64,1) , zeros(Float64,1) , zeros(Float64,1) ] ,
-#expected_score_min
+# 17. expected_score_pts
+[ zeros(Float64, 1) , zeros(Float64, 1) , zeros(Float64, 1) ] ,
+# 18. expected_score_min
 [ [0.50] , [0.50] , [0.50] ] ,
-#expected_score_max
+# 19. expected_score_max
 [ [0.57] , [0.57] , [0.57] ] ,
+
 ####################################################################
 ###################### GENERIC CONSTRAINTS#################
 ####################################################################
-#mean_vars
-Vector{Vector{String}}(undef,0) ,  #(future)
-#mean_vars_min
-Vector{Vector{Float64}}(undef,0) , #(future)
-#mean_vars_max
-Vector{Vector{Float64}}(undef,0) , #(future)
-#sum_vars
+
+# 20. mean_vars
+Vector{Vector{String}}(undef,0) ,  # (future)
+# 21. mean_vars_min
+Vector{Vector{Float64}}(undef,0) , # (future)
+# 22. mean_vars_max
+Vector{Vector{Float64}}(undef,0) , # (future)
+# 23. sum_vars
 Vector{Vector{String}}(undef,0) ,
-#sum_vars_min
+# 24. sum_vars_min
 Vector{Vector{Float64}}(undef,0) ,
-#sum_vars_max
+# 25. sum_vars_max
 Vector{Vector{Float64}}(undef,0) ,
+
 ####################################################################
 ######################### OBJECTIVE ################################
 ####################################################################
-#opt_type
-"MAXIMIN" ,
-#opt_pts
+
+# 26. obj_type
+"MAXIMIN" , # "MAXIMIN", "CCMAXIMIN", "", "custom"
+# 27. obj_points
 [ [ -0.60 ] , [ 0.30 ] , [ 0.60 ] ] ,
-#aux_int
+# 28. obj_aux_int
 zero(Float64) ,
-#aux_float
+# 29. obj_aux_float
 0.05 ,
+
 ####################################################################
 ######################### OUTPUT ###################################
 ####################################################################
-#categories
+# 30. categories
 ["UNIT",
 		"CAT_1",
 		"CAT_2",
