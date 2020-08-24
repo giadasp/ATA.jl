@@ -7,7 +7,7 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 	end
 
 	n_items = ATAmodel.settings.n_items
-	if ATAmodel.settings.opt_type == "MAXIMIN"
+	if ATAmodel.obj.type == "MAXIMIN"
 		if isfile("OPT/IIF.jld2")
 			JLD2.@load "OPT/IIF.jld2" IIF
 			message *= "- Assembling tests with MAXIMIN..."
@@ -15,10 +15,10 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 			message *= "No IIF.jld2 file in OPT folder, Run add_obj_fun!() first!"
 			return message
 		end
-	elseif ATAmodel.settings.opt_type == "CC"
+	elseif ATAmodel.obj.type == "CC"
 		message *= "You must use the Simulated Annealing algorithm to assemble tests with CC objective function."
 		return message
-	elseif ATAmodel.settings.opt_type == ""
+	elseif ATAmodel.obj.type == ""
 		IIF = []
 		message *= "Assembling tests with NO objective function..."
 	end
@@ -32,9 +32,9 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 	opMatrix = ATAmodel.settings.ol_max
 	nPairs = 0
 	if size(opMatrix, 1) > 0
-		Pairs_t = combinations(ATAmodel.settings.T)
+		Pairs_t = _combinations(ATAmodel.settings.T)
 		nPairs_t = size(Pairs_t, 1)
-		Pairs = combinations(ATAmodel.settings.T)
+		Pairs = _combinations(ATAmodel.settings.T)
 		nPairs = size(Pairs, 1)
 		ol_max = Array{Int64,1}(undef, nPairs)
 		fInd = [Pairs[pair][1] for pair in 1:nPairs]
@@ -242,16 +242,16 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 
 	ncons=copy(c)-1
 
-	if ATAmodel.settings.opt_type == "MAXIMIN"
+	if ATAmodel.obj.type == "MAXIMIN"
 		#Objective bound
 		JuMP.@variable(m, w >= 0)
 		for t = 1:ATAmodel.settings.T
-			for k = 1:size(ATAmodel.obj.opt_pts[t], 1)
+			for k = 1:size(ATAmodel.obj.points[t], 1)
 				JuMP.@constraint(m, sum(round(IIF_new[t][k,i];digits = 4)*x[i, t] for i = 1:ATAmodel.settings.n_FS) >= w)
 			end
 		end
 		JuMP.@objective(m, Min, (-w))# + (0.9 * sum(z[c] for c = 1:ncons)))
-	elseif ATAmodel.settings.opt_type == ""
+	elseif ATAmodel.obj.type == ""
 		#JuMP.@objective(m, min, (sum(z[c] for c=1:ncons)))
 	end
 	JuMP.optimize!(m)

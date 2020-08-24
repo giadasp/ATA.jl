@@ -24,10 +24,10 @@ mutable struct InputSettings
 	sum_vars::Vector{Vector{String}}
 	sum_vars_min::Vector{Vector{Float64}}
 	sum_vars_max::Vector{Vector{Float64}}
-	opt_type::String
-	opt_pts::Vector{Vector{Float64}}
-	aux_int::Int64
-	aux_float::Float64
+	obj_type::String
+	obj_points::Vector{Vector{Float64}}
+	obj_aux_int::Int64
+	obj_aux_float::Float64
 	categories::Vector{String}
 	InputSettings(T, n_items, n_groups, groups,
 	IRT_model, IRT_parameters, IRT_parametrization, IRT_D,
@@ -37,7 +37,7 @@ mutable struct InputSettings
 	expected_score_var, expected_score_pts, expected_score_min,expected_score_max,
 	mean_vars, mean_vars_min, mean_vars_max,
 	sum_vars, sum_vars_min, sum_vars_max,
-	opt_type, opt_pts, aux_int, aux_float,
+	obj_type, obj_points, obj_aux_int, obj_aux_float, 
 	categories) = new(T, n_items, n_groups, groups,
 	IRT_model, IRT_parameters, IRT_parametrization, IRT_D,
 	enemy_sets_var, friend_sets_var,
@@ -46,7 +46,7 @@ mutable struct InputSettings
 	expected_score_var, expected_score_pts, expected_score_min, expected_score_max,
 	mean_vars, mean_vars_min, mean_vars_max,
 	sum_vars, sum_vars_min, sum_vars_max,
-	opt_type, opt_pts, aux_int, aux_float,
+	obj_type, obj_points, obj_aux_int, obj_aux_float,
 	categories)
 	InputSettings() = new(Int64[], zero(Int64), zero(Int64), String[],
 	"", String[], "at-b", 1.0,
@@ -77,16 +77,16 @@ mutable struct FS
 	sets::Vector{String}
 	counts::Vector{Int64}
 	items::Vector{Vector{Int64}}
-	FS(var,sets,counts,items) = new(var,sets,counts,items)
-	FS()=new(Symbol[],String[],Int64[],Vector{Vector{Int64}}(undef,0))
+	FS(var, sets, counts, items) = new(var, sets, counts, items)
+	FS() = new(Symbol[], String[], Int64[], Vector{Vector{Int64}}(undef, 0))
 end
 
 mutable struct ES
 	var::Vector{Symbol}
 	names::Vector{String}
 	sets::Vector{Vector{Int64}}
-	ES(var,names,sets) = new(var,names,sets)
-	ES()=new(Symbol[],String[],Vector{Vector{Int64}}(undef,0))
+	ES(var, names, sets) = new(var, names, sets)
+	ES() = new(Symbol[], String[], Vector{Vector{Int64}}(undef, 0))
 end
 
 mutable struct ExpectedScore
@@ -96,7 +96,7 @@ mutable struct ExpectedScore
 	max::Vector{Float64}
 	pts::Vector{Float64}
 	ExpectedScore(var, val, min, max, pts) = new(var, val, min, max, pts)
-	ExpectedScore() = new(Symbol(""), zeros(Float64,0 , 0), Float64[], Float64[], Float64[])
+	ExpectedScore() = new(Symbol(""), zeros(Float64, 0, 0), Float64[], Float64[], Float64[])
 end
 
 mutable struct Settings
@@ -104,17 +104,16 @@ mutable struct Settings
 	n_FS::Int64
 	bank::DataFrames.DataFrame
 	IRT::IRT
-	thetaBounds::Vector{Vector{Float64}}
+	theta_bounds::Vector{Vector{Float64}}
 	forced0::Vector{Vector{Bool}}
 	n_groups::Int64
 	T::Int64
 	Tg::Vector{Int64}
-	opt_type::String
-	FS::FS #friend Sets
-	ES::ES #enemy Sets
+	FS::FS # friend Sets
+	ES::ES # enemy Sets
 	ol_max::Matrix{Float64}
-	Settings(n_items, n_FS, bank, IRT, thetaBounds, forced0, n_groups, T, Tg, opt_type, FS, ES, ol_max) = new(n_items, n_FS, bank, IRT, thetaBounds, forced0, n_groups, T, Tg, opt_type, FS, ES, ol_max) #no pattern mode
-	Settings() = new(0, 0, DataFrames.DataFrame(), IRT(), [[-6.0,6.0]], Vector{Vector{Bool}}(undef, 0), 1, 1, [1], "MAXIMIN", FS(), ES(), zeros(Int64, 0, 0))
+	Settings(n_items, n_FS, bank, IRT, theta_bounds, forced0, n_groups, T, Tg,  FS, ES, ol_max) = new(n_items, n_FS, bank, IRT, theta_bounds, forced0, n_groups, T, Tg,  FS, ES, ol_max) # no pattern mode
+	Settings() = new(0, 0, DataFrames.DataFrame(), IRT(), [[-6.0,6.0]], Vector{Vector{Bool}}(undef, 0), 1, 1, [1], FS(), ES(), zeros(Int64, 0, 0))
 end
 
 mutable struct Neighbourhood
@@ -132,26 +131,30 @@ mutable struct Constraint
 	length_min::Int64
 	length_max::Int64
 	expected_score::ExpectedScore
-	mean_vars::Vector{Symbol} #constrain the mean to be
+	mean_vars::Vector{Symbol} # constrain the mean to be
 	mean_vars_min::Vector{Float64}
 	mean_vars_max::Vector{Float64}
-	sum_vars::Vector{Symbol}#constrain the sum to be
+	sum_vars::Vector{Symbol}# constrain the sum to be
 	sum_vars_min::Vector{Float64}
 	sum_vars_max::Vector{Float64}
 	constr_A::Matrix{Float64}
 	constr_b::Vector{Float64}
-	#ol_max::Matrix{Int64}
+	# ol_max::Matrix{Int64}
 	Constraint(length_min, length_max, expected_score, mean_vars, mean_vars_min, mean_vars_max, sum_vars, sum_vars_min, sum_vars_max, constr_A, constr_b) = new(length_min, length_max, expected_score, mean_vars, mean_vars_min, mean_vars_max, sum_vars, sum_vars_min, sum_vars_max, constr_A, constr_b)
 	Constraint() = new(zero(Int64), 10000000, ExpectedScore(), Vector{Symbol}(undef, 0), Vector{Float64}(undef, 0), Vector{Float64}(undef, 0), Vector{Symbol}(undef, 0), Vector{Float64}(undef, 0), Vector{Float64}(undef, 0), Matrix{Float64}(undef, 0, 0), Vector{Float64}(undef, 0))
 end
 
 mutable struct Obj
 	sense::String
-	opt_pts::Vector{Vector{Float64}}
+	type::String
+	points::Vector{Vector{Float64}}
 	aux_int::Int64
 	aux_float::Float64
-	obj(sense, opt_pts, aux_int, aux_float) = new(sense, opt_pts, aux_int, aux_float)
-	Obj() = new("max", Vector{Vector{Float64}}(undef, 0), zero(Int64), zero(Float64))
+	# must be test separable and accept x_Iₜ (design of test v, item level, not grouped by friend sets) as first argument and NamedTuple as second argument, it must return a Vector of Float64 with T elements.
+	fun::Function 
+	args::NamedTuple # ex: (a = [0, 0, 0], b = "hello") 
+	obj(sense, type, points, aux_int, aux_float, fun, args) = new(sense, type, points, aux_int, aux_float, fun, args)
+	Obj() = new("max", "MAXIMIN", Vector{Vector{Float64}}(undef, 0), zero(Int64), zero(Float64), () -> nothing,  (default_arg_1 = 0, default_arg_2 = 0))
 end
 
 mutable struct Output
@@ -164,7 +167,7 @@ mutable struct Output
 	TIF::Vector{Float64}
 	elapsed_time::Float64
 	neighbourhoods::Vector{Neighbourhood}
-	Output(categories, quantitative, summ_quan, design, f, feas, TIF, elapsed_time, neighbourhoods)=new(categories, quantitative, summ_quan, design, f, feas, TIF, elapsed_time, neighbourhoods)
+	Output(categories, quantitative, summ_quan, design, f, feas, TIF, elapsed_time, neighbourhoods) = new(categories, quantitative, summ_quan, design, f, feas, TIF, elapsed_time, neighbourhoods)
 	Output() = new(Vector{Vector{Symbol}}(undef, 0), Vector{Vector{Symbol}}(undef, 0), Function[], zeros(Float64, 0, 0), zero(Float64), Float64[], Float64[], zero(Float64), Neighbourhood[])
 end
 

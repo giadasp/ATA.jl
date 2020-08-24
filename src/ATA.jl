@@ -12,24 +12,13 @@ import LinearAlgebra
 import JLD2
 import StatsBase
 import LaTeXStrings.@L_str
-import Base.Threads
-import Dates
-import MathOptInterface
-import JuMP
-import Dash
-import DashHtmlComponents
-import DashCoreComponents
-import Plots
-import PGFPlotsX
 using Requires
 
 include("structs.jl")
 include("utils.jl")
 include("build.jl")
 include("opt.jl")
-include("plot.jl")
 include("out.jl")
-include("app.jl")
 
 function __init__()
 	@require Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76" begin
@@ -72,10 +61,18 @@ function __init__()
 			JuMP.set_optimizer(m, SCIP.Optimizer)
 		end
 	end
-
+	@require Plots="91a5bcdd-55d7-5caf-9e0b-520d859cae80" begin
+			@require PGFPlotsX = "8314cec4-20b6-5062-9cdb-752b83310925"	include("plot.jl")
+	end
+	@require Dash ="1b08a953-4be3-4667-9a23-3db579824955" begin
+		@require DashHtmlComponents ="1b08a953-4be3-4667-9a23-f6ba134464e5" begin
+			@require DashCoreComponents ="1b08a953-4be3-4667-9a23-e4a2b8b6b400" include("app.jl")
+		end
+	end
+	@require JuMP ="4076af6c-e467-56ae-b986-b466b2749572" include("jump.jl")
 end
 
-export mean, start_ATA, load_settings!, add_friends!, add_enemies!, add_constraints!, add_overlap!, add_exp_score!, group_by_friends!, add_obj_fun!, assemble!, print_results!, load_design, run_app! #mycopy,  fast_sort!, myqle#, optimize
+export mean, start_ATA, load_settings!, add_friends!, add_enemies!, add_constraints!, add_overlap!, add_exp_score!, group_by_friends!, add_obj_fun!, assemble!, print_results!, load_design, run_app!, item_info, item_char, resp_gen, student_likelihood, FS_to_items#_mycopy,  fast_sort!, _myqle#, optimize
 
 ATA
 

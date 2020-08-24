@@ -18,13 +18,13 @@ function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", p
 			n=n_items*T
 		end
 
-		if ATAmodel.settings.opt_type=="CC"
+		if ATAmodel.obj.type=="CC"
 			JLD2.@load "OPT/IIF_CC.jld2" IIF
 			JLD2.@load "OPT/ICF_CC.jld2" ICF
 			IIF_CC=copy(IIF)
 			ICF_CC=copy(ICF)
 		end
-		if ATAmodel.settings.opt_type=="MAXIMIN" || ATAmodel.settings.opt_type=="CC"
+		if ATAmodel.obj.type=="MAXIMIN" || ATAmodel.obj.type=="CC"
 			JLD2.@load "OPT/IIF.jld2" IIF
 			JLD2.@load "OPT/ICF.jld2" ICF
 		end
@@ -48,7 +48,7 @@ function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", p
 		end
 		#DelimitedFiles.writedlm(string(results_folder,"/olMatrixOUT.csv"),olMatrixOUT)
 		#TIF e ICF
-		if ATAmodel.settings.opt_type == "MAXIMIN" ||  ATAmodel.settings.opt_type == "CC"
+		if ATAmodel.obj.type == "MAXIMIN" ||  ATAmodel.obj.type == "CC"
 			if isfile("simPool.csv")
 				simPool = CSV.read("simPool.csv")
 			else
@@ -72,7 +72,7 @@ function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", p
 				design,
 				simPool = simPool,
 				results_folder = results_folder)
-				if ATAmodel.settings.opt_type == "CC"
+				if ATAmodel.obj.type == "CC"
 					PlotATA_CC!(ATAmodel, IIFf, ICFf, design,
 					simPool = simPool,
 					results_folder = results_folder)
@@ -80,7 +80,7 @@ function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", p
 			end
 		end
 		#save values
-		if ATAmodel.settings.opt_type=="CC"
+		if ATAmodel.obj.type=="CC"
 			min=Float64[]
 			First=Float64[]
 			Median=Float64[]
@@ -92,7 +92,7 @@ function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", p
 				True=Float64[]
 			end
 			Distributed.@sync for t=1:T
-				K=size(ATAmodel.obj.opt_pts[t],1)
+				K=size(ATAmodel.obj.points[t],1)
 				for k=1:K
 					IIF_t = (IIF_CC[t][k,:,:]'*design[:, t])
 					min = vcat(min, minimum(IIF_t))
@@ -104,7 +104,7 @@ function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", p
 					Estimated = vcat(Estimated, IIF[t][k,:]'*design[:,t] )
 					if isfile("simPool.csv")
 						True=vcat(True, item_info(simPool,
-						ATAmodel.obj.opt_pts[t][k],
+						ATAmodel.obj.points[t][k],
 						model = ATAmodel.settings.IRT.model)'*design[:,t])
 					end
 				end
@@ -125,11 +125,11 @@ function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", p
 				True = Float64[]
 			end
 			for t=1:T
-				K=size(ATAmodel.obj.opt_pts[t],1)
+				K=size(ATAmodel.obj.points[t],1)
 				for k=1:K
 					Estimated=vcat(Estimated,IIF[t][k,:]'*design[:,t])
 					if isfile("simPool.csv")
-						True = vcat(True, item_info(simPool, ATAmodel.obj.opt_pts[t][k], model = ATAmodel.settings.IRT.model)'*design[:,t])
+						True = vcat(True, item_info(simPool, ATAmodel.obj.points[t][k], model = ATAmodel.settings.IRT.model)'*design[:,t])
 					end
 				end
 			end

@@ -131,7 +131,7 @@ function load_settings!(ATAmodel::Model; settings_file = "settingsATA.jl", bank_
 					end
 				end
 			end
-			message[2] = message[2] * "- Expected score variable and points loaded.\n"
+			message[2] = message[2] * "- Expected score variable and obj_points loaded.\n"
 
 			if Inputs.expected_score_min != Float64[]
 				t1 = 1
@@ -200,23 +200,24 @@ function load_settings!(ATAmodel::Model; settings_file = "settingsATA.jl", bank_
 				end
 				message[2] = message[2] * "- Maximum item use constrained.\n"
 			end
-			if Inputs.opt_type != ""
-				ATAmodel.settings.opt_type = Inputs.opt_type
-				message[2] = message[2] * "- Optimization type loaded.\n"
+			if Inputs.obj_type != ""
+				ATAmodel.obj.type = Inputs.obj_type
+				ATAmodel.obj.aux_int = Inputs.obj_aux_int
+				ATAmodel.obj.aux_float = Inputs.obj_aux_float
+				message[2] = message[2] * "- Optimization type and objective function loaded.\n"
 			end
-			if size(Inputs.opt_pts, 1) > 0
-				ATAmodel.obj.opt_pts = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
+			if size(Inputs.obj_points, 1) > 0
+				ATAmodel.obj.points = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
 				t1 = 1
 				for g = 1:ATAmodel.settings.n_groups
 					for t = 1:ATAmodel.settings.Tg[g]
-						ATAmodel.obj.opt_pts[t1] = Inputs.opt_pts[g]
+						ATAmodel.obj.points[t1] = Inputs.obj_points[g]
 						t1+= 1
 					end
 				end
 				message[2] = message[2] *  "- Points to optimize loaded.\n"
 			end
-			ATAmodel.obj.aux_int = Inputs.aux_int
-			ATAmodel.obj.aux_float = Inputs.aux_float
+			
 			message[2] = message[2] * "- Auxiliars vars for optimization loaded.\n"
 			#fictiuos friendSets
 			ATAmodel.settings.FS.counts = ones(ATAmodel.settings.n_items)
@@ -589,25 +590,29 @@ function add_obj_fun!(ATAmodel::Model)
 	message = ["",""]
 	T = ATAmodel.settings.T
 	n_items = ATAmodel.settings.n_items
-	ThetasOpt = ATAmodel.obj.opt_pts
-	if ATAmodel.settings.opt_type == "MAXIMIN" || ATAmodel.settings.opt_type == "CC"
+	obj_points = ATAmodel.obj.points
+	if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+		IRT_parameters = ATAmodel.settings.IRT.parameters
+		IRT_model = ATAmodel.settings.IRT.model
+		IRT_D = ATAmodel.settings.IRT.D
+		IRT_parametrization = ATAmodel.settings.IRT.parametrization
 		IIF = Vector{Array{Float64, 2}}(undef, T)
 		ICF = Vector{Array{Float64, 2}}(undef, T)
 		K = zeros(Int, T)
 		for t = 1:T
-			K[t] = size(ThetasOpt[t], 1)
+			K[t] = size(obj_points[t], 1)
 			IIF[t] = zeros(K[t], n_items)
 			ICF[t] = zeros(K[t], n_items)
 			for k = 1:K[t]
-				IIF[t][k, :] = item_info(ATAmodel.settings.IRT.parameters, ThetasOpt[t][k], model = ATAmodel.settings.IRT.model, parametrization = ATAmodel.settings.IRT.parametrization, D = ATAmodel.settings.IRT.D)# K[t] x I
-				ICF[t][k, :] = item_char(ATAmodel.settings.IRT.parameters, ThetasOpt[t][k], model = ATAmodel.settings.IRT.model, parametrization = ATAmodel.settings.IRT.parametrization, D = ATAmodel.settings.IRT.D)[1][:,:,1] # K[t] x I
+				IIF[t][k, :] = item_info(IRT_parameters, [obj_points[t][k]], model = IRT_model, parametrization = IRT_parametrization, D = IRT_D)# K[t] x I
+				ICF[t][k, :] = item_char(IRT_parameters, [obj_points[t][k]], model = IRT_model, parametrization = IRT_parametrization, D = IRT_D)[1][:,:,1] # K[t] x I
 			end
 		end
 		JLD2.@save "OPT/IIF.jld2" IIF
 		if !isfile("OPT/ICF.jld2")
 			JLD2.@save "OPT/ICF.jld2" ICF
 		end
-		if ATAmodel.settings.opt_type == "CC"
+		if ATAmodel.obj.type == "CC"
 			R = ATAmodel.obj.aux_int
 			K = zeros(Int, T)
 			IIF = Vector{Array{Float64, 3}}(undef, T)
@@ -616,20 +621,20 @@ function add_obj_fun!(ATAmodel::Model)
 			BSa = Matrix(BSPar[2])[:, 2:end]
 			BSb = Matrix(BSPar[1])[:, 2:end]
 			for t = 1:T
-				K[t] = size(ThetasOpt[t], 1)
+				K[t] = size(obj_points[t], 1)
 				IIF[t] = zeros(K[t], n_items, R)
 				ICF[t] = zeros(K[t], n_items, R)
 				for r = 1:R
-					if ATAmodel.settings.IRT.model == "1PL"
+					if IRT_model == "1PL"
 						df = DataFrames.DataFrame(b = BSb[:, r]) #nqp values in interval\r\n",
-					elseif ATAmodel.settings.IRT.model == "2PL"
+					elseif IRT_model == "2PL"
 						df = DataFrames.DataFrame(a = BSa[:, r], b = BSb[:, r]) #nqp values in interval\r\n",
-					elseif ATAmodel.settings.IRT.model == "3PL"
+					elseif IRT_model == "3PL"
 						df = DataFrames.DataFrame(a = BSa[:, r], b = BSb[:, r], c = BSc[:, r])
 					end
 					for k = 1:K[t]
-						IIF[t][k, :, r] = item_info(df, ThetasOpt[t][k]; model = (ATAmodel.settings.IRT.model)) # K[t] x I x R
-						ICF[t][k, :, r] = item_char(df, ThetasOpt[t][k]; model = (ATAmodel.settings.IRT.model)) # K[t] x I x R
+						IIF[t][k, :, r] = item_info(df, obj_points[t][k]; model = IRT_model, parametrization = IRT_parametrization, D = IRT_D) # K[t] x I x R
+						ICF[t][k, :, r] = item_char(df, obj_points[t][k]; model = IRT_model, parametrization = IRT_parametrization, D = IRT_D) # K[t] x I x R
 					end
 				end
 			end
@@ -639,12 +644,13 @@ function add_obj_fun!(ATAmodel::Model)
 		else
 			message = ["success","- MAXIMIN objective function applied.\n"]
 		end
-	else
-		return 	["danger","- Only MAXIMIN and MAXIMIN CC are supported. \n"]
-	end
-	open("OPT/Settings.jl", "a") do f
+		open("OPT/Settings.jl", "a") do f
 		write(f, "K = $K\n\n")
 	end
+	elseif !(ATAmodel.obj.type == "custom" || ATAmodel.obj.type == "")
+		return 	["danger","- Only \"MAXIMIN\", \"CC\", \"\" (no objective) and \"custom\" are supported. \n"]
+	end
+	
 	return message
 end
 
