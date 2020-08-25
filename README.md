@@ -51,6 +51,6 @@ using ATA
 
 Play with the test files in folder "examples".
 
-Set all the specifications by modifying the files in "test" folder and run "examples/example.jl" following the manual in the comments.
+Set all the specifications by modifying the files in "examples" folder and run "example.jl" or "example with custom objective function.jl" following the manual in the comments.
 
 Distributed analysis of the neighbourhoods is available, look at "examples/parallelExample.jl".
