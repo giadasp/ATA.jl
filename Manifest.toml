@@ -139,30 +139,6 @@ git-tree-sha1 = "81685fee51fc5168898e3cbd8b0f01506cd9148e"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
 version = "0.5.4"
 
-[[Dash]]
-deps = ["CodecZlib", "DataStructures", "HTTP", "JSON", "JSON2", "LibGit2", "MD5", "MacroTools", "PlotlyBase", "Sockets", "Test", "UUIDs"]
-git-tree-sha1 = "4900d60a7f2161ff71d7ddee825966e35d8c16d0"
-repo-rev = "dev"
-repo-url = "https://github.com/plotly/Dash.jl.git"
-uuid = "1b08a953-4be3-4667-9a23-3db579824955"
-version = "0.1.0"
-
-[[DashCoreComponents]]
-deps = ["Dash"]
-git-tree-sha1 = "9b1686f7216acaace13539b36a032d6a5e765336"
-repo-rev = "jl"
-repo-url = "https://github.com/plotly/dash-core-components.git"
-uuid = "1b08a953-4be3-4667-9a23-f6ba134464e5"
-version = "1.4.0"
-
-[[DashHtmlComponents]]
-deps = ["Dash"]
-git-tree-sha1 = "1c78a8db0ceecc81bf2ea82ba14bfebc17c6c74b"
-repo-rev = "jl"
-repo-url = "https://github.com/plotly/dash-html-components.git"
-uuid = "1b08a953-4be3-4667-9a23-e4a2b8b6b400"
-version = "1.0.1"
-
 [[DataAPI]]
 git-tree-sha1 = "176e23402d80e7743fc26c19c681bfb11246af32"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
@@ -341,12 +317,6 @@ git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.0"
 
-[[JSON2]]
-deps = ["Dates", "Parsers", "Test"]
-git-tree-sha1 = "66397cc6c08922f98a28ab05a8d3002f9853b129"
-uuid = "2535ab7d-5cd8-5a07-80ac-9b1792aadce3"
-version = "0.3.2"
-
 [[JSONSchema]]
 deps = ["HTTP", "JSON", "ZipFile"]
 git-tree-sha1 = "2646fb3efdb60f35a8c053250a2647358ae0629f"
@@ -389,12 +359,6 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
-
-[[MD5]]
-deps = ["Random", "SHA"]
-git-tree-sha1 = "eeffe42284464c35a08026d23aa948421acf8923"
-uuid = "6ac74813-4b46-53a4-afec-0b5dc9d7885c"
-version = "0.2.1"
 
 [[MacroTools]]
 deps = ["Markdown", "Random"]
@@ -529,12 +493,6 @@ deps = ["ColorSchemes", "Colors", "Dates", "Printf", "Random", "Reexport", "Stat
 git-tree-sha1 = "e18e0e51ff07bf92bb7e06dcb9c082a4e125e20c"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 version = "1.0.5"
-
-[[PlotlyBase]]
-deps = ["Dates", "DelimitedFiles", "DocStringExtensions", "JSON", "LaTeXStrings", "Logging", "Requires", "Statistics", "UUIDs"]
-git-tree-sha1 = "c50438d8affbd77ebcb46f46e276cc66cabc61bd"
-uuid = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
-version = "0.3.1"
 
 [[Plots]]
 deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "GeometryTypes", "JSON", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
