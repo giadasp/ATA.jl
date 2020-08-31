@@ -5,15 +5,9 @@
 # cd("where your input files are")
 using ATA
 
-# for custom obj_fun:
+# for load data to input in custom obj_fun:
 using CSV
 using FileIO
-
-# For using the Dash APP:
-# run_app!()
-# Navigate with the browser to localhost:8080
-# Before running the app, if you want to use a MILP solver, remember to load it
-# (ex: using Cbc; run_app!()).
 
 # If you prefere to use Julia code:
 
