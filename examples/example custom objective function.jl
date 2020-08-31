@@ -5,7 +5,7 @@
 # cd("where your input files are")
 using ATA
 
-# for load data to input in custom obj_fun:
+# For load data to input in custom obj_fun:
 using CSV
 using FileIO
 
