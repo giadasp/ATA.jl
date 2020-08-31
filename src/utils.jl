@@ -339,7 +339,7 @@ function student_likelihood(f::Float64, r::Vector{Float64}, i_index::Vector{Int6
 end
 
 """
-	resp_gen(f::Vector{Float64}, pars::DataFrames.DataFrame, theta::Vector{Float64}, design::Matrix{Float64};
+	resp_gen(f, pars, theta, design)
 
 # Description
 
