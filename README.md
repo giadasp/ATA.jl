@@ -11,7 +11,7 @@ Interfaced with Dash or pure Julia code.
 3. Chance-constrained MAXIMIN TIF.
 
 ## Solvers:
-- for objectives 1 and 2: JuMP MILP solvers (see the list at https://jump.dev/JuMP.jl/v0.21.1/installation/). Follow tinstallation manuals for the solver you want to use. For open-source we suggest CBC or GLPK (default). For commercial we suggest Gurobi or CPLEX.
+- for objectives 1 and 2: JuMP MILP solvers (see the list at https://jump.dev/JuMP.jl/v0.21.1/installation/). Follow the installation manuals of the solver you want to use. For open-source we suggest CBC or GLPK (default). For commercial we suggest Gurobi or CPLEX.
 - for objectives 1, 2 and 3: Simulated Annealing solver, pure Julia ATA solver.
 
 ## constraints:
