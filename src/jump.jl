@@ -1,4 +1,4 @@
-function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0), optimizer_constructor = "GLPK", optimizer_attributes = [("tm_lim", 500000),("msg_lev", 3)], results_folder= "RESULTS")
+function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0), results_folder= "RESULTS", optimizer_constructor = "GLPK", optimizer_attributes = [("tm_lim", 500000),("msg_lev", 3)])
 	message = ""
 	if !(results_folder in readdir())
 		mkdir(results_folder)

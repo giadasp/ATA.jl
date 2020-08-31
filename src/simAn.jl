@@ -1,7 +1,7 @@
 include("eval.jl")
 
 # optimize with simulated annealing
-function siman!(ATAmodel::Model; starting_design=Matrix{Float64}(undef, 0, 0), start_temp=0.1, geom_temp=0.1, max_time=1000.00, results_folder="RESULTS", n_item_sample=1000, n_test_sample=2, conv_max=2, verbosity=2, opt_feas=0.0, n_fill=1 , feas_nh=0, opt_nh=5)
+function siman!(ATAmodel::Model; starting_design=Matrix{Float64}(undef, 0, 0), results_folder= "RESULTS", start_temp=0.1, geom_temp=0.1, max_time=1000.00, max_conv=2, feas_nh=0, opt_nh=5, n_item_sample=1000, n_test_sample=2, opt_feas=0.0, n_fill=1, verbosity=2)
 	message = ""
 	if !(results_folder in readdir())
 		mkdir(results_folder)
@@ -104,7 +104,7 @@ function siman!(ATAmodel::Model; starting_design=Matrix{Float64}(undef, 0, 0), s
 			# println("f was ", ATAmodel.output.neighbourhoods[NHs[p]].f)
 			NH_proc = Neighbourhood()
 			NH_proc = _mycopy(ATAmodel.output.neighbourhoods[NHs[p]], NH_proc)
-			NH_proc = analyse_NH(NH_proc, ATAmodel, IIF; fF=fF, n_fill=n_fill, opt_feas=opt_feas, conv_max=conv_max, start_temp=t, geom_temp=geom_temp, n_item_sample=n_item_sample, n_test_sample=n_test_sample, verbosity=verbosity, start_time=start_time, max_time=max_time)
+			NH_proc = analyse_NH(NH_proc, ATAmodel, IIF; fF=fF, n_fill=n_fill, opt_feas=opt_feas, max_conv=max_conv, start_temp=t, geom_temp=geom_temp, n_item_sample=n_item_sample, n_test_sample=n_test_sample, verbosity=verbosity, start_time=start_time, max_time=max_time)
 			open(string(results_folder, "/neigh_", nh_tot, "_x.csv"), "w") do io
 				DelimitedFiles.writedlm(io, NH_proc.x)
 			end

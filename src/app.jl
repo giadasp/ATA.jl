@@ -344,10 +344,10 @@ function run_app!()
   ]),
   DashHtmlComponents.html_div(className = "row m-1", [
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashHtmlComponents.html_label("Minimum convergence:")
+  DashHtmlComponents.html_label("Maximum convergence:")
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashCoreComponents.dcc_input(value=10,className="form-control", type="number", min=2, max=1000, step=1, id="conv_max_txt")
+  DashCoreComponents.dcc_input(value=10,className="form-control", type="number", min=2, max=1000, step=1, id="max_conv_txt")
 
   ]),
   ]),
@@ -509,7 +509,7 @@ function run_app!()
   Dash.State("max_time_txt","value"),
   Dash.State("n_item_StatsBase.sample_txt","value"),
   Dash.State("n_test_StatsBase.sample_txt","value"),
-  Dash.State("conv_max_txt","value"),
+  Dash.State("max_conv_txt","value"),
   Dash.State("verbosity_txt","value"),
   Dash.State("opt_feas_txt","value"),
   Dash.State("n_fill_txt","value"),
@@ -520,7 +520,7 @@ function run_app!()
   Dash.State("starting_design_txt","value"),
   Dash.State("solver_txt","value"),
   Dash.State("plots_out_txt","value"),
-  Dash.State("results_folder_txt","value")]) do n_clicks, start_temp, geom_temp, max_time, n_item_sample, n_test_sample, conv_max, verbosity, opt_feas, n_fill, feas_nh, opt_nh, optimizer_constructor, optimizer_attributes, starting_design, solver, plots_out, results_folder
+  Dash.State("results_folder_txt","value")]) do n_clicks, start_temp, geom_temp, max_time, n_item_sample, n_test_sample, max_conv, verbosity, opt_feas, n_fill, feas_nh, opt_nh, optimizer_constructor, optimizer_attributes, starting_design, solver, plots_out, results_folder
     if n_clicks > 0
       output=""
       try
@@ -537,7 +537,7 @@ function run_app!()
         ,results_folder," "
         ,n_item_sample," "
         ,n_test_sample," "
-        ,conv_max," "
+        ,max_conv," "
         ,verbosity," "
         ,opt_feas," "
         ,opt_feas," "
@@ -552,7 +552,7 @@ function run_app!()
         results_folder = results_folder,
         n_item_sample =  Int64(n_item_sample),
         n_test_sample = Int64(n_test_sample),
-        conv_max = Int64(conv_max),
+        max_conv = Int64(max_conv),
         verbosity = Int64(verbosity),
         opt_feas = Float64(opt_feas) ,
         n_fill = Int64(n_fill),

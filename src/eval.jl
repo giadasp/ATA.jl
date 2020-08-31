@@ -262,7 +262,7 @@ function fill_up_custom(NH::Neighbourhood, obj::Obj, opt_feas::Float64, v::Int64
 	return NH::Neighbourhood
 end
 #MAXIMIN CC neighbourhood
-function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{Float64, 3}}; fF = true, n_fill = 1, opt_feas = 0.9, conv_max = 1, start_temp = 1000.0, geom_temp = 0.1, n_item_sample = 1, n_test_sample = 1, verbosity = 1, start_time = 0, max_time = 1000)
+function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{Float64, 3}}; fF = true, n_fill = 1, opt_feas = 0.9, max_conv = 1, start_temp = 1000.0, geom_temp = 0.1, n_item_sample = 1, n_test_sample = 1, verbosity = 1, start_time = 0, max_time = 1000)
 	if fF == true
 		NH_start.obj = zeros(Float64, ATAmodel.settings.T)
 	end
@@ -555,7 +555,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 		end
 		#println("convergence is ", convergence)
 		# ? how many are equal f₀ in the last iterations?
-		if (f_star[2] == f_star[1] && convergence == conv_max) || time() - start_time>= max_time
+		if (f_star[2] == f_star[1] && convergence == max_conv) || time() - start_time>= max_time
 			coverage_ok = 1
 			#t += 1
 		else
@@ -577,7 +577,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 end
 
 #MAXIMIN neighbourhood
-function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{Float64, 2}}; fF = true, n_fill = 1, opt_feas = 0.9, conv_max = 1, start_temp = 1000.0, geom_temp = 0.1, n_item_sample = 1, n_test_sample = 1, verbosity = 1, start_time = 0, max_time = 1000)
+function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{Float64, 2}}; fF = true, n_fill = 1, opt_feas = 0.9, max_conv = 1, start_temp = 1000.0, geom_temp = 0.1, n_item_sample = 1, n_test_sample = 1, verbosity = 1, start_time = 0, max_time = 1000)
 	if fF == true
 		NH_start.obj = zeros(Float64, ATAmodel.settings.T)
 	end
@@ -859,7 +859,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 		end
 		#println("convergence is ", convergence)
 		#how many equal f₀ in the last iterations?
-		if (f_star[2] == f_star[1] && convergence == conv_max) || time()-start_time >= max_time
+		if (f_star[2] == f_star[1] && convergence == max_conv) || time()-start_time >= max_time
 			coverage_ok = 1
 			#t += 1
 		else
@@ -881,7 +881,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Array{
 end
 
 #custom neighborhood
-function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Float64}; fF = true, n_fill = 1, opt_feas = 0.9, conv_max = 1, start_temp = 1000.0, geom_temp = 0.1, n_item_sample = 1, n_test_sample = 1, verbosity = 1, start_time = 0, max_time = 1000)
+function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Float64}; fF = true, n_fill = 1, opt_feas = 0.9, max_conv = 1, start_temp = 1000.0, geom_temp = 0.1, n_item_sample = 1, n_test_sample = 1, verbosity = 1, start_time = 0, max_time = 1000)
 	if fF == true
 		NH_start.obj = zeros(Float64, ATAmodel.settings.T)
 	end
@@ -1163,7 +1163,7 @@ function analyse_NH(NH_start::Neighbourhood, ATAmodel::Model, IIF::Vector{Float6
 		end
 		#println("convergence is ", convergence)
 		#how many equal f₀ in the last iterations?
-		if (f_star[2] == f_star[1] && convergence == conv_max) || time()-start_time >= max_time
+		if (f_star[2] == f_star[1] && convergence == max_conv) || time()-start_time >= max_time
 			coverage_ok = 1
 			#t += 1
 		else
