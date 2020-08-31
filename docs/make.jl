@@ -18,7 +18,7 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/giadasp/ATA.jl.git",
+    repo = "github.com/giadasp/ATA.jl.git"
 )
 # Documenter can also automatically deploy documentation to gh-pages.
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
