@@ -8,9 +8,6 @@ using JuMP
 # add Cbc by running import Pkg; Pkg.add("Cbc")
 using Cbc
 
-# for resetting the ATA process (Needed)
-ATAmodel = start_ATA()
-
 # Each of the following commands returns a string vector, the second element is a message describing the result.
 # 1. Add file with custom settings (Needed)
 # for resetting the ATA process (Needed)
