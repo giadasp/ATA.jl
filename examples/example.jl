@@ -5,17 +5,6 @@
 # cd("where your input files are")
 using ATA
 
-# For using the Dash APP:
-# run_app!()
-# Navigate with the browser to localhost:8080
-# Before running the app, if you want to use a MILP solver, remember to load it
-# (ex: using Cbc; run_app!()).
-
-# If you prefere to use Julia code:
-
-# for resetting the ATA process (Needed)
-ATAmodel = start_ATA()
-
 # Each of the following commands returns a string vector, the second element is a message describing the result.
 # 1. Add file with custom settings (Needed)
 # for resetting the ATA process (Needed)
@@ -45,7 +34,7 @@ ATAmodel = start_ATA()
 
 # 8. Add objective function (Optional)
 @info add_obj_fun!(ATAmodel)[2] 
-s
+
 # Assembly settings
 
 # Set the solver, "siman" for simulated annealing, "jumpATA" for MILP solver.
