@@ -1,4 +1,7 @@
 using Documenter
+using Pkg
+Pkg.activate("..") 
+Pkg.instantiate()
 using ATA
 
 makedocs(
