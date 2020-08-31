@@ -4,14 +4,9 @@
 # Pkg.instantiate()
 # cd("where your input files are")
 using ATA
-
-# For using the Dash APP:
-# run_app!()
-# Navigate with the browser to localhost:8080
-# Before running the app, if you want to use a MILP solver, remember to load it
-# (ex: using Cbc; run_app!()).
-
-# If you prefere to use Julia code:
+using JuMP
+# add Cbc by running import Pkg; Pkg.add("Cbc")
+using Cbc
 
 # for resetting the ATA process (Needed)
 ATAmodel = start_ATA()
@@ -45,7 +40,7 @@ ATAmodel = start_ATA()
 
 # 8. Add objective function (Optional)
 @info add_obj_fun!(ATAmodel)[2] 
-s
+
 # Assembly settings
 
 # Set the solver, "siman" for simulated annealing, "jumpATA" for MILP solver.
@@ -53,11 +48,9 @@ solver = "jumpATA"
 
 # MILP (Not suggested for large scale ATA)
 # Select the solver, Cbc as open-source is a good option.
-# add Cbc by running import Pkg; Pkg.add("Cbc")
-# using Cbc
-# optimizer_constructor = Cbc.Optimizer
+optimizer_constructor = Cbc.Optimizer
 # #Optimizer attributes
-# optimizer_attributes = [("seconds",100), ("logLevel",1)]
+optimizer_attributes = [("seconds",100), ("logLevel",1)]
 
 # 9. assemble
 assemble!(ATAmodel;
@@ -71,7 +64,6 @@ assemble!(ATAmodel;
 # A summary of the resulting tests is available in results_folder/Results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
-
 
 print_results!(ATAmodel;
 group_by_fs=true,
