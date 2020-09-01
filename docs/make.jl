@@ -18,5 +18,6 @@ makedocs(
 )
 
 deploydocs(
-    repo = "giadasp@github.com/giadasp/ATA.jl.git"
+    repo = "giadasp@github.com/giadasp/ATA.jl.git",
+    devurl ="docs"
 )
