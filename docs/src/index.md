@@ -58,8 +58,10 @@ using ATA
 
 Play with the test files in folder "examples".
 
-Set all the specifications by modifying the files in "examples" folder and run "example.jl" or "example with custom objective function.jl" following the manual in the comments.
+Set all the specifications by modifying the files in "examples" folder and run "example.jl" or "example custom objective function.jl" following the manual in the comments.
 
-Distributed analysis of the neighbourhoods is available, look at "examples/parallelExample.jl".
+Distributed analysis of the neighbourhoods is available, look at "examples/example parallel.jl".
+
+A Dash app is available for an even more easier experience. Look at "examples/example Dash app.jl"
 
 
