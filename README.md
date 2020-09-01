@@ -5,7 +5,7 @@ Simulated Annealing algorithm is available for large scale ATA models.
 Otherwise, any MILP solver compatible with JuMP can be used.
 Interfaced with Dash or pure Julia code.
 
-![https://giadasp.github.io/ATA.jl/docs/](https://img.shields.io/readthedocs/ATA.jl?style=plastic)
+![https://giadasp.github.io/ATA.jl/docs/](https://img.shields.io/badge/docs-stable-brightgreen)
 
 ## Objectives
 1. no objective;
