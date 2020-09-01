@@ -1,9 +1,3 @@
-```@meta
-CurrentModule = ATA
-DocTestSetup = quote
-    using ATA
-end
-```
 # ATA.jl: Automated Test Assembly Made Easy
 
 A package for automated test assembly (ATA) written in Julia.
