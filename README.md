@@ -1,3 +1,9 @@
+```@meta
+CurrentModule = ATA
+DocTestSetup = quote
+    using ATA
+end
+```
 # ATA.jl: Automated Test Assembly Made Easy
 
 A package for automated test assembly (ATA) written in Julia.
@@ -10,9 +16,6 @@ Interfaced with Dash or pure Julia code.
 2. MAXIMIN TIF (minimum between multiple ability points supported);
 3. Chance-constrained MAXIMIN TIF.
 
-## Solvers
-- for objectives 1 and 2: JuMP MILP solvers (see the list at https://jump.dev/JuMP.jl/v0.21.1/installation/). Follow the installation manuals of the solver you want to use. For open-source we suggest CBC or GLPK (default). For commercial we suggest Gurobi or CPLEX.
-- for objectives 1, 2 and 3: Simulated Annealing solver, pure Julia ATA solver.
 
 ## Constraints
 - parallel tests (one group of tests);
@@ -27,6 +30,10 @@ Interfaced with Dash or pure Julia code.
 - maximum overlap between tests;
 - group by units (friend sets);
 - items exclusivity (enemy sets);
+
+## Solvers
+- for objectives 1 and 2: JuMP MILP solvers (see the list at https://jump.dev/JuMP.jl/v0.21.1/installation/). Follow the installation manuals of the solver you want to use. For open-source we suggest CBC or GLPK (default). For commercial we suggest Gurobi or CPLEX.
+- for objectives 1, 2 and 3: Simulated Annealing solver, pure Julia ATA solver.
 
 ## Report
 Summarizing features of the assembled tests and Plots of the ICFs and TIFs are available.
@@ -51,6 +58,8 @@ using ATA
 
 Play with the test files in folder "examples".
 
-Set all the specifications by modifying the files in "examples" folder and run "example.jl" or "example with custom objective function.jl" following the manual in the comments.
+Set all the specifications by modifying the files in "examples" folder and run "example.jl" or "example custom objective function.jl" following the manual in the comments.
 
-Distributed analysis of the neighbourhoods is available, look at "examples/parallelExample.jl".
+Distributed analysis of the neighbourhoods is available, look at "examples/example parallel.jl".
+
+A Dash app is available for an even more easier experience. Look at "examples/example Dash app.jl"
