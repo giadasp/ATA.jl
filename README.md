@@ -6,7 +6,8 @@ Otherwise, any MILP solver compatible with JuMP can be used.
 Interfaced with Dash or pure Julia code.
 
 ## Documentation
-Documentation on exported functions available at ![https://giadasp.github.io/ATA.jl/docs](link)
+
+Documentation on exported functions available at [link!](https://giadasp.github.io/ATA.jl/docs)
 
 ## Objectives
 1. no objective;
