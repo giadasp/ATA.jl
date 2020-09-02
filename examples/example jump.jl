@@ -45,15 +45,15 @@ solver = "jumpATA"
 
 # MILP (Not suggested for large scale ATA)
 # Select the solver, Cbc as open-source is a good option.
-optimizer_constructor = Cbc.Optimizer
+optimizer_constructor = "Cbc"
 # #Optimizer attributes
-optimizer_attributes = [("seconds",100), ("logLevel",1)]
+optimizer_attributes = [("seconds", 100), ("logLevel", 1)]
 
 # 9. assemble
 assemble!(ATAmodel;
     solver=solver,
-    optimizer_attributes = optimizer_constructor,
-    optimizer_constructor = optimizer_attributes
+    optimizer_attributes=optimizer_constructor,
+    optimizer_constructor=optimizer_attributes
     )
 
 # All the settings and outputs from optimization are in ATAmodel object.

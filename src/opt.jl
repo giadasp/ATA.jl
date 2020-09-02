@@ -10,11 +10,12 @@ Assemble the tests.
 # Arguments
 
 - **`ATAmodel::Model`** : Required. The model built with ATA fuctions (load_settings!, add_friends, etc...). 
-- **`solver`** : Optional. Default: `"jumpATA"`. Values: `"jumpATA"`, `"siman"`. The solving interface to be used (JuMP or internal solver based on Simulated Annealing)
+- **`solver`** : Optional. Default: `"jumpATA"`. Values: `"jumpATA"`, `"siman"`. The solving interface to be used (JuMP or internal solver based on Simulated Annealing).
 - **`starting_design`** : Optional. Default: `Matrix{Float64}(undef, 0, 0)`. The starting design matrix. Must be a `Matrix{Float64}`.
 - **`results_folder`** : Optional. Default: `"RESULTS"`. The folder in which the output is stored.
 
-## siman arguments:
+## siman arguments
+
     - **`start_temp`** : Optional. Default: `0.1`. Values: `[0, Inf]`. Starting temperature, set to minimum for short journeys (if 0 worse solutions will never be accepted).
     - **`geom_temp`** : Optional. Default: `0.1`. Values: `[0, Inf)`. Decreasing geometric factor.
     - **`n_item_sample`** : Optional. Default: `1`. Values: `[1, Inf]`. Number of items to alter. Set to minimum for a shallow analysis, set to maximum for a deep analysis of the neighbourhoods.
@@ -22,12 +23,16 @@ Assemble the tests.
     - **`opt_feas`** : Optional. Default: `0.0`. Values: `[0, Inf)`. Optimality/feasibility balancer, if 0 only feasibility of solution is analysed. Viceversa, if 1, only optimality is considered (uncontrained model). All the other values are accepted but produce uninterpretable results.
     - **`n_fill`** : Optional. Default: `1`. Values: `[0, Inf)`. Number of fill-up phases, usually 1 is sufficient, if start_temp is high it can be higher. If a starting_design is supplied, it can be set to 0.
     - **`verbosity`** : Optional. Default: `2`. Values: `1` (minimal), `2` (detailed). Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution. The dots are the fill-up improvement steps.
+    
     * Termination criteria: 
-    - **`max_time`** : Optional. Default: `1000.0`. Values: `[0, Inf)`. Time limit in seconds.
-    - **`max_conv`** : Optional. Default: `2`. Values: `[1, Inf)`. Maximum convergence, stop when, after max_conv rounds no improvements have been found. Set to minimum for shallow analysis, increase it for deep analysis of neighbourhoods.
-    - **`feas_nh`** : Optional. Default: `0`. Values: `[1, Inf)`. Maximum number of Feasibility neighbourhoods to explore, set to the minimum if the model is small or not highly constrained.
-    - **`opt_nh`** : Optional. Default: `5`. Values: `[1, Inf)`. Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
-## jumpATA arguments:
+
+        - **`max_time`** : Optional. Default: `1000.0`. Values: `[0, Inf)`. Time limit in seconds.
+        - **`max_conv`** : Optional. Default: `2`. Values: `[1, Inf)`. Maximum convergence, stop when, after max_conv rounds no improvements have been found. Set to minimum for shallow analysis, increase it for deep analysis of neighbourhoods.
+        - **`feas_nh`** : Optional. Default: `0`. Values: `[1, Inf)`. Maximum number of Feasibility neighbourhoods to explore, set to the minimum if the model is small or not highly constrained.
+        - **`opt_nh`** : Optional. Default: `5`. Values: `[1, Inf)`. Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
+
+## jumpATA arguments
+
     - **`optimizer_constructor`** : Optional. Default: `"GLPK"`. Values: `"GLPK"`, `"Knitro"`, `"Gurobi"`, `"Cbc"`, `"CPLEX"`, `"Xpress"`, `"SCIP"`, `"Juniper"`. JuMP solver selection. Remember to load the required package before assemble!.
     - **`optimizer_attributes`** : Optional. Default: `[("tm_lim", 1000)]`. Values: An array of pairs `(attribute, value)`. Attributes and related values for the JuMP solver.
 
