@@ -5,13 +5,14 @@
 
 ```jldoctest
 #cd("folder in which the package is saved")
-# using Pkg
-# Pkg.activate(".")  # required
-# Pkg.instantiate()
-# cd("where your input files are")
+julia> using Pkg
+julia> Pkg.activate(".")  # required
+julia> Pkg.instantiate()
 julia> using ATA
+julia> cd("examples")
+julia> Pkg.add("JuMP@0.21.3")
 julia> using JuMP
-# add Cbc by running import Pkg; Pkg.add("Cbc")
+julia> Pkg.add("Cbc")
 julia> using Cbc
 ```
 
