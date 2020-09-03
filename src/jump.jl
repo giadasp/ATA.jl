@@ -27,8 +27,9 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 		ATAmodel.settings.n_FS = ATAmodel.settings.n_items
 	end
 
-	#OVERLAP
-	#OVERLAP new
+	################################################################################
+	#                                overlap
+	################################################################################	
 	opMatrix = ATAmodel.settings.ol_max
 	nPairs = 0
 	if size(opMatrix, 1) > 0
@@ -84,8 +85,6 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 	c += size(ATAmodel.IU.max, 1)
 	c += sum(ATAmodel.IU.min .> 0)
 
-	#overlap new
-	# c += ATAmodel.settings.T
 	#overlap old
 	c += nPairs
 
@@ -170,22 +169,6 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 			JuMP.@variable(m, y[i = 1:ATAmodel.settings.n_FS, p = 1:nPairs], Bin)
 		end
 	end
-	#constraints vars
-	#JuMP.@variable(m, z[c = 1:ncons] >= 0)
-	c = 1
-
-	#length
-	# for t=1:ATAmodel.settings.T
-	# 	if ATAmodel.constraints[t].length_max>0
-	# 		JuMP.@constraint(m,  sum(x[i,t]*ATAmodel.settings.FS.counts[i] for i=1:ATAmodel.settings.n_FS) - ATAmodel.constraints[t].length_max <= 0) # z[c])
-	# 		c+=1
-	# 	end
-	# 	if ATAmodel.constraints[t].length_min>0
-	# 		JuMP.@constraint(m,  -sum(x[i,t]*ATAmodel.settings.FS.counts[i] for i=1:ATAmodel.settings.n_FS)  + ATAmodel.constraints[t].length_min <=0) # z[c])
-	# 		c+=1
-	# 	end
-	# end
-
 
 	# Item Use
 	for i in 1:ATAmodel.settings.n_FS
@@ -213,6 +196,7 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 			end
 		end
 	end
+
 	#expected score
 	for t=1:ATAmodel.settings.T
 		if size(ICF_new[t],1) > 0
@@ -250,9 +234,7 @@ function jumpATA!(ATAmodel::Model; starting_design = Matrix{Float64}(undef, 0, 0
 				JuMP.@constraint(m, sum(round(IIF_new[t][k,i];digits = 4)*x[i, t] for i = 1:ATAmodel.settings.n_FS) >= w)
 			end
 		end
-		JuMP.@objective(m, Min, (-w))# + (0.9 * sum(z[c] for c = 1:ncons)))
-	elseif ATAmodel.obj.type == ""
-		#JuMP.@objective(m, min, (sum(z[c] for c=1:ncons)))
+		JuMP.@objective(m, Min, (-w))
 	end
 	JuMP.optimize!(m)
 	message *= string("The model has termination status:", JuMP.termination_status(m))

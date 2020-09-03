@@ -13,7 +13,8 @@ makedocs(
         "index.md",
         "utils.md",
         "build.md",
-        "opt.md"
+        "opt.md",
+        "examples.md"
     ]
 )
 

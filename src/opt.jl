@@ -36,10 +36,7 @@ Assemble the tests.
     - **`optimizer_constructor`** : Optional. Default: `"GLPK"`. Values: `"GLPK"`, `"Knitro"`, `"Gurobi"`, `"Cbc"`, `"CPLEX"`, `"Xpress"`, `"SCIP"`, `"Juniper"`. JuMP solver selection. Remember to load the required package before assemble!.
     - **`optimizer_attributes`** : Optional. Default: `[("tm_lim", 1000)]`. Values: An array of pairs `(attribute, value)`. Attributes and related values for the JuMP solver.
 
-# Examples
-```jldoctest
-julia> nothing
-```
+
 """
 function assemble!(ATAmodel::Model; solver="jumpATA", starting_design=Matrix{Float64}(undef, 0, 0), results_folder="RESULTS", start_temp=0.1, geom_temp=0.1, n_item_sample=1, n_test_sample=1, opt_feas=0.0, n_fill=1, max_time=1000.00, max_conv=2, feas_nh=0, opt_nh=5, verbosity=2, optimizer_constructor="GLPK", optimizer_attributes=[("tm_lim", 1000)])
     if solver == "siman"
