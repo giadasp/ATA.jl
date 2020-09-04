@@ -16,17 +16,17 @@ Pkg.add("Cbc")
 using Cbc
 ```
 
-<li> Resetting the ATA process (Needed)
+    1. Resetting the ATA process (Needed)
 
-```julia
-  ATAmodel = start_ATA()
-```
-</li>
-<li> Add file with custom settings (Needed)
-```julia
-  @info load_settings!(ATAmodel; settings_file="settingsATA.jl", bank_file="data/bank.csv", bank_delim=";")[2]
-```
-</li>
+    ```julia
+    ATAmodel = start_ATA()
+    ```
+ì
+    2. Add file with custom settings (Needed)
+    ```julia
+    @info load_settings!(ATAmodel; settings_file="settingsATA.jl", bank_file="data/bank.csv", bank_delim=";")[2]
+    ```
+
 <li>Add friend set variables (Optional)
 ```julia
   @info add_friends!(ATAmodel)[2]
