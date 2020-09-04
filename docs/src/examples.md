@@ -16,48 +16,48 @@ Pkg.add("Cbc")
 using Cbc
 ```
 
-  1. Resetting the ATA process (Needed)
+### 1. Resetting the ATA process (Needed)
 
 ```julia
   ATAmodel = start_ATA()
 ```
 
-  2. Add file with custom settings (Needed)
+### 2. Add file with custom settings (Needed)
 ```julia
   @info load_settings!(ATAmodel; settings_file="settingsATA.jl", bank_file="data/bank.csv", bank_delim=";")[2]
 ```
 
-  3. Add friend set variables (Optional)
+### 3. Add friend set variables (Optional)
 ```julia
   @info add_friends!(ATAmodel)[2]
 ```
 
-  4. Add enemy set variables (Optional)
+### 4. Add enemy set variables (Optional)
 ```julia
   @info add_enemies!(ATAmodel)[2]
 ```
 
-  5. Add categorical constraints (Optional)
+### 5. Add categorical constraints (Optional)
 ```julia
   @info add_constraints!(ATAmodel; constraints_file="constraints.csv", constraints_delim=";")[2]
 ```
 
-  6. Add overlap maxima (Optional)
+### 6. Add overlap maxima (Optional)
 ```julia
   @info add_overlap!(ATAmodel; overlap_file="Overlap Matrix.csv", overlap_delim=";")[2]
 ```
 
-  7. Add expected score constraints (Optional)
+### 7. Add expected score constraints (Optional)
 ```julia
   @info add_exp_score!(ATAmodel)[2]
 ```
 
-  8. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
+### 8. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
 ```julia
   @info group_by_friends!(ATAmodel)[2]
 ```
 
-  9. Add objective function (Optional)
+### 9. Add objective function (Optional)
 ```julia
   @info add_obj_fun!(ATAmodel)[2] 
 ```
@@ -80,7 +80,7 @@ Optimizer attributes:
 optimizer_attributes = [("seconds", 100), ("logLevel", 1)]
 ```
 
-  10. assemble
+### 10. assemble
 ```julia
   assemble!(ATAmodel;
       solver=solver,
