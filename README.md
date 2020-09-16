@@ -7,7 +7,7 @@ Interfaced with Dash or pure Julia code.
 
 ## Documentation
 
-Documentation on exported functions available at [link](https://giadasp.github.io/ATA.jl/docs).
+Documentation on exported functions available at [link](https://giadasp.github.io/ATA.jl/docs) (in progress).
 
 ## Objectives
 
