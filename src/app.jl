@@ -80,7 +80,7 @@ function run_app!()
   DashHtmlComponents.html_label("file name:"),
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashCoreComponents.dcc_input(id="settings_txt", value="settingsATA.jl", className="form-control", type = "text")
+  DashCoreComponents.dcc_input(id="settings_txt", value="SettingsATA.jl", className="form-control", type = "text")
   ])
   ]),
   DashHtmlComponents.html_div(className = "row m-1", [
@@ -165,7 +165,7 @@ function run_app!()
   DashHtmlComponents.html_label("file name:"),
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashCoreComponents.dcc_input(id="constraints_file_txt", value="constraints.csv", className="form-control", type = "text")
+  DashCoreComponents.dcc_input(id="constraints_file_txt", value="Constraints.csv", className="form-control", type = "text")
   ])
   ]),
   DashHtmlComponents.html_div(className = "row justify-content-center m-1", [
@@ -203,7 +203,7 @@ function run_app!()
   DashHtmlComponents.html_label("file name:"),
   ]),
   DashHtmlComponents.html_div(className = "col-md-6", [
-  DashCoreComponents.dcc_input(id="ol_txt", value="Overlap Matrix.csv", className="form-control", type = "text"),
+  DashCoreComponents.dcc_input(id="ol_txt", value="OverlapMatrix.csv", className="form-control", type = "text"),
   ])
   ]),
   DashHtmlComponents.html_div(className = "row justify-content-center m-1", [

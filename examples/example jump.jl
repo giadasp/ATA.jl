@@ -15,7 +15,7 @@ ATAmodel = start_ATA()
 
 # Each of the following commands returns a string vector, the second element is a message describing the result.
 # 1. Add file with custom settings (Needed)
-@info load_settings!(ATAmodel; settings_file="settingsATA.jl", bank_file="data/bank.csv", bank_delim=";")[2]
+@info load_settings!(ATAmodel; settings_file="SettingsATA.jl", bank_file="data/bank.csv", bank_delim=";")[2]
 
 # 2. Add friend set variables (Optional)
 @info add_friends!(ATAmodel)[2]
@@ -24,10 +24,10 @@ ATAmodel = start_ATA()
 @info add_enemies!(ATAmodel)[2]
 
 # 4. Add categorical constraints (Optional)
-@info add_constraints!(ATAmodel; constraints_file="constraints.csv", constraints_delim=";")[2]
+@info add_constraints!(ATAmodel; constraints_file="Constraints.csv", constraints_delim=";")[2]
 
 # 5. Add overlap maxima (Optional)
-@info add_overlap!(ATAmodel; overlap_file="Overlap Matrix.csv", overlap_delim=";")[2]
+@info add_overlap!(ATAmodel; overlap_file="OverlapMatrix.csv", overlap_delim=";")[2]
 
 # 6. Add expected score constraints (Optional)
 @info add_exp_score!(ATAmodel)[2]
