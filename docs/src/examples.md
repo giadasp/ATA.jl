@@ -98,7 +98,7 @@ optimizer_attributes = [("seconds", 100), ("logLevel", 1)]
   )
 ```
 
-11\. Print and Plot<a name="print_and_plot"></a>
+11\. Print and Plot
 
 All the settings and outputs from optimization are in ATAmodel object.
 See the struct in ATA.jl to understand how to retrieve all the information.
@@ -284,7 +284,7 @@ assemble!(ATAmodel;
     )
 ```
 
-For printing resulting tests and plots see (here)[#print_and_plot]
+For printing resulting tests and plots see step 11. in [first example](#Example-with-JuMP-(0.21.3)-and-Cbc)
 
 ## Custom objective function
 
