@@ -8,7 +8,7 @@
 #cd("where your input files are")
 # include("LocalTest.jl")
 
-#[Beta: for running ATA with multiple cores do:
+#Beta: for running ATA with multiple cores do:
 #add julia.exe to the path and run Julia with the command prompt:
 #julia -p numberOfCores]
 
@@ -22,8 +22,8 @@ using Distributed #this is not needed if Julia has been run with numberOfCores>1
 @everywhere   using ATA
 
 #@everywhere cd("where your input files are")
-#Input files needed: SettingsATA.jl, bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
-#SettingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...
+#Input files needed: settingsATA.jl, bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
+#settingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...
 #CategoricalConstraints.csv : categorical constraints
 #OverlapMatrix.csv : maximum overlap allowed between test forms, it is a TxT matrix. If the assembly is non parallel (i.e. there is more than one group of parallel tests, n_groups>1)
 #it is a n_groups x n_groups matrix.
@@ -34,7 +34,7 @@ ATAmodel = start_ATA()
 
 #Each of the following commands returns a string vector, the second element is a message describing the result.
 #1. Add file with custom settings (Needed)
-println(load_settings!(ATAmodel; settings_file = "SettingsATA.jl", bank_file = "bank.csv", bank_delim = ";")[2])
+println(load_settings!(ATAmodel; settings_file = "settingsATA.jl", bank_file = "bank.csv", bank_delim = ";")[2])
 
 #2. Add friend set variables (Optional)
 println(add_friends!(ATAmodel)[2])
@@ -43,7 +43,7 @@ println(add_friends!(ATAmodel)[2])
 println(add_enemies!(ATAmodel)[2])
 
 #4. Add categorical constraints (Optional)
-println(add_constraints!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim=";")[2])
+println(add_constraints!(ATAmodel; constraints_file = "constraints.csv", constraints_delim=";")[2])
 
 #5. Add overlap maxima (Optional)
 println(add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim=";")[2])

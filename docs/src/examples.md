@@ -116,7 +116,9 @@ plots_out=true,
 results_folder="RESULTS")
 ```
 
-## Example with siman solver (Simulated Annealing heuristic)
+## Example with siman solver (Simulated Annealing Heuristic)
+
+Suitable for large-scale ATA instances and custom objective functions optimization.
 
 0\. Add and load required packages.
 ```julia
@@ -284,7 +286,7 @@ assemble!(ATAmodel;
 For printing resulting tests and plots see step 11. in [first example](#Example-with-JuMP-(0.21.3)-and-Cbc)
 
 
-## Custom objective function
+## Custom objective function (only siman)
 
 To add a custom objective function modify step 8 in previous examples.
 It works only with the siman solver.
@@ -322,3 +324,8 @@ end
 
 ATAmodel.obj.args = (IIF = FileIO.load("data/IIF.jld2", "IIF"), FS_items = ATAmodel.settings.FS.items)
 ```
+
+## Parallel neighbouhoods evaluation (only siman)
+
+Run `Julia` with `<ncores>` cores by typing `julia -p <ncores>`.
+
