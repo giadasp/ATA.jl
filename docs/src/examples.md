@@ -325,8 +325,8 @@ end
 ATAmodel.obj.args = (IIF = FileIO.load("data/IIF.jld2", "IIF"), FS_items = ATAmodel.settings.FS.items)
 ```
 
-## Parallel neighbouhoods evaluation (only siman)
+## Parallel neighbourhoods evaluation (only siman)
 
 By using multiple cores, the Simulated Annealing solver evaluates several neighbourhoods at a time reducing the time needed for the exploration of the solution space.  
-`Julia` starts with 1 core by default, to run `Julia` with `<ncores>`, type `julia -p <ncores>` in the command prompt and follow the [example](#Example-with-siman-solver-(Simulated-Annealing-Heuristic)) as usual.
+`Julia` starts with 1 core by default, to run `Julia` with `<ncores>`, type `julia -p <ncores>` in the command prompt and follow the steps in [example](#Example-with-siman-solver-(Simulated-Annealing-Heuristic)).
 
