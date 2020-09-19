@@ -7,7 +7,7 @@ Start the test assembly instance.
 
 # Output
 
-It returns an empty ATA.model.
+It returns an empty `ATA.Model` object.
 
 """
 function start_ATA()
@@ -15,7 +15,7 @@ function start_ATA()
 		files = readdir("OPT")
 		if size(files, 1)>0
 			for f in 1:size(files, 1)
-				rm(string("OPT/", files[f]), force = true)
+				rm(string("OPT", files[f]), force = true)
 			end
 		end
 	else
@@ -37,9 +37,9 @@ Load the test assembly settings.
 # Arguments
 
 - **`ATAmodel::Model`** : Required. The model built with `start_ATA()` function.
-- **`settings_file`** : Optional. Default: /"settingsATA.jl/". The path of the file containing the ATA settings in the form of an `InputSettings` struct.
-- **`bank_file`** : Optional. Default: /"bank.csv/". The path of the file containing the item pool/bank in the form of custom-separated values.
-- **`bank_delim`** : Optional. Default: /";/". The custom-separator for the bank_file.
+- **`settings_file`** : Optional. Default: "settingsATA.jl". The path of the file containing the ATA settings in the form of an `InputSettings` struct.
+- **`bank_file`** : Optional. Default: "bank.csv". The path of the file containing the item pool/bank in the form of custom-separated values.
+- **`bank_delim`** : Optional. Default: ";". The custom-separator for the bank_file.
 """
 function load_settings!(ATAmodel::Model; settings_file = "settingsATA.jl", bank_file = "bank.csv", bank_delim = ";")
 	message = ["", ""]
@@ -264,7 +264,17 @@ function load_settings!(ATAmodel::Model; settings_file = "settingsATA.jl", bank_
 	return message
 end
 
+"""
+	add_friends!(ATAmodel::Model)
 
+# Description
+
+Add friend sets to the `ATA.Model` as specified in the `settings_file` loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+
+# Arguments
+
+- **`ATAmodel::Model`** : Required. The model built with `start_ATA()` and with settings loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+"""
 function add_friends!(ATAmodel::Model)
 	message = ["", ""]
 	if !isfile("OPT/Settings.jl")
