@@ -14,6 +14,7 @@ makedocs(
         "utils.md",
         "build.md",
         "opt.md",
+        "print.md",
         "examples.md"
     ]
 )
