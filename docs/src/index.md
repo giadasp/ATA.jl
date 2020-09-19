@@ -64,4 +64,10 @@ Distributed analysis of the neighbourhoods is available, look at "examples/examp
 
 A Dash app is available for an even more easier experience. Look at "examples/example Dash app.jl"
 
+## Documentation Contents
+
+```@contents
+Pages = ["build.md", "opt.md", "utils.md", "examples.md"]
+Depth = 3
+```
 
