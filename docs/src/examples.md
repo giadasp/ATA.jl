@@ -1,7 +1,5 @@
 # Examples
 
-
-
 ## Example with JuMP (0.21.3) and Cbc
 
 0\. Add and load required packages.

@@ -14,11 +14,7 @@ makedocs(
         "utils.md",
         "build.md",
         "opt.md",
-        "examples.md" => [
-            "jump_example.md",
-            "siman_example.md",
-            "custom_example.md"
-        ]
+        "examples.md"
     ]
 )
 
