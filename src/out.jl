@@ -227,9 +227,9 @@ function print_results!(ATAmodel; group_by_fs=false, results_folder="RESULTS", p
 			# end
 			write(io,"Item use")
 			write(io,"\r\n")
-			iu=[sum(design[i,:])   for i=1:ATAmodel.settings.n_items]
-			ids=sortperm(iu, rev=true)
-			sort!(iu, rev=true)
+			iu=[sum(design[i,:]) for i=1:ATAmodel.settings.n_items]
+			ids=sortperm(iu; rev=true)
+			sort!(iu; rev=true)
 			for i=1:ATAmodel.settings.n_items
 				write(io,string(ids[i]))
 				write(io,"\t")
