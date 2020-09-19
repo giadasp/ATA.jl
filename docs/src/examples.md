@@ -327,5 +327,6 @@ ATAmodel.obj.args = (IIF = FileIO.load("data/IIF.jld2", "IIF"), FS_items = ATAmo
 
 ## Parallel neighbouhoods evaluation (only siman)
 
-Before step 0, run `Julia` with `<ncores>` cores by typing `julia -p <ncores>` in the command prompt.
+By using multiple cores, the Simulated Annealing solver evaluates several neighbourhoods at a time reducing the time needed for the exploration of the solution space.  <a class="docs-heading-anchor" href="#Example-with-siman-solver-(Simulated-Annealing-Heuristic)">Example with siman solver (Simulated Annealing Heuristic)</a>
+`Julia` starts with 1 core by default, to run `Julia` with `<ncores>`, type `julia -p <ncores>` in the command prompt and follow the [example](#Example-with-siman-solver-(Simulated-Annealing-Heuristic)) as usual.
 
