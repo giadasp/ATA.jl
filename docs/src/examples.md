@@ -70,7 +70,7 @@ ATAmodel = start_ATA()
 @info add_obj_fun!(ATAmodel)[2] 
 ```
 
-### Assembly settings
+10\. Assemble
 
 Set the solver, "siman" for simulated annealing, "jumpATA" for MILP solver.
 ```julia
@@ -87,8 +87,6 @@ Optimizer attributes:
 ```julia
 optimizer_attributes = [("seconds", 100), ("logLevel", 1)]
 ```
-
-10\. Assemble
 
 ```julia
   assemble!(ATAmodel;
@@ -184,7 +182,7 @@ ATAmodel = start_ATA()
 @info add_obj_fun!(ATAmodel)[2] 
 ```
 
-### Assembly settings
+10\. Assemble.
 
 Set the solver, "siman" for simulated annealing, "jumpATA" for MILP solver.
 ```julia
@@ -264,7 +262,6 @@ opt_nh = Inf
 Default: `5`. Values: `[1, Inf)`. 
 Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
 
-10\. Assemble.
 
 ```julia
 assemble!(ATAmodel;
