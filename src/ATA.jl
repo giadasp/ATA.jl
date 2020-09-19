@@ -72,7 +72,7 @@ function __init__()
 	@require JuMP ="4076af6c-e467-56ae-b986-b466b2749572" include("jump.jl")
 end
 
-export mean, start_ATA, load_settings!, add_friends!, add_enemies!, add_constraints!, add_overlap!, add_exp_score!, group_by_friends!, add_obj_fun!, assemble!, print_results!, load_design, run_app!, item_info, item_char, resp_gen, student_likelihood, FS_to_items#_mycopy,  fast_sort!, _myqle#, optimize
+export mean, start_ATA, load_settings!, add_friends!, add_enemies!, add_constraints!, add_overlap!, add_exp_score!, group_by_friends!, add_obj_fun!, assemble!, print_results!, load_design!, run_app!, item_info, item_char, resp_gen, student_likelihood, FS_to_items#_mycopy,  fast_sort!, _myqle#, optimize
 
 ATA
 
