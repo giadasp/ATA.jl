@@ -32,7 +32,8 @@ end
 
 # Description
 
-Load the test assembly settings.
+Load the test assembly settings contained in the `settings_file`.
+It requires the [`start_ATA`](#ATA.start_ATA) step.
 
 # Arguments
 
@@ -270,6 +271,7 @@ end
 # Description
 
 Add friend sets to the `ATA.Model` as specified in the `settings_file` loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+It requires the [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) step.
 
 # Arguments
 
@@ -325,6 +327,18 @@ function add_friends!(ATAmodel::Model)
 	end
 end
 
+"""
+	add_enemies!(ATAmodel::Model)
+
+# Description
+
+Add enemy sets to the `ATA.Model` as specified in the `settings_file` loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+It requires the [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) step.
+
+# Arguments
+
+- **`ATAmodel::Model`** : Required. The model built with `start_ATA()` and with settings loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+"""
 function add_enemies!(ATAmodel::Model)
 	bank = ATAmodel.settings.bank
 	n_items = ATAmodel.settings.n_items
@@ -385,7 +399,22 @@ function add_enemies!(ATAmodel::Model)
 	end
 end
 
-function add_constraints!(ATAmodel::Model; constraints_file = "CategoricalConstraints.csv", constraints_delim = ";")
+"""
+	add_constraints!(ATAmodel::Model; constraints_file = "Constraints.csv", constraints_delim = ";")
+
+# Description
+
+Add categorical and sum constraints to the `ATA.Model` as specified in the `constraints_file`.
+It requires the [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) step.
+
+# Arguments
+
+  - **`ATAmodel::Model`** : Required. The model built with `start_ATA()` and with settings loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+  - **`constraints_file`** : Optional. Default: "Constraints.csv". The path of the file containing the categorical and sum constraints in the form of custom-separated values.
+  - **`constraints_delim`** : Optional. Default: ";". The custom-separator for the `constraints_file`.
+
+"""
+function add_constraints!(ATAmodel::Model; constraints_file = "Constraints.csv", constraints_delim = ";")
 	message=["", ""]
 	n_items = ATAmodel.settings.n_items
 	bank = ATAmodel.settings.bank
@@ -490,6 +519,21 @@ function add_constraints!(ATAmodel::Model; constraints_file = "CategoricalConstr
 	return message
 end
 
+"""
+	add_overlap!(ATAmodel::Model; overlap_file = "OverlapMatrix.csv", overlap_delim=";")
+
+# Description
+
+Add maximum overlap constraints to the `ATA.Model` as specified by the `overlap_file` which contains a `TxT` matrix defining the maximum number of shared items between each pair of tests.
+It requires the [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) step.
+
+# Arguments
+
+  - **`ATAmodel::Model`** : Required. The model built with `start_ATA()` and with settings loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+  - **`overlap_file`** : Optional. Default: "OverlapMatrix.csv". The path of the file containing the maximum overlap between each pair of tests in the form of a matrix with custom-separated values.
+  - **`overlap_delim`** : Optional. Default: ";". The custom-separator for the `overlap_file`.
+
+"""
 function add_overlap!(ATAmodel::Model; overlap_file = "OverlapMatrix.csv", overlap_delim=";")
 	T = ATAmodel.settings.T
 	n_items = ATAmodel.settings.n_items
@@ -514,6 +558,20 @@ function add_overlap!(ATAmodel::Model; overlap_file = "OverlapMatrix.csv", overl
 	end
 end
 
+"""
+	add_exp_score!(ATAmodel::Model)
+
+# Description
+
+Add the expected score constraints as specified in the `settings_file`.
+If the names of the expected score columns of the item bank are not provided in the `settings_file` they are computed as the item characteristic functions following the IRT model always specified in the `settings_file`.
+It requires the [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) step.
+
+# Arguments
+
+  - **`ATAmodel::Model`** : Required. The model built with `start_ATA()` and with settings loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+
+"""
 function add_exp_score!(ATAmodel::Model)
 	T = ATAmodel.settings.T
 	n_items = ATAmodel.settings.n_items
@@ -539,6 +597,97 @@ function add_exp_score!(ATAmodel::Model)
 	return ["success", "- Expected Score constrained."]
 end
 
+"""
+	add_obj_fun!(ATAmodel::Model)
+
+# Description
+
+Add the objective function as specified in the `settings_file`. It requires the [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) step.  
+
+# Arguments
+
+  - **`ATAmodel::Model`** : Required. The model built with `start_ATA()` and with settings loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function.
+
+"""
+function add_obj_fun!(ATAmodel::Model)
+	message = ["",""]
+	T = ATAmodel.settings.T
+	n_items = ATAmodel.settings.n_items
+	obj_points = ATAmodel.obj.points
+	if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+		IRT_parameters = ATAmodel.settings.IRT.parameters
+		IRT_model = ATAmodel.settings.IRT.model
+		IRT_D = ATAmodel.settings.IRT.D
+		IRT_parametrization = ATAmodel.settings.IRT.parametrization
+		IIF = Vector{Array{Float64, 2}}(undef, T)
+		ICF = Vector{Array{Float64, 2}}(undef, T)
+		K = zeros(Int, T)
+		for t = 1:T
+			K[t] = size(obj_points[t], 1)
+			IIF[t] = zeros(K[t], n_items)
+			ICF[t] = zeros(K[t], n_items)
+			for k = 1:K[t]
+				IIF[t][k, :] = item_info(IRT_parameters, [obj_points[t][k]], model = IRT_model, parametrization = IRT_parametrization, D = IRT_D)# K[t] x I
+				ICF[t][k, :] = item_char(IRT_parameters, [obj_points[t][k]], model = IRT_model, parametrization = IRT_parametrization, D = IRT_D)[1][:,:,1] # K[t] x I
+			end
+		end
+		JLD2.@save "OPT/IIF.jld2" IIF
+		if !isfile("OPT/ICF.jld2")
+			JLD2.@save "OPT/ICF.jld2" ICF
+		end
+		if ATAmodel.obj.type == "CC"
+			R = ATAmodel.obj.aux_int
+			K = zeros(Int, T)
+			IIF = Vector{Array{Float64, 3}}(undef, T)
+			ICF = Vector{Array{Float64, 3}}(undef, T)
+			JLD2.@load "BSPar.jld2" BSPar
+			BSa = Matrix(BSPar[2]) |> x -> x[:, 2:end]
+			BSb = Matrix(BSPar[1]) |> x -> x[:, 2:end]
+			for t = 1:T
+				K[t] = size(obj_points[t], 1)
+				IIF[t] = zeros(K[t], n_items, R)
+				ICF[t] = zeros(K[t], n_items, R)
+				for r = 1:R
+					if IRT_model == "1PL"
+						df = DataFrames.DataFrame(b = BSb[:, r]) #nqp values in interval\r\n",
+					elseif IRT_model == "2PL"
+						df = DataFrames.DataFrame(a = BSa[:, r], b = BSb[:, r]) #nqp values in interval\r\n",
+					elseif IRT_model == "3PL"
+						df = DataFrames.DataFrame(a = BSa[:, r], b = BSb[:, r], c = BSc[:, r])
+					end
+					for k = 1:K[t]
+						IIF[t][k, :, r] = item_info(df, obj_points[t][k]; model = IRT_model, parametrization = IRT_parametrization, D = IRT_D) # K[t] x I x R
+						ICF[t][k, :, r] = item_char(df, obj_points[t][k]; model = IRT_model, parametrization = IRT_parametrization, D = IRT_D) # K[t] x I x R
+					end
+				end
+			end
+			JLD2.@save "OPT/IIF_CC.jld2" IIF
+			JLD2.@save "OPT/ICF_CC.jld2" ICF
+			message = ["success","- MAXIMIN CC objective function applied.\n"]
+		else
+			message = ["success","- MAXIMIN objective function applied.\n"]
+		end
+		open("OPT/Settings.jl", "a") do f
+		write(f, "K = $K\n\n")
+	end
+	elseif !(ATAmodel.obj.type == "custom" || ATAmodel.obj.type == "")
+		return 	["danger","- Only \"MAXIMIN\", \"CC\", \"\" (no objective) and \"custom\" are supported. \n"]
+	end
+	
+	return message
+end
+
+"""
+	group_by_friends!(ATAmodel::Model)
+
+# Description
+
+Group the items by friend sets once the friend sets have been added to the `ATA.Model` by [`add_friends!`](#ATA.add_friends!-Tuple{ATA.Model}) function and as **last operation** of the assembly.
+
+# Arguments
+
+- **`ATAmodel::Model`** : Required. The model built with `start_ATA()`, settings loaded by [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) function and friend sets added by [`add_friends!`](#ATA.add_friends!-Tuple{ATA.Model}) function.
+"""
 function group_by_friends!(ATAmodel::Model) #last
 	n_items = ATAmodel.settings.n_items
 	#only works for categorical variables and item use, all the other contraitns need expansion by FS_items
@@ -620,74 +769,8 @@ function group_by_friends!(ATAmodel::Model) #last
 	end
 end
 
-function add_obj_fun!(ATAmodel::Model)
-	message = ["",""]
-	T = ATAmodel.settings.T
-	n_items = ATAmodel.settings.n_items
-	obj_points = ATAmodel.obj.points
-	if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
-		IRT_parameters = ATAmodel.settings.IRT.parameters
-		IRT_model = ATAmodel.settings.IRT.model
-		IRT_D = ATAmodel.settings.IRT.D
-		IRT_parametrization = ATAmodel.settings.IRT.parametrization
-		IIF = Vector{Array{Float64, 2}}(undef, T)
-		ICF = Vector{Array{Float64, 2}}(undef, T)
-		K = zeros(Int, T)
-		for t = 1:T
-			K[t] = size(obj_points[t], 1)
-			IIF[t] = zeros(K[t], n_items)
-			ICF[t] = zeros(K[t], n_items)
-			for k = 1:K[t]
-				IIF[t][k, :] = item_info(IRT_parameters, [obj_points[t][k]], model = IRT_model, parametrization = IRT_parametrization, D = IRT_D)# K[t] x I
-				ICF[t][k, :] = item_char(IRT_parameters, [obj_points[t][k]], model = IRT_model, parametrization = IRT_parametrization, D = IRT_D)[1][:,:,1] # K[t] x I
-			end
-		end
-		JLD2.@save "OPT/IIF.jld2" IIF
-		if !isfile("OPT/ICF.jld2")
-			JLD2.@save "OPT/ICF.jld2" ICF
-		end
-		if ATAmodel.obj.type == "CC"
-			R = ATAmodel.obj.aux_int
-			K = zeros(Int, T)
-			IIF = Vector{Array{Float64, 3}}(undef, T)
-			ICF = Vector{Array{Float64, 3}}(undef, T)
-			JLD2.@load "BSPar.jld2" BSPar
-			BSa = Matrix(BSPar[2]) |> x -> x[:, 2:end]
-			BSb = Matrix(BSPar[1]) |> x -> x[:, 2:end]
-			for t = 1:T
-				K[t] = size(obj_points[t], 1)
-				IIF[t] = zeros(K[t], n_items, R)
-				ICF[t] = zeros(K[t], n_items, R)
-				for r = 1:R
-					if IRT_model == "1PL"
-						df = DataFrames.DataFrame(b = BSb[:, r]) #nqp values in interval\r\n",
-					elseif IRT_model == "2PL"
-						df = DataFrames.DataFrame(a = BSa[:, r], b = BSb[:, r]) #nqp values in interval\r\n",
-					elseif IRT_model == "3PL"
-						df = DataFrames.DataFrame(a = BSa[:, r], b = BSb[:, r], c = BSc[:, r])
-					end
-					for k = 1:K[t]
-						IIF[t][k, :, r] = item_info(df, obj_points[t][k]; model = IRT_model, parametrization = IRT_parametrization, D = IRT_D) # K[t] x I x R
-						ICF[t][k, :, r] = item_char(df, obj_points[t][k]; model = IRT_model, parametrization = IRT_parametrization, D = IRT_D) # K[t] x I x R
-					end
-				end
-			end
-			JLD2.@save "OPT/IIF_CC.jld2" IIF
-			JLD2.@save "OPT/ICF_CC.jld2" ICF
-			message = ["success","- MAXIMIN CC objective function applied.\n"]
-		else
-			message = ["success","- MAXIMIN objective function applied.\n"]
-		end
-		open("OPT/Settings.jl", "a") do f
-		write(f, "K = $K\n\n")
-	end
-	elseif !(ATAmodel.obj.type == "custom" || ATAmodel.obj.type == "")
-		return 	["danger","- Only \"MAXIMIN\", \"CC\", \"\" (no objective) and \"custom\" are supported. \n"]
-	end
-	
-	return message
-end
-
 function load_design!(design::Matrix{Any}, ATAmodel::Model)
 	ATAmodel.output.design = design
 end
+
+

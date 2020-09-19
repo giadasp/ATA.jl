@@ -3,4 +3,5 @@
 ```@autodocs
 Modules = [ATA]
 Pages   = ["build.jl"]
+Order   = [:constant]
 ```
