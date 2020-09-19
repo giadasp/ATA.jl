@@ -1,10 +1,10 @@
 
 ## Custom objective function
 
-To add a custom objective function modify step 8. in previous examples.
+To add a custom objective function modify step 8 in previous examples.
 It works only with the siman solver.
 
-\8. Add objective function (Optional)
+8\. Add objective function (Optional)
 
 ```julia
 @info add_obj_fun!(ATAmodel)[2] 

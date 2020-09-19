@@ -113,7 +113,7 @@ If a `starting_design` is supplied, it should be set to `0`.
 ```julia
 verbosity = 2
 ```
-Default: 2. Values: `1` (minimal), `2` (detailed).
+Default: `2`. Values: `1` (minimal), `2` (detailed).
 Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution.
 The dots are the fill-up improvement steps.
 
