@@ -327,5 +327,5 @@ ATAmodel.obj.args = (IIF = FileIO.load("data/IIF.jld2", "IIF"), FS_items = ATAmo
 
 ## Parallel neighbouhoods evaluation (only siman)
 
-Run `Julia` with `<ncores>` cores by typing `julia -p <ncores>`.
+Before step 0, run `Julia` with `<ncores>` cores by typing `julia -p <ncores>` in the command prompt.
 
