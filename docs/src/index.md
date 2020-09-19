@@ -67,7 +67,7 @@ A Dash app is available for an even more easier experience. Look at "examples/ex
 ## Documentation Contents
 
 ```@contents
-Pages = ["build.md", "opt.md", "utils.md", "examples.md"]
+Pages = ["build.md", "opt.md", "print.md", "utils.md", "examples.md"]
 Depth = 3
 ```
 
