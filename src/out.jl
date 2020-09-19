@@ -8,7 +8,7 @@ Print the features of the assembled tests and plots the test information functio
 # Arguments
 
 - **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nFSxT` if the items are grouped by friend sets. 
-- **`group_by_fs=false`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](##ATA.group_by_friends!-Tuple{ATA.Model}).
+- **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.Model}).
 - **`results_folder`** : Optional. Default: "RESULTS". The folder in which the output is stored.
 - **`plots_out`** : Optional. Default: `false`. Create the plots. It requires the packages `Plots.jl` and `PGFPlotsX.jl` and lualatex installed in the pc.
 """
