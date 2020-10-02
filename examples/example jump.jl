@@ -15,7 +15,12 @@ ATAmodel = start_ATA()
 
 # Each of the following commands returns a string vector, the second element is a message describing the result.
 # 1. Add file with custom settings (Needed)
-@info load_settings!(ATAmodel; settings_file="SettingsATA.jl", bank_file="data/bank.csv", bank_delim=";")[2]
+@info load_settings!(
+    ATAmodel;
+    settings_file = "SettingsATA.jl",
+    bank_file = "data/bank.csv",
+    bank_delim = ";",
+)[2]
 
 # 2. Add friend set variables (Optional)
 @info add_friends!(ATAmodel)[2]
@@ -24,10 +29,14 @@ ATAmodel = start_ATA()
 @info add_enemies!(ATAmodel)[2]
 
 # 4. Add categorical constraints (Optional)
-@info add_constraints!(ATAmodel; constraints_file="Constraints.csv", constraints_delim=";")[2]
+@info add_constraints!(
+    ATAmodel;
+    constraints_file = "Constraints.csv",
+    constraints_delim = ";",
+)[2]
 
 # 5. Add overlap maxima (Optional)
-@info add_overlap!(ATAmodel; overlap_file="OverlapMatrix.csv", overlap_delim=";")[2]
+@info add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")[2]
 
 # 6. Add expected score constraints (Optional)
 @info add_exp_score!(ATAmodel)[2]
@@ -36,7 +45,7 @@ ATAmodel = start_ATA()
 @info group_by_friends!(ATAmodel)[2]
 
 # 8. Add objective function (Optional)
-@info add_obj_fun!(ATAmodel)[2] 
+@info add_obj_fun!(ATAmodel)[2]
 
 # Assembly settings
 
@@ -50,11 +59,12 @@ optimizer_constructor = "Cbc"
 optimizer_attributes = [("seconds", 100), ("logLevel", 1)]
 
 # 9. assemble
-assemble!(ATAmodel;
-    solver=solver,
-    optimizer_attributes=optimizer_constructor,
-    optimizer_constructor=optimizer_attributes
-    )
+assemble!(
+    ATAmodel;
+    solver = solver,
+    optimizer_attributes = optimizer_constructor,
+    optimizer_constructor = optimizer_attributes,
+)
 
 # All the settings and outputs from optimization are in ATAmodel object.
 # See the struct in ATA.jl to understand how to retrieve all the information.
@@ -62,7 +72,4 @@ assemble!(ATAmodel;
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
 
-print_results!(ATAmodel;
-group_by_fs=true,
-plots_out=true,
-results_folder="RESULTS")
+print_results!(ATAmodel; group_by_fs = true, plots_out = true, results_folder = "RESULTS")

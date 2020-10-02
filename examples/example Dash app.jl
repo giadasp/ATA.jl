@@ -12,5 +12,3 @@ using DashHtmlComponents
 # (ex: using Cbc; run_app!()).
 run_app!()
 # Navigate with the browser to localhost:8080
-
-

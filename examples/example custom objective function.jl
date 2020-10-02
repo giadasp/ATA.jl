@@ -16,7 +16,12 @@ ATAmodel = start_ATA()
 
 # Each of the following commands returns a string vector, the second element is a message describing the result.
 # 1. Add file with custom settings (Needed)
-@info load_settings!(ATAmodel; settings_file="SettingsATA.jl", bank_file="data/bank.csv", bank_delim=";")[2]
+@info load_settings!(
+    ATAmodel;
+    settings_file = "SettingsATA.jl",
+    bank_file = "data/bank.csv",
+    bank_delim = ";",
+)[2]
 
 # 2. Add friend set variables (Optional)
 @info add_friends!(ATAmodel)[2]
@@ -25,10 +30,14 @@ ATAmodel = start_ATA()
 @info add_enemies!(ATAmodel)[2]
 
 # 4. Add categorical constraints (Optional)
-@info add_constraints!(ATAmodel; constraints_file="Constraints.csv", constraints_delim=";")[2]
+@info add_constraints!(
+    ATAmodel;
+    constraints_file = "Constraints.csv",
+    constraints_delim = ";",
+)[2]
 
 # 5. Add overlap maxima (Optional)
-@info add_overlap!(ATAmodel; overlap_file="OverlapMatrix.csv", overlap_delim=";")[2]
+@info add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")[2]
 
 # 6. Add expected score constraints (Optional)
 @info add_exp_score!(ATAmodel)[2]
@@ -37,36 +46,37 @@ ATAmodel = start_ATA()
 @info group_by_friends!(ATAmodel)[2]
 
 # 8. Add objective function (Optional)
-@info add_obj_fun!(ATAmodel)[2] 
+@info add_obj_fun!(ATAmodel)[2]
 
 # custom objective type, function and arguments
 ATAmodel.obj.type = "custom"
 
 ATAmodel.obj.fun = function (x::Matrix{Float64}, obj_args::NamedTuple)
-	IIF = obj_args.IIF
-	T = size(IIF, 1)
-	TIF = zeros(Float64, T)
-	for t = 1:T
+    IIF = obj_args.IIF
+    T = size(IIF, 1)
+    TIF = zeros(Float64, T)
+    for t = 1:T
         K, I = size(IIF[t])
         # ungroup items
         xₜ = FS_to_items(x[:, t], obj_args.FS_items)
-		if K > 1
-			TIF[t] = Inf
-			for k = 1:K
-				TIF[t] = min(TIF, LinearAlgebra.dot(IIF[1, :], xₜ))
-			end
-		else
-			TIF[t] = LinearAlgebra.BLAS.gemv('N', IIF, xₜ)[1]
-		end
+        if K > 1
+            TIF[t] = Inf
+            for k = 1:K
+                TIF[t] = min(TIF, LinearAlgebra.dot(IIF[1, :], xₜ))
+            end
+        else
+            TIF[t] = LinearAlgebra.BLAS.gemv('N', IIF, xₜ)[1]
+        end
     end
     min_TIF = minimum(TIF)
-    TIF = [min_TIF for t = 1:T] 
+    TIF = [min_TIF for t = 1:T]
     # Must return a vector of length T.
     # The resulting objective function is the minimum of all values in this vector.
-	return TIF::Vector{Float64}
+    return TIF::Vector{Float64}
 end
 
-ATAmodel.obj.args = (IIF = FileIO.load("data/IIF.jld2", "IIF"), FS_items = ATAmodel.settings.FS.items)
+ATAmodel.obj.args =
+    (IIF = FileIO.load("data/IIF.jld2", "IIF"), FS_items = ATAmodel.settings.FS.items)
 
 # Assembly settings
 
@@ -101,7 +111,7 @@ n_fill = 1
 # Default: 1. Values: `[0, Inf)`.
 # Number of fill-up phases, usually 1 is sufficient, if start_temp is high it can be higher. 
 # If a starting_design is supplied, it should be set to 0.
- 
+
 verbosity = 2
 # Default: 2. Values: `1` (minimal), `2` (detailed).
 # Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution.
@@ -128,22 +138,23 @@ opt_nh = Inf
 
 
 # 9. assemble
-assemble!(ATAmodel;
-    solver=solver,
-    max_time=max_time,
-    start_temp=start_temp,
-    geom_temp=geom_temp,
-    n_item_sample=n_item_sample,
-    n_test_sample=n_test_sample,
-    verbosity=verbosity,
-    max_conv=max_conv,
-    opt_feas=opt_feas,
-    n_fill=n_fill,
-    feas_nh=feas_nh,
-    opt_nh=opt_nh# ,
+assemble!(
+    ATAmodel;
+    solver = solver,
+    max_time = max_time,
+    start_temp = start_temp,
+    geom_temp = geom_temp,
+    n_item_sample = n_item_sample,
+    n_test_sample = n_test_sample,
+    verbosity = verbosity,
+    max_conv = max_conv,
+    opt_feas = opt_feas,
+    n_fill = n_fill,
+    feas_nh = feas_nh,
+    opt_nh = opt_nh,# ,
     # optimizer_attributes = optimizer_constructor,
     # optimizer_constructor =optimizer_attributes
-    )
+)
 
 # All the settings and outputs from optimization are in ATAmodel object.
 # See the struct in ATA.jl to understand how to retrieve all the information.
@@ -156,7 +167,4 @@ using PGFPlotsX
 
 # requires lualatex installed 
 ATAmodel.obj.type = "MAXIMIN"
-print_results!(ATAmodel;
-group_by_fs=true,
-plots_out=false,
-results_folder="RESULTS")
+print_results!(ATAmodel; group_by_fs = true, plots_out = false, results_folder = "RESULTS")

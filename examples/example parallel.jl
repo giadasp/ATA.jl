@@ -13,13 +13,13 @@
 #julia -p numberOfCores]
 
 using Distributed #this is not needed if Julia has been run with numberOfCores>1
-@everywhere   using DataFrames.DataFrames
-@everywhere   using Distributed
-@everywhere   cd("folder in which the package is saved")
-@everywhere   using Pkg
-@everywhere   Pkg.activate(".")  # required
-@everywhere   Pkg.instantiate()
-@everywhere   using ATA
+@everywhere using DataFrames.DataFrames
+@everywhere using Distributed
+@everywhere cd("folder in which the package is saved")
+@everywhere using Pkg
+@everywhere Pkg.activate(".")  # required
+@everywhere Pkg.instantiate()
+@everywhere using ATA
 
 #@everywhere cd("where your input files are")
 #Input files needed: settingsATA.jl, bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
@@ -34,7 +34,12 @@ ATAmodel = start_ATA()
 
 #Each of the following commands returns a string vector, the second element is a message describing the result.
 #1. Add file with custom settings (Needed)
-println(load_settings!(ATAmodel; settings_file = "settingsATA.jl", bank_file = "bank.csv", bank_delim = ";")[2])
+println(load_settings!(
+    ATAmodel;
+    settings_file = "settingsATA.jl",
+    bank_file = "bank.csv",
+    bank_delim = ";",
+)[2])
 
 #2. Add friend set variables (Optional)
 println(add_friends!(ATAmodel)[2])
@@ -43,10 +48,14 @@ println(add_friends!(ATAmodel)[2])
 println(add_enemies!(ATAmodel)[2])
 
 #4. Add categorical constraints (Optional)
-println(add_constraints!(ATAmodel; constraints_file = "constraints.csv", constraints_delim=";")[2])
+println(add_constraints!(
+    ATAmodel;
+    constraints_file = "constraints.csv",
+    constraints_delim = ";",
+)[2])
 
 #5. Add overlap maxima (Optional)
-println(add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim=";")[2])
+println(add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")[2])
 
 #6. Add expected score constraints (Optional)
 println(add_exp_score!(ATAmodel)[2])
@@ -89,7 +98,7 @@ n_fill = 1
 # Default: 1. Values: `[0, Inf)`.
 # Number of fill-up phases, usually 1 is sufficient, if start_temp is high it can be higher. 
 # If a starting_design is supplied, it should be set to 0.
- 
+
 verbosity = 2
 # Default: 2. Values: `1` (minimal), `2` (detailed).
 # Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution.
@@ -115,7 +124,8 @@ opt_nh = Inf
 # Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
 
 #9. assemble
-assemble!(ATAmodel;
+assemble!(
+    ATAmodel;
     solver = solver,
     max_time = max_time,
     start_temp = start_temp,
@@ -129,18 +139,15 @@ assemble!(ATAmodel;
     feas_nh = feas_nh,
     opt_nh = opt_nh,
     optimizer_attributes = optimizer_constructor,
-    optimizer_constructor =optimizer_attributes
-    )
+    optimizer_constructor = optimizer_attributes,
+)
 
 # All the settings and outputs from optimization are in ATAmodel object.
 # See the struct in ATA.jl to understand how to retrieve all the information.
 # A summary of the resulting tests is available in results_folder/Results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
-print_results(ATAmodel;
-group_by_fs = true,
-plots_out = false,
-results_folder = "RESULTS")
+print_results(ATAmodel; group_by_fs = true, plots_out = false, results_folder = "RESULTS")
 
 
 #to stop all the processes do:

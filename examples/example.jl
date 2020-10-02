@@ -12,7 +12,12 @@ ATAmodel = start_ATA()
 
 # Each of the following commands returns a string vector, the second element is a message describing the result.
 # 1. Add file with custom settings (Needed)
-@info load_settings!(ATAmodel; settings_file="SettingsATA.jl", bank_file="data/bank.csv", bank_delim=";")[2]
+@info load_settings!(
+    ATAmodel;
+    settings_file = "SettingsATA.jl",
+    bank_file = "data/bank.csv",
+    bank_delim = ";",
+)[2]
 
 # 2. Add friend set variables (Optional)
 @info add_friends!(ATAmodel)[2]
@@ -21,10 +26,14 @@ ATAmodel = start_ATA()
 @info add_enemies!(ATAmodel)[2]
 
 # 4. Add categorical constraints (Optional)
-@info add_constraints!(ATAmodel; constraints_file="Constraints.csv", constraints_delim=";")[2]
+@info add_constraints!(
+    ATAmodel;
+    constraints_file = "Constraints.csv",
+    constraints_delim = ";",
+)[2]
 
 # 5. Add overlap maxima (Optional)
-@info add_overlap!(ATAmodel; overlap_file="OverlapMatrix.csv", overlap_delim=";")[2]
+@info add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")[2]
 
 # 6. Add expected score constraints (Optional)
 @info add_exp_score!(ATAmodel)[2]
@@ -33,7 +42,7 @@ ATAmodel = start_ATA()
 @info group_by_friends!(ATAmodel)[2]
 
 # 8. Add objective function (Optional)
-@info add_obj_fun!(ATAmodel)[2] 
+@info add_obj_fun!(ATAmodel)[2]
 
 # Assembly settings
 
@@ -67,7 +76,7 @@ n_fill = 1
 # Default: 1. Values: `[0, Inf)`.
 # Number of fill-up phases, usually 1 is sufficient, if start_temp is high it can be higher. 
 # If a starting_design is supplied, it should be set to 0.
- 
+
 verbosity = 2
 # Default: 2. Values: `1` (minimal), `2` (detailed).
 # Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution.
@@ -93,21 +102,22 @@ opt_nh = Inf
 # Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
 
 # 9. assemble
-assemble!(ATAmodel;
-    solver=solver,
-    max_time=max_time,
-    start_temp=start_temp,
-    geom_temp=geom_temp,
+assemble!(
+    ATAmodel;
+    solver = solver,
+    max_time = max_time,
+    start_temp = start_temp,
+    geom_temp = geom_temp,
     results_folder = results_folder,
-    n_item_sample=n_item_sample,
-    n_test_sample=n_test_sample,
-    verbosity=verbosity,
-    max_conv=max_conv,
-    opt_feas=opt_feas,
-    n_fill=n_fill,
-    feas_nh=feas_nh,
-    opt_nh=opt_nh
-    )
+    n_item_sample = n_item_sample,
+    n_test_sample = n_test_sample,
+    verbosity = verbosity,
+    max_conv = max_conv,
+    opt_feas = opt_feas,
+    n_fill = n_fill,
+    feas_nh = feas_nh,
+    opt_nh = opt_nh,
+)
 
 # All the settings and outputs from optimization are in ATAmodel object.
 # See the struct in ATA.jl to understand how to retrieve all the information.
@@ -115,7 +125,4 @@ assemble!(ATAmodel;
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
 
-print_results!(ATAmodel;
-group_by_fs=true,
-plots_out=true,
-results_folder="RESULTS")
+print_results!(ATAmodel; group_by_fs = true, plots_out = true, results_folder = "RESULTS")
