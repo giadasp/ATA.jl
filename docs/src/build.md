@@ -2,7 +2,7 @@
 
 ```@docs
 start_ATA()
-load_settings!(::ATA.Model; settings_file = "SettingsATA.jl", bank_file = "bank.csv", bank_delim = ";")
+load_settings!(::ATA.Model; settings_file = "SettingsATA.jl", bank_file = "Bank.csv", bank_delim = ";")
 add_friends!(::ATA.Model)
 add_enemies!(::ATA.Model)
 add_constraints!(::ATA.Model; constraints_file = "Constraints.csv", constraints_delim = ";")

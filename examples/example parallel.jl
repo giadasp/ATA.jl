@@ -22,7 +22,7 @@ using Distributed #this is not needed if Julia has been run with numberOfCores>1
 @everywhere using ATA
 
 #@everywhere cd("where your input files are")
-#Input files needed: settingsATA.jl, bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
+#Input files needed: settingsATA.jl, Bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
 #settingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...
 #CategoricalConstraints.csv : categorical constraints
 #OverlapMatrix.csv : maximum overlap allowed between test forms, it is a TxT matrix. If the assembly is non parallel (i.e. there is more than one group of parallel tests, n_groups>1)
@@ -37,7 +37,7 @@ ATAmodel = start_ATA()
 println(load_settings!(
     ATAmodel;
     settings_file = "settingsATA.jl",
-    bank_file = "bank.csv",
+    bank_file = "Bank.csv",
     bank_delim = ";",
 )[2])
 
@@ -147,8 +147,12 @@ assemble!(
 # A summary of the resulting tests is available in results_folder/Results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
-print_results(ATAmodel; group_by_fs = true, plots_out = false, results_folder = "RESULTS")
+print_results(ATAmodel; group_by_fs = true,  results_folder = "RESULTS")
 
+
+#]add https://github.com/giadasp/ATAPlot.jl
+using ATAPlot
+plot_results(ATAmodel; group_by_fs = true, results_folder = "PLOTS")
 
 #to stop all the processes do:
 #ctrl+C

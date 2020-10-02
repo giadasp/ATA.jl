@@ -2,7 +2,7 @@
 # using Pkg
 # Pkg.activate(".")  # required
 # Pkg.instantiate()
-# cd("where your input files are")
+# cd("the path of this file")
 using ATA
 
 # Each of the following commands returns a string vector, the second element is a message describing the result.
@@ -15,7 +15,7 @@ ATAmodel = start_ATA()
 @info load_settings!(
     ATAmodel;
     settings_file = "SettingsATA.jl",
-    bank_file = "data/bank.csv",
+    bank_file = "data/Bank.csv",
     bank_delim = ";",
 )[2]
 
@@ -101,6 +101,10 @@ opt_nh = Inf
 # Default: `5`. Values: `[1, Inf)`. 
 # Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
 
+results_folder = "RESULTS"
+# Default: `"RESULTS"`. 
+# The folder in which the results of the optimization are saved
+
 # 9. assemble
 assemble!(
     ATAmodel;
@@ -108,7 +112,6 @@ assemble!(
     max_time = max_time,
     start_temp = start_temp,
     geom_temp = geom_temp,
-    results_folder = results_folder,
     n_item_sample = n_item_sample,
     n_test_sample = n_test_sample,
     verbosity = verbosity,
@@ -117,6 +120,7 @@ assemble!(
     n_fill = n_fill,
     feas_nh = feas_nh,
     opt_nh = opt_nh,
+    results_folder = results_folder
 )
 
 # All the settings and outputs from optimization are in ATAmodel object.
@@ -125,4 +129,8 @@ assemble!(
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
 
-print_results!(ATAmodel; group_by_fs = true, plots_out = true, results_folder = "RESULTS")
+print_results(ATAmodel; group_by_fs = true, results_folder = "RESULTS")
+
+#]add https://github.com/giadasp/ATAPlot.jl
+using ATAPlot
+plot_results(ATAmodel; group_by_fs = true, results_folder = "PLOTS")

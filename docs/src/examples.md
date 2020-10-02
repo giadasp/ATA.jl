@@ -110,7 +110,7 @@ using Plots
 Pkg.add("PGFPlotsX")
 using PGFPlotsX
 
-print_results!(ATAmodel;
+print_results(ATAmodel;
 group_by_fs=true,
 plots_out=true,
 results_folder="RESULTS")

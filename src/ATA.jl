@@ -17,7 +17,7 @@ include("structs.jl")
 include("utils.jl")
 include("build.jl")
 include("opt.jl")
-include("out.jl")
+include("print.jl")
 
 function __init__()
     @require Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76" begin
@@ -63,9 +63,9 @@ function __init__()
     @require ATAPlot = "372623d9-1dd6-4d20-a513-3f20705132c0" begin
         include("plot.jl")
     end
-    @require Dash = "1b08a953-4be3-4667-9a23-3db579824955" begin
-        @require DashHtmlComponents = "1b08a953-4be3-4667-9a23-f6ba134464e5" begin
-            @require DashCoreComponents = "1b08a953-4be3-4667-9a23-e4a2b8b6b400" include("app.jl")
+    @require ATADash = "236b7dbe-4167-40cb-a459-bcf8ce4b2cbd" begin
+        function 
+            run_app() = ATADash.ATA_app() 
         end
     end
     @require JuMP = "4076af6c-e467-56ae-b986-b466b2749572" include("jump.jl")

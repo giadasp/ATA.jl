@@ -12,7 +12,16 @@ Plot the ICFs and TIFs of the assembled tests.
 - **`results_folder`** : Optional. Default: "PLOTS". The folder in which the output is stored.
 """
 function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
-
+    if !(results_folder in readdir())
+        mkdir(results_folder)
+    else
+        println(string(
+            "You have already a folder with this name, files in ",
+            results_folder,
+            " will be overwritten.\n",
+        ))
+    end
+    T = ATAmodel.settings.T
     if size(ATAmodel.output.design, 1) > 0
         n_items = ATAmodel.settings.n_items
         length_max = [ATAmodel.constraints[t].length_max for t = 1:T]
@@ -63,31 +72,40 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
                 simPool = Float64[]
             end
 
-            if plots_out == true
-                ThetasPlot = collect(range(-4, stop = 4, length = 101)) #nqp values in interval/r/n",
-                IIFplot = item_info(
-                    ATAmodel.settings.IRT.parameters,
-                    ThetasPlot,
-                    model = ATAmodel.settings.IRT.model,
-                )
-                ICFplot = item_char(
-                    ATAmodel.settings.IRT.parameters,
-                    ThetasPlot,
-                    model = ATAmodel.settings.IRT.model,
-                )[1][
-                    :,
-                    :,
-                    1,
-                ]
-                IIFf = Array{Float64,2}(undef, T, 101)
-                ICFf = Array{Float64,2}(undef, T, 101)
+            ThetasPlot = collect(range(-4, stop = 4, length = 101)) #nqp values in interval/r/n",
+            IIFplot = item_info(
+                ATAmodel.settings.IRT.parameters,
+                ThetasPlot,
+                model = ATAmodel.settings.IRT.model,
+            )
+            ICFplot = item_char(
+                ATAmodel.settings.IRT.parameters,
+                ThetasPlot,
+                model = ATAmodel.settings.IRT.model,
+            )[1][
+                :,
+                :,
+                1,
+            ]
+            IIFf = Array{Float64,2}(undef, T, 101)
+            ICFf = Array{Float64,2}(undef, T, 101)
 
-                for t = 1:T
-                    IIFf[t, :] = [sum(IIFplot[findall(design[:, t] .> 0), i]) for i = 1:101]
-                    ICFf[t, :] = [sum(ICFplot[findall(design[:, t] .> 0), i]) for i = 1:101]
-                end
+            for t = 1:T
+                IIFf[t, :] = [sum(IIFplot[findall(design[:, t] .> 0), i]) for i = 1:101]
+                ICFf[t, :] = [sum(ICFplot[findall(design[:, t] .> 0), i]) for i = 1:101]
+            end
 
-                ATAPlot.PlotATA(
+            ATAPlot.plot_ATA(
+                ATAmodel,
+                IIFf,
+                ICFf,
+                design;
+                simPool = simPool,
+                results_folder = results_folder,
+            )
+
+            if ATAmodel.obj.type == "CC"
+                ATAPlot.plot_ATA_CC(
                     ATAmodel,
                     IIFf,
                     ICFf,
@@ -95,18 +113,6 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
                     simPool = simPool,
                     results_folder = results_folder,
                 )
-
-                if ATAmodel.obj.type == "CC"
-                    ATAPlot.PlotATA_CC(
-                        ATAmodel,
-                        IIFf,
-                        ICFf,
-                        design;
-                        simPool = simPool,
-                        results_folder = results_folder,
-                    )
-                end
-
             end
 
         end

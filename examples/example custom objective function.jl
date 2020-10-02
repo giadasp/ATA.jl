@@ -19,7 +19,7 @@ ATAmodel = start_ATA()
 @info load_settings!(
     ATAmodel;
     settings_file = "SettingsATA.jl",
-    bank_file = "data/bank.csv",
+    bank_file = "data/Bank.csv",
     bank_delim = ";",
 )[2]
 
@@ -162,9 +162,10 @@ assemble!(
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
 
-using Plots
-using PGFPlotsX
-
-# requires lualatex installed 
 ATAmodel.obj.type = "MAXIMIN"
-print_results!(ATAmodel; group_by_fs = true, plots_out = false, results_folder = "RESULTS")
+print_results(ATAmodel; group_by_fs = true,  results_folder = "RESULTS")
+
+
+#]add https://github.com/giadasp/ATAPlot.jl
+using ATAPlot
+plot_results(ATAmodel; group_by_fs = true, results_folder = "PLOTS")

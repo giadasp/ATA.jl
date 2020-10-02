@@ -28,7 +28,7 @@ function start_ATA()
 end
 
 """
-    load_settings!(ATAmodel::Model; settings_file = "SettingsATA.jl", bank_file = "bank.csv", bank_delim = ";")
+    load_settings!(ATAmodel::Model; settings_file = "SettingsATA.jl", bank_file = "Bank.csv", bank_delim = ";")
 
 # Description
 
@@ -39,13 +39,13 @@ It requires the [`start_ATA`](#ATA.start_ATA) step.
 
 - **`ATAmodel::Model`** : Required. The model built with `start_ATA()` function.
 - **`settings_file`** : Optional. Default: "SettingsATA.jl". The path of the file containing the ATA settings in the form of an `InputSettings` struct.
-- **`bank_file`** : Optional. Default: "bank.csv". The path of the file containing the item pool/bank in the form of custom-separated values.
+- **`bank_file`** : Optional. Default: "Bank.csv". The path of the file containing the item pool/bank in the form of custom-separated values.
 - **`bank_delim`** : Optional. Default: ";". The custom-separator for the bank_file.
 """
 function load_settings!(
     ATAmodel::Model;
     settings_file = "SettingsATA.jl",
-    bank_file = "bank.csv",
+    bank_file = "Bank.csv",
     bank_delim = ";",
 )
     message = ["", ""]
@@ -928,7 +928,7 @@ end
 # Description
 
 Load a 0-1 `IxT` (or `nFSxT` if the items are grouped by friend sets) design matrix into the ATA model.
-Useful for loading a custom starting design before the `assemble!` step or to print/plot the features of the tests produced by a custom design before running `print_results!`
+Useful for loading a custom starting design before the `assemble!` step or to print/plot the features of the tests produced by a custom design before running `print_results`
 
 # Arguments
 
