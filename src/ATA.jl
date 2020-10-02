@@ -85,13 +85,12 @@ export mean,
     print_results,
     plot_results,
     load_design!,
-    run_app!,
     item_info,
     item_char,
     resp_gen,
     student_likelihood,
-    FS_to_items#_mycopy,  fast_sort!, _myqle#, optimize
-
+    FS_to_items,#_mycopy,  fast_sort!, _myqle#, optimize
+    run_app
 ATA
 
 end
