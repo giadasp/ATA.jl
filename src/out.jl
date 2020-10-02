@@ -115,7 +115,7 @@ function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS"
                         "Median",
                         "0.75-Qle",
                         "max",
-                        L"{\alpha}-Qle",
+                        string(ATAmodel.obj.aux_float,"-Qle"),
                         "Estimated",
                         "True",
                     ]),
@@ -129,7 +129,7 @@ function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS"
                         "Median",
                         "0.75-Qle",
                         "max",
-                        L"{\alpha}-Qle",
+                    	string(ATAmodel.obj.aux_float,"-Qle"),
                         "Estimated",
                     ]),
                 )

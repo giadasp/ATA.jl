@@ -11,7 +11,6 @@ import Random
 import LinearAlgebra
 import JLD2
 import StatsBase
-import LaTeXStrings.@L_str
 using Requires
 
 include("structs.jl")
