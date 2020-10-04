@@ -72,7 +72,7 @@ assemble!(
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
 
-print_results(ATAmodel; group_by_fs = true,  results_folder = "RESULTS")
+print_results(ATAmodel; group_by_fs = true, results_folder = "RESULTS")
 
 #]add https://github.com/giadasp/ATAPlot.jl
 using ATAPlot

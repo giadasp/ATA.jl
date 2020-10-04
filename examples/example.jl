@@ -120,7 +120,7 @@ assemble!(
     n_fill = n_fill,
     feas_nh = feas_nh,
     opt_nh = opt_nh,
-    results_folder = results_folder
+    results_folder = results_folder,
 )
 
 # All the settings and outputs from optimization are in ATAmodel object.
