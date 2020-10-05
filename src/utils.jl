@@ -298,15 +298,15 @@ function _desume_pars(
         b = mapslices(x -> b .- x, d; dims = 2)
     end
 
-    a2 = ones(n_items)
+    a2 = ones(n_items) #default: "at+b" a*theta + b
     if parametrization == "at-b" #a*theta - b
         b = -b
     elseif parametrization == "at-ab" #a*(theta - b)
         a2 = copy(a)
         b = -b
-    elseif parametrization == "at+ab" #a*theta + b
+    elseif parametrization == "at+ab" #a*(theta + b)
         a2 = copy(a)
-    end
+    end 
     return a, a2, b, c
 end
 
