@@ -506,9 +506,9 @@ function item_info(
     D = 1,
 ) #true, false
     theta = [theta]
-    return function item_info(
-        pars
-        theta
+    return item_info(
+        pars,
+        theta,
         model = model,
         parametrization = parametrization, 
         D = D,
