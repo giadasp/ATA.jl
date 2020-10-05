@@ -276,28 +276,27 @@ function _desume_pars(
         ("a1" in names(pars) || "a" in names(pars)) ||
             error("discrimination parameter a1 not defined")
     end
-
+    b = pars.b
     nb = 0
-    b = zeros(Float64, size(pars, 1), 1)
-    for n in names(pars)
-        if startswith(string(n), "b")
-            nb += 1
-            b = hcat(b, pars[!, n])
-        end
-    end
-    nd = 0
-    b = zeros(Float64, size(pars, 1), 1)
-    for n in names(pars)
-        if startswith(string(n), "d")
-            nd += 1
-            d = hcat(d, pars[!, n])
-        end
-    end
     # TODO grm
-    if nd > 0
-        b = mapslices(x -> b .- x, d; dims = 2)
-    end
-
+    # b = zeros(Float64, size(pars, 1), 1)
+    # for n in names(pars)
+    #     if startswith(string(n), "b")
+    #         nb += 1
+    #         b = hcat(b, pars[!, n])
+    #     end
+    # end
+    # nd = 0
+    # d = zeros(Float64, size(pars, 1), 1)
+    # for n in names(pars)
+    #     if startswith(string(n), "d")
+    #         nd += 1
+    #         d = hcat(d, pars[!, n])
+    #     end
+    # end
+    # if nd > 0
+    #     d = mapslices(x -> b .- x, d; dims = 2)
+    # end
     a2 = ones(n_items) #default: "at+b" a*theta + b
     if parametrization == "at-b" #a*theta - b
         b = -b
