@@ -521,13 +521,13 @@ function analyse_NH(
             h₂ = 0
             while exit == 0 && h₂ < nI
                 add_remove = 0
-                while exit == 0 && add_remove < 2
+                h₂ += 1
+                #println("item ", h₂, " of ", size(taken_items, 1))
+                h = taken_items[h₂]
+                while exit == 0 && add_remove < 2 
                     add_remove += 1
                     NH₁ = _mycopy(NH₀, NH₁)
-                    h₂ += 1
-                    println("item ", h₂, " of ", size(taken_items, 1))
                     #try to remove h
-                    h = taken_items[h₂]
                     #iu = copy(iu₀)
                     #if rand()>0.0
                     if add_remove == 1 #remove
@@ -570,10 +570,8 @@ function analyse_NH(
                         )
                         #NH₁.ol[v] = eval_overlap_v(NH₁.x[:, v], NH₁.x, ATAmodel.settings.FS.counts, ol_maxₜ, v)
                         if fF == false
-
                             NH₁.obj[v] =
                                 eval_TIF_CCₜ(x_Iₜ, IIFₜ; α = ATAmodel.obj.aux_float)
-
                         end
                         NH₁.f = _comp_f(NH₁, opt_feas)
                         f_evals += 1
@@ -643,7 +641,6 @@ function analyse_NH(
                                 n_items,
                             )
                             if fF == false
-
                                 NH₁.obj[v] =
                                     eval_TIF_CCₜ(x_Iₜ, IIFₜ; α = ATAmodel.obj.aux_float)
                             end
@@ -904,7 +901,7 @@ function analyse_NH(
             else
                 nI = n_item_sample
             end
-            taken_items = taken_items #Random.shuffle!(taken_items) #reset
+            # #Random.shuffle!(taken_items) #reset
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
@@ -1280,7 +1277,7 @@ function analyse_NH(
             else
                 nI = n_item_sample
             end
-            taken_items = taken_items #Random.shuffle!(taken_items) #reset
+            # Random.shuffle!(taken_items) #reset
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
