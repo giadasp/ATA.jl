@@ -337,8 +337,10 @@ function FS_to_items(xₜ::Vector{Float64}, n_items::Int64, FS_items::Vector{Vec
     return x_Iₜ::Vector{Float64}
 end
 
+
+
 """
-	item_char(pars, theta; model = "2PL", parametrization = "at-b", D = 1, derivatives = false) 
+	item_char(pars::DataFrames.DataFrame, theta::Vector{Float64}; model = "2PL", parametrization = "at-b", D = 1, derivatives = false) 
 
 # Description
 
@@ -396,8 +398,49 @@ function item_char(
     return p, pder
 end
 
+
 """
-	item_info(pars, theta; model = "2PL", parametrization = "at-b", D = 1, derivatives = false) 
+	item_char(pars::DataFrames.DataFrame, theta::Float64; model = "2PL", parametrization = "at-b", D = 1, derivatives = false) 
+
+# Description
+
+Compute the item characteristic function (probability of correct answer).
+
+# Arguments
+
+- **`pars::DataFrames.DataFrame`** : Required. DataFrame with item parameters (difficulty: b or d, discrimination: a or a1, guessing: c or g).
+- **`theta::Float64`** : Required. Ability point.
+- **`model`** : Optional. Default: `"2PL`". Values:  `"1PL`", `"2PL`", `"3PL`". IRT model.
+- **`parametrization`** : Optional. Default: `"at-b`". Values:  `"at-b`", `"at-ab`", `"at+b`", `"at+ab`". IRT model parametrization. Ex: at-b is ``Da(\\theta-b)``.
+- **`D`** : Optional. Default: 1. 
+- **`derivatives`** : Optional. Default: false. If it's true compute the derivatives. Ow a `zeros(0,0)` matrix is returned. 
+
+# Output
+
+- **`p::Matrix{Float64}`**: Matrix of probabilites. 
+- **`pder::Matrix{Float64}`**: Matrix of derivatives.
+"""
+function item_char(
+    pars::DataFrames.DataFrame,
+    theta::Float64;
+    model = "2PL", #1PL, 2PL, 3PL
+    parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
+    D = 1,#any number (1, 1.6)
+    derivatives = false,
+)
+    theta = [theta]
+    return item_char(
+        pars,
+        theta,
+        model = model, #1PL, 2PL, 3PL
+        parametrization = parametrization, #"at-b, at-ab, at+b, at+ab"
+        D = D,#any number (1, 1.6)
+        derivatives = derivatives,
+    )
+end
+
+"""
+	item_info(pars::DataFrames.DataFrame, theta::Vector{Float64}; model = "2PL", parametrization = "at-b", D = 1, derivatives = false) 
 
 # Description
 
@@ -417,7 +460,7 @@ Compute the item Fisher information function.
 """
 function item_info(
     pars::DataFrames.DataFrame,
-    theta;
+    theta::Vector{Float64};
     model = "2PL", #1PL, 2PL, 3PL, grm
     parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
     D = 1,
@@ -436,6 +479,41 @@ function item_info(
     return i
 end
 
+"""
+	item_info(pars::DataFrames.DataFrame, theta::Float64; model = "2PL", parametrization = "at-b", D = 1, derivatives = false) 
+
+# Description
+
+Compute the item Fisher information function.
+
+# Arguments
+
+- **`pars::DataFrames.DataFrame`** : Required. DataFrame with item parameters (difficulty: b or d, discrimination: a or a1, guessing: c or g).
+- **`theta::Float64`** : Required. Vector of ability points.
+- **`model`** : Optional. Default: `"2PL`". Values:  `"1PL`", `"2PL`", `"3PL`". IRT model.
+- **`parametrization`** : Optional. Default: `"at-b`". Values:  `"at-b`", `"at-ab`", `"at+b`", `"at+ab`". IRT model parametrization. Ex: at-b is ``Da(\\theta-b)``.
+- **`D`** : Optional. Default: 1. 
+
+# Output
+
+- **`i::Matrix{Float64}`**: Matrix of the item information. 
+"""
+function item_info(
+    pars::DataFrames.DataFrame,
+    theta::Float64;
+    model = "2PL", #1PL, 2PL, 3PL, grm
+    parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
+    D = 1,
+) #true, false
+    theta = [theta]
+    return function item_info(
+        pars
+        theta
+        model = model,
+        parametrization = parametrization, 
+        D = D,
+    )
+end
 
 function student_likelihood(
     f::Float64,
