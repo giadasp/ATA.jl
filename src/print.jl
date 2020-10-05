@@ -179,7 +179,7 @@ function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS"
         for t = 1:T
             ESprintIRT[t] = zeros(size(ICF[t], 1))
             for k = 1:size(ICF[t], 1)
-                ESprintIRT[t][k] = ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
+                ESprintIRT[t][k] = ((ICF[t][:, k]'*design[:, t]))[1] / sum(design[:, t])
             end
         end
         #number of items
