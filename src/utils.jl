@@ -395,7 +395,7 @@ function item_char(
         # 	pder[:, :, k] = pder[:, :, k] - pder[:, :, k-1]
         # end
     end
-    return p, pder
+    return p
 end
 
 
@@ -428,10 +428,9 @@ function item_char(
     D = 1,#any number (1, 1.6)
     derivatives = false,
 )
-    theta = [theta]
     return item_char(
         pars,
-        theta,
+        [theta],
         model = model, #1PL, 2PL, 3PL
         parametrization = parametrization, #"at-b, at-ab, at+b, at+ab"
         D = D,#any number (1, 1.6)
@@ -505,10 +504,9 @@ function item_info(
     parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
     D = 1,
 ) #true, false
-    theta = [theta]
     return item_info(
         pars,
-        theta,
+        [theta],
         model = model,
         parametrization = parametrization, 
         D = D,
