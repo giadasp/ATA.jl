@@ -395,7 +395,7 @@ function item_char(
         # 	pder[:, :, k] = pder[:, :, k] - pder[:, :, k-1]
         # end
     end
-    return p
+    return p, pder
 end
 
 
