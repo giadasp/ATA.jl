@@ -686,7 +686,7 @@ function add_exp_score!(ATAmodel::Model)
     ICF = Vector{Matrix{Float64}}(undef, T)
     for t = 1:T
         if expected_score_var[t] == Symbol("")
-            ICF[t] = item_char(
+            ICF[t] .= item_char(
                 ATAmodel.settings.IRT.parameters,
                 ATAmodel.constraints[t].expected_score.pts,
                 model = ATAmodel.settings.IRT.model,
@@ -750,7 +750,7 @@ function add_obj_fun!(ATAmodel::Model)
                     parametrization = IRT_parametrization,
                     D = IRT_D,
                 )# K[t] x I
-                ICF[t][k, :] = item_char(
+                ICF[t][k, :] .= item_char(
                     IRT_parameters,
                     [obj_points[t][k]],
                     model = IRT_model,
@@ -799,7 +799,7 @@ function add_obj_fun!(ATAmodel::Model)
                             parametrization = IRT_parametrization,
                             D = IRT_D,
                         ) # K[t] x I x R
-                        ICF[t][k, :, r] = item_char(
+                        ICF[t][k, :, r] .= item_char(
                             df,
                             obj_points[t][k];
                             model = IRT_model,
