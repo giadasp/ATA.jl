@@ -48,14 +48,20 @@ function eval_TIF_CCₜ(xₜ::Vector{Float64}, IIF::Array{Float64,3}; α = 0.1) 
 end
 
 function eval_Exp_Scoreₜ(x_Iₜ::Vector{Float64}, expected_scoreₜ::ExpectedScore) #x = I
-    es =sum(
-        _gemvblas(
+    # es =
+    #     _gemvblas(
+    #         expected_scoreₜ.val,
+    #         x_Iₜ,
+    #         zeros(size(expected_scoreₜ.val, 1)),
+    #         size(x_Iₜ, 1),
+    #     ) / sum(x_Iₜ)
+    es =
+        _gemvblasT(
             expected_scoreₜ.val,
             x_Iₜ,
-            zeros(size(expected_scoreₜ.val, 1)),
-            size(x_Iₜ, 1),
-        )) / sum(x_Iₜ)
-    es = vcat((es - expected_scoreₜ.max)..., (-es + expected_scoreₜ.min)...)
+            size(expected_scoreₜ.val, 2)
+        ) / sum(x_Iₜ)
+    es = vcat((es .- expected_scoreₜ.max)..., (-es .+ expected_scoreₜ.min)...)
     return es
 end
 
