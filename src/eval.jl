@@ -525,7 +525,7 @@ function analyse_NH(
                     add_remove += 1
                     NH₁ = _mycopy(NH₀, NH₁)
                     h₂ += 1
-                    #println("item ", h₂, " of ", size(taken_items, 1))
+                    println("item ", h₂, " of ", size(taken_items, 1))
                     #try to remove h
                     h = taken_items[h₂]
                     #iu = copy(iu₀)
