@@ -745,14 +745,14 @@ function add_obj_fun!(ATAmodel::Model)
             for k = 1:K[t]
                 IIF[t][k, :] .= item_info(
                     IRT_parameters,
-                    [obj_points[t][k]],
+                    obj_points[t][k],
                     model = IRT_model,
                     parametrization = IRT_parametrization,
                     D = IRT_D,
                 )# K[t] x I
                 ICF[t][k, :] .= item_char(
                     IRT_parameters,
-                    [obj_points[t][k]],
+                    obj_points[t][k],
                     model = IRT_model,
                     parametrization = IRT_parametrization,
                     D = IRT_D,
