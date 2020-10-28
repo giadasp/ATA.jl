@@ -54,44 +54,58 @@ function jumpATA!(
             ol_max[pair] = opMatrix[fInd[pair], fIndFirst[pair]]
         end
     end
-    #Friend sets groups
-    IIF_new = [zeros(Float64, 0, 0) for t = 1:ATAmodel.settings.T]
+    #Group IIFs by friend set
+    if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+        IIF_new = [zeros(Float64, 0, 0) for t = 1:ATAmodel.settings.T]
+        if ATAmodel.settings.n_FS != ATAmodel.settings.n_items
+            #group IIFs
+            for t = 1:ATAmodel.settings.T
+                if size(IIF, 1) > 0
+                    IIF_new[t] = Matrix{Float64}(undef, size(IIF[t], 1), ATAmodel.settings.n_FS)
+                end
+            end
+            for fs = 1:ATAmodel.settings.n_FS
+                for t = 1:ATAmodel.settings.T
+                    if size(IIF[t], 1) > 0
+                        IIF_new[t][:, fs] =
+                            sum(IIF[t][:, ATAmodel.settings.FS.items[fs]], dims = 2)
+                    end
+                end
+            end
+        else
+            IIF_new = IIF
+            ICF_new = [ATAmodel.constraints[t].expected_score.val for t = 1:ATAmodel.settings.T]
+        end
+    end
+    # group expected score by friend set
     ICF_new = [zeros(Float64, 0, 0) for t = 1:ATAmodel.settings.T]
     if ATAmodel.settings.n_FS != ATAmodel.settings.n_items
-        #group IIFs
-        for t = 1:ATAmodel.settings.T
-            if size(IIF, 1) > 0
-                IIF_new[t] = Matrix{Float64}(undef, size(IIF[t], 1), ATAmodel.settings.n_FS)
-            end
-            if size(ATAmodel.constraints[t].expected_score.val, 1) > 0
-                ICF_new[t] = Matrix{Float64}(
-                    undef,
-                    size(ATAmodel.constraints[t].expected_score.val, 2),
-                    ATAmodel.settings.n_FS,
-                )
-            end
-        end
-        for fs = 1:ATAmodel.settings.n_FS
+            #group IIFs
             for t = 1:ATAmodel.settings.T
-                if size(IIF[t], 1) > 0
-                    IIF_new[t][:, fs] =
-                        sum(IIF[t][:, ATAmodel.settings.FS.items[fs]], dims = 2)
-                end
                 if size(ATAmodel.constraints[t].expected_score.val, 1) > 0
-                    ICF_new[t][:, fs] = sum(
-                        ATAmodel.constraints[t].expected_score.val[
-                            ATAmodel.settings.FS.items[fs],
-                            :,
-                        ],
-                        dims = 1,
+                    ICF_new[t] = Matrix{Float64}(
+                        undef,
+                        size(ATAmodel.constraints[t].expected_score.val, 2),
+                        ATAmodel.settings.n_FS,
                     )
                 end
             end
+            for fs = 1:ATAmodel.settings.n_FS
+                for t = 1:ATAmodel.settings.T
+                    if size(ATAmodel.constraints[t].expected_score.val, 1) > 0
+                        ICF_new[t][:, fs] = sum(
+                            ATAmodel.constraints[t].expected_score.val[
+                                ATAmodel.settings.FS.items[fs],
+                                :,
+                            ],
+                            dims = 1,
+                        )
+                    end
+                end
+            end
+        else
+            ICF_new = [ATAmodel.constraints[t].expected_score.val for t = 1:ATAmodel.settings.T]
         end
-    else
-        IIF_new = IIF
-        ICF_new = [ATAmodel.constraints[t].expected_score.val for t = 1:ATAmodel.settings.T]
-    end
     ################################################################################
     #                                count constraints
     ################################################################################
