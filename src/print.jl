@@ -41,8 +41,10 @@ function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS"
         end
         if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
             JLD2.@load "OPT/IIF.jld2" IIF
-            JLD2.@load "OPT/ICF.jld2" ICF
         end
+	if isfile("OPT/ICF.jld2")
+	    JLD2.@load "OPT/ICF.jld2" ICF
+	end
         if group_by_fs == true
             design = reshape(ATAmodel.output.design, n_FS, T)
             new_design = zeros(Float64, n_items, T)
@@ -144,7 +146,7 @@ function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS"
             end
             CSV.write(string(results_folder, "/TIFatTheta_k.csv"), TIFatTheta_k)
 
-        else
+	elseif ATAmodel.obj.type == "MAXIMIN"
             Estimated = Float64[]
             if isfile("simPool.csv")
                 True = Float64[]
@@ -175,13 +177,16 @@ function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS"
         end
 
         #expected score
-        ESprintIRT = Vector{Vector{Float64}}(undef, T)
-        for t = 1:T
-            ESprintIRT[t] = zeros(size(ICF[t], 1))
-            for k = 1:size(ICF[t], 1)
-                ESprintIRT[t][k] = ((ICF[t][:, k]'*design[:, t]))[1] / sum(design[:, t])
-            end
+        if isfile("OPT/ICF.jld2")
+		ESprintIRT = Vector{Vector{Float64}}(undef, T)
+		for t = 1:T
+		    ESprintIRT[t] = zeros(size(ICF[t], 1))
+		    for k = 1:size(ICF[t], 1)
+			ESprintIRT[t][k] = ((ICF[t][:, k]'*design[:, t]))[1] / sum(design[:, t])
+		    end
+		end
         end
+									
         #number of items
         n = sum(design, dims = 1)
         design_items = zeros(Int64, Int(maximum(n)), T)
