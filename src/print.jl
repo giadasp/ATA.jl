@@ -205,13 +205,15 @@ function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS"
             write(io, "\r\n")
             write(io, "expected score")
             write(io, "\r\n")
-            for t = 1:T
-                DelimitedFiles.writedlm(
-                    io,
-                    vcat(t, round.(ESprintIRT[t], digits = 3))',
-                    "\t",
-                )
-                write(io, "\r\n")
+	    if isfile("OPT/ICF.jld2")
+		    for t = 1:T
+			DelimitedFiles.writedlm(
+			    io,
+			    vcat(t, round.(ESprintIRT[t], digits = 3))',
+			    "\t",
+			)
+			write(io, "\r\n")
+		    end
             end
             if size(categories, 1) > 0
                 write(io, "Categorical variables")
