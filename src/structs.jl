@@ -118,7 +118,7 @@ mutable struct InputSettings
         Vector{Vector{String}}(undef, 0),
         Vector{Vector{Float64}}(undef, 0),
         Vector{Vector{Float64}}(undef, 0),
-        "MAXIMIN",
+        "",
         Vector{Vector{Float64}}(undef, 0),
         zero(Int64),
         zero(Float64),
