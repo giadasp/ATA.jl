@@ -293,9 +293,7 @@ mutable struct Constraint
     )
 end
 
-mutabl
-
-e struct Obj
+mutable struct Obj
     sense::String
     type::String
     points::Vector{Vector{Float64}}
