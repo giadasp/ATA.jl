@@ -526,7 +526,7 @@ function add_constraints!(
                         if !ismissing(Categoricalconsts[con, :min])
                             indices =
                                 string.(bank[!, Symbol.(Categoricalconsts[con, :var])]) .==
-                                Categoricalconsts[con, :value]
+                                string(Categoricalconsts[con, :value])
                             indices[ismissing.(indices)] .= false
                             indices = findall(indices .== true)
                             A[t] = vcat(A[t], zeros(Float64, 1, n_items))
@@ -547,7 +547,7 @@ function add_constraints!(
                                 string.(ATAmodel.settings.bank[
                                     !,
                                     Symbol.(Categoricalconsts[con, :var]),
-                                ]) .== Categoricalconsts[con, :value]
+                                ]) .== string(Categoricalconsts[con, :value])
                             indices[ismissing.(indices)] .= false
                             indices = findall(indices .== true)
                             if Categoricalconsts[con, :max] == 0
