@@ -293,7 +293,9 @@ mutable struct Constraint
     )
 end
 
-mutable struct Obj
+mutabl
+
+e struct Obj
     sense::String
     type::String
     points::Vector{Vector{Float64}}
@@ -306,7 +308,7 @@ mutable struct Obj
         new(sense, type, points, aux_int, aux_float, fun, args)
     Obj() = new(
         "max",
-        "MAXIMIN",
+        "",
         Vector{Vector{Float64}}(undef, 0),
         zero(Int64),
         zero(Float64),
