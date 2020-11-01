@@ -16,37 +16,45 @@ ATAmodel = start_ATA()
 
 # Each of the following commands returns a string vector, the second element is a message describing the result.
 # 1. Add file with custom settings (Needed)
-@info load_settings!(
+load_settings!(
     ATAmodel;
     settings_file = "SettingsATA.jl",
     bank_file = "data/Bank.csv",
     bank_delim = ";",
-)[2]
+)
+@info ATAmodel.output.infos[end]
 
 # 2. Add friend set variables (Optional)
-@info add_friends!(ATAmodel)[2]
+add_friends!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
 # 3. Add enemy set variables (Optional)
-@info add_enemies!(ATAmodel)[2]
+add_enemies!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
 # 4. Add categorical constraints (Optional)
-@info add_constraints!(
+add_constraints!(
     ATAmodel;
     constraints_file = "Constraints.csv",
     constraints_delim = ";",
-)[2]
+)
+@info ATAmodel.output.infos[end]
 
 # 5. Add overlap maxima (Optional)
-@info add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")[2]
+add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
+@info ATAmodel.output.infos[end]
 
 # 6. Add expected score constraints (Optional)
-@info add_exp_score!(ATAmodel)[2]
+add_exp_score!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
 # 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
-@info group_by_friends!(ATAmodel)[2]
+group_by_friends!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
 # 8. Add objective function (Optional)
-@info add_obj_fun!(ATAmodel)[2]
+add_obj_fun!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
 # custom objective type, function and arguments
 ATAmodel.obj.type = "custom"

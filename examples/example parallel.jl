@@ -29,42 +29,50 @@ using Distributed  #this is not needed if Julia has been run with numberOfCores>
 #it is a n_groups x n_groups matrix.
 #BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
-#for resetting the ATA process (Needed)
+# for resetting the ATA process (Needed)
 ATAmodel = start_ATA()
 
-#Each of the following commands returns a string vector, the second element is a message describing the result.
-#1. Add file with custom settings (Needed)
-println(load_settings!(
+# Each of the following commands returns a string vector, the second element is a message describing the result.
+# 1. Add file with custom settings (Needed)
+load_settings!(
     ATAmodel;
-    settings_file = "settingsATA.jl",
-    bank_file = "Bank.csv",
+    settings_file = "SettingsATA.jl",
+    bank_file = "data/Bank.csv",
     bank_delim = ";",
-)[2])
+)
+@info ATAmodel.output.infos[end]
 
-#2. Add friend set variables (Optional)
-println(add_friends!(ATAmodel)[2])
+# 2. Add friend set variables (Optional)
+add_friends!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
-#3. Add enemy set variables (Optional)
-println(add_enemies!(ATAmodel)[2])
+# 3. Add enemy set variables (Optional)
+add_enemies!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
-#4. Add categorical constraints (Optional)
-println(add_constraints!(
+# 4. Add categorical constraints (Optional)
+add_constraints!(
     ATAmodel;
-    constraints_file = "constraints.csv",
+    constraints_file = "Constraints.csv",
     constraints_delim = ";",
-)[2])
+)
+@info ATAmodel.output.infos[end]
 
-#5. Add overlap maxima (Optional)
-println(add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")[2])
+# 5. Add overlap maxima (Optional)
+add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
+@info ATAmodel.output.infos[end]
 
-#6. Add expected score constraints (Optional)
-println(add_exp_score!(ATAmodel)[2])
+# 6. Add expected score constraints (Optional)
+add_exp_score!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
-#7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
-println(group_by_friends!(ATAmodel)[2])
+# 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
+group_by_friends!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
-#8. Add objective function (Optional)
-println(add_obj_fun!(ATAmodel)[2])
+# 8. Add objective function (Optional)
+add_obj_fun!(ATAmodel)
+@info ATAmodel.output.infos[end]
 
 #Assembly settings
 
