@@ -325,7 +325,7 @@ It requires the [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) step.
 function add_friends!(ATAmodel::Model)
     message = ["", ""]
     if !isfile("OPT/Settings.jl")
-        return ["danger", "Run load_settings!(model) before!"]
+        push!(ATAmodel.output.infos, ["danger", "Run load_settings!(model) before!"])
     else
         n_items = ATAmodel.settings.n_items
         FriendSets =
