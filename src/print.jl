@@ -311,7 +311,7 @@ Print the results of each build step of the ATAmodel.
 
 # Arguments
 
-- **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nFSxT` if the items are grouped by friend sets. 
+- **`ATAmodel::Model`** : Required. Model processed with build functions.
 """
 function print_infos(ATAmodel::Model)
     for m in ATAmodel.output.infos
@@ -320,5 +320,25 @@ function print_infos(ATAmodel::Model)
         else
             printstyled(m[2]; color= :green)
         end
+    end
+end
+
+"""
+    print_last_info(ATAmodel)
+
+# Description
+
+Print info of the last build step.
+
+# Arguments
+
+- **`ATAmodel::Model`** : Required. Model processed with build functions.
+"""
+function print_last_info(ATAmodel::Model)
+    m = ATAmodel.output.infos[end]
+    if ATAmodel.output.infos[1] == "danger"
+        printstyled(m[2]; color= :red)
+    else
+        printstyled(m[2]; color= :green)
     end
 end
