@@ -381,7 +381,7 @@ function add_friends!(ATAmodel::Model)
         ATAmodel.settings.FS.items = FSItems
         ATAmodel.settings.FS.counts = FS_counts
         JLD2.@save "OPT/ATAmodel.jld2" Model
-        push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.")])
+        push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.\n")])
     end
 end
 
@@ -501,7 +501,7 @@ function add_constraints!(
 
     end
     if !isfile(constraints_file)
-        return ["danger", string(constraints_file, " doesn't exist.")]
+        push!(ATAmodel.output.infos, ["danger", string(constraints_file, " doesn't exist.")])
     else
         x_forced0 = ATAmodel.settings.forced0
         Categoricalconsts = CSV.read(constraints_file, delim = constraints_delim)
