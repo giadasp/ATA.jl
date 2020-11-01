@@ -381,7 +381,7 @@ function add_friends!(ATAmodel::Model)
         ATAmodel.settings.FS.items = FSItems
         ATAmodel.settings.FS.counts = FS_counts
         JLD2.@save "OPT/ATAmodel.jld2" Model
-        return ["success", string("- ", n_FS, " friend sets added.")]
+        push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.")])
     end
 end
 
