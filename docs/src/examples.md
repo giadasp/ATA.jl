@@ -113,7 +113,7 @@ using PGFPlotsX
 print_results(ATAmodel;
 group_by_fs=true,
 plots_out=true,
-results_folder="RESULTS")
+results_folder="RESULTS") 
 ```
 
 ## Example with siman solver (Simulated Annealing Heuristic)
