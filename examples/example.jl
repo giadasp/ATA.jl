@@ -17,15 +17,15 @@ load_settings!(
     bank_file = "data/Bank.csv",
     bank_delim = ";",
 )
-@info ATAmodel.output.infos[end]
+print_infos(ATAmodel)
 
 # 2. Add friend set variables (Optional)
 add_friends!(ATAmodel)
-@info ATAmodel.output.infos[end]
+print_infos(ATAmodel)
 
 # 3. Add enemy set variables (Optional)
 add_enemies!(ATAmodel)
-@info ATAmodel.output.infos[end]
+print_infos(ATAmodel)
 
 # 4. Add categorical constraints (Optional)
 add_constraints!(
@@ -33,23 +33,23 @@ add_constraints!(
     constraints_file = "Constraints.csv",
     constraints_delim = ";",
 )
-@info ATAmodel.output.infos[end]
+print_infos(ATAmodel)
 
 # 5. Add overlap maxima (Optional)
 add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
-@info ATAmodel.output.infos[end]
+print_infos(ATAmodel)
 
 # 6. Add expected score constraints (Optional)
 add_exp_score!(ATAmodel)
-@info ATAmodel.output.infos[end]
+print_infos(ATAmodel)
 
 # 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
 group_by_friends!(ATAmodel)
-@info ATAmodel.output.infos[end]
+print_infos(ATAmodel)
 
 # 8. Add objective function (Optional)
 add_obj_fun!(ATAmodel)
-@info ATAmodel.output.infos[end]
+print_infos(ATAmodel)
 
 # Assembly settings
 
