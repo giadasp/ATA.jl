@@ -307,7 +307,7 @@ function load_settings!(
 
     end
     message[1] = "success"
-    return message
+    push!(ATAmodel.output.infos, message)
 end
 
 """
@@ -605,7 +605,7 @@ function add_constraints!(
         message[1] = "success"
         message[2] = message[2] * "- constraints added. \n"
     end
-    return message
+    push!(ATAmodel.output.infos, message)
 end
 
 """
@@ -825,7 +825,7 @@ function add_obj_fun!(ATAmodel::Model)
         ]
     end
 
-    return message
+    push!(ATAmodel.output.infos, message)
 end
 
 """

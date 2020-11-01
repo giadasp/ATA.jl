@@ -336,6 +336,7 @@ mutable struct Output
     TIF::Vector{Float64}
     elapsed_time::Float64
     neighbourhoods::Vector{Neighbourhood}
+    infos::Vector{Vector{String}}
     Output(
         categories,
         quantitative,
@@ -346,6 +347,7 @@ mutable struct Output
         TIF,
         elapsed_time,
         neighbourhoods,
+        infos,
     ) = new(
         categories,
         quantitative,
@@ -356,6 +358,7 @@ mutable struct Output
         TIF,
         elapsed_time,
         neighbourhoods,
+        infos,
     )
     Output() = new(
         Vector{Vector{Symbol}}(undef, 0),
@@ -367,6 +370,7 @@ mutable struct Output
         Float64[],
         zero(Float64),
         Neighbourhood[],
+        Vector{Vector{String}}(undef, 0),
     )
 end
 
