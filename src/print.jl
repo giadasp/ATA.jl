@@ -11,7 +11,7 @@ Print the features of the assembled tests.
 - **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.Model}).
 - **`results_folder`** : Optional. Default: "RESULTS". The folder in which the output is stored.
 """
-function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS")
+function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "RESULTS")
     if !(results_folder in readdir())
         mkdir(results_folder)
     else
@@ -313,7 +313,7 @@ Print the results of each build step of the ATAmodel.
 
 - **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nFSxT` if the items are grouped by friend sets. 
 """
-function print_infos(ATAmodel::model)
+function print_infos(ATAmodel::Model)
     for m in ATAmodel.output.infos
         if m[1] == "danger"
             printstyled(m[2]; color= :red)
