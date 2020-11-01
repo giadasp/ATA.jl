@@ -53,10 +53,10 @@ function load_settings!(
         ATAmodel.settings.bank = CSV.read(bank_file, delim = bank_delim)
         message[2] = message[2] * "- Item bank file read.\n"
     else
-        return ["danger", "Not a valid file for bank"]
+        push!(ATAmodel.output.infos,  ["danger", "Not a valid file for bank"])
     end
     if !isfile(settings_file)
-        return ["danger", "Settings file not valid"]
+        push!(ATAmodel.output.infos,  ["danger", "Settings file not valid"])
     else
         include(settings_file)
         ATAmodel.settings.n_items = Inputs.n_items
@@ -92,7 +92,7 @@ function load_settings!(
                     [:a, :b, :c],
                 ) #nqp values in interval\r\n",
             else
-                return ["danger", "Only 1PL, 2PL and 3PL IRT models are allowed."]
+                push!(ATAmodel.output.infos,  ["danger", "Only 1PL, 2PL and 3PL IRT models are allowed."])
             end
             CSV.write("OPT/IRT_parameters.csv", ATAmodel.settings.IRT.parameters)
             message[2] = message[2] * "- IRT item parameters loaded.\n"
@@ -381,7 +381,7 @@ function add_friends!(ATAmodel::Model)
         ATAmodel.settings.FS.items = FSItems
         ATAmodel.settings.FS.counts = FS_counts
         JLD2.@save "OPT/ATAmodel.jld2" Model
-        push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.\n")])
+        push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.")])
     end
 end
 
@@ -459,7 +459,7 @@ function add_enemies!(ATAmodel::Model)
             ATAmodel.constraints[t].constr_A = A[t]
         end
         JLD2.@save "OPT/ATAmodel.jld2" Model
-        return ["success", string("- ", nES, " enemy sets added. ")]
+        push!(ATAmodel.output.infos,  ["success", string("- ", nES, " enemy sets added. ")])
     end
 end
 
@@ -501,7 +501,7 @@ function add_constraints!(
 
     end
     if !isfile(constraints_file)
-        push!(ATAmodel.output.infos, ["danger", string(constraints_file, " doesn't exist.")])
+        push!(ATAmodel.output.infos,  ["danger", string(constraints_file, " doesn't exist.")])
     else
         x_forced0 = ATAmodel.settings.forced0
         Categoricalconsts = CSV.read(constraints_file, delim = constraints_delim)
@@ -631,7 +631,7 @@ function add_overlap!(
     T = ATAmodel.settings.T
     n_items = ATAmodel.settings.n_items
     if !isfile(overlap_file)
-        return ["danger", string(overlap_file, " not found.")]
+        push!(ATAmodel.output.infos, ["danger", string(overlap_file, " not found.\n")])
     else
         opMatrix =
             Matrix{Int64}(CSV.read(overlap_file, delim = overlap_delim, header = false))
@@ -647,7 +647,7 @@ function add_overlap!(
             ATAmodel.settings.ol_max =
                 ones(ATAmodel.settings.n_items, ATAmodel.settings.n_items) .*
                 ATAmodel.settings.n_items
-            return [
+            push!(ATAmodel.output.infos,  [
                 "success",
                 string(
                     "- No lines in ",
@@ -656,10 +656,10 @@ function add_overlap!(
                     ATAmodel.settings.n_items,
                     ".\n",
                 ),
-            ]
+            ])
         end
         JLD2.@save "OPT/ATAmodel.jld2" ATAmodel
-        return ["success", "- Maximum overlap constrained.\n"]
+        push!(ATAmodel.output.infos,  ["success", "- Maximum overlap constrained.\n"])
     end
 end
 
@@ -710,7 +710,7 @@ function add_exp_score!(ATAmodel::Model)
     # 	DelimitedFiles.writedlm("OPT/b_$t.csv", ATAmodel.constraints[t].constr_b)
     # end
     JLD2.@save "OPT/ICF.jld2" ICF
-    return ["success", "- Expected Score constrained."]
+    push!(ATAmodel.output.infos,  ["success", "- Expected Score constrained.\n"])
 end
 
 """
@@ -819,10 +819,10 @@ function add_obj_fun!(ATAmodel::Model)
             write(f, "K = $K\n\n")
         end
     elseif !(ATAmodel.obj.type == "custom" || ATAmodel.obj.type == "")
-        return [
+        push!(ATAmodel.output.infos,  [
             "danger",
             "- Only \"MAXIMIN\", \"CC\", \"\" (no objective) and \"custom\" are supported. \n",
-        ]
+        ])
     end
 
     push!(ATAmodel.output.infos, message)
@@ -843,10 +843,10 @@ function group_by_friends!(ATAmodel::Model) #last
     n_items = ATAmodel.settings.n_items
     #only works for categorical variables and item use, all the other contraitns need expansion by FS_items
     if ATAmodel.settings.n_FS == 0
-        return ["danger", "No friend sets found, run add_friends!(model) before."]
+        push!(ATAmodel.output.infos, ["danger", "No friend sets found, run add_friends!(model) before.\n"])
     end
     if size(ATAmodel.constraints[1].constr_b, 1) == 0
-        return ["danger", "No constraints to group, run add_constraints!(model) before."]
+        push!(ATAmodel.output.infos, ["danger", "No constraints to group, run add_constraints!(model) before.\n"])
     else
         A = Vector{Matrix{Float64}}(undef, ATAmodel.settings.T)
         b = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
@@ -918,7 +918,7 @@ function group_by_friends!(ATAmodel::Model) #last
             write(f, "item_use_min = $item_use_min_new\n\n")
             write(f, "item_use_max = $item_use_max_new\n\n")
         end
-        return ["success", string("- Grouped in ", n_FS, " Friend sets")]
+        push!(ATAmodel.output.infos, ["success", string("- Grouped in ", n_FS, " Friend sets.\n")])
     end
 end
 
