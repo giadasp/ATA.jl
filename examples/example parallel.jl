@@ -12,7 +12,7 @@
 #add julia.exe to the path and run Julia with the command prompt:
 #julia -p numberOfCores]
 
-using Distributed #this is not needed if Julia has been run with numberOfCores>1
+using Distributed  #this is not needed if Julia has been run with numberOfCores>1
 @everywhere using DataFrames.DataFrames
 @everywhere using Distributed
 @everywhere cd("folder in which the package is saved")
