@@ -166,6 +166,13 @@ mutable struct ExpectedScore
     ExpectedScore() = new(Symbol(""), zeros(Float64, 0, 0), Float64[], Float64[], Float64[])
 end
 
+mutable struct IU
+    min::Vector{Int64}
+    max::Vector{Int64}
+    IU(min, max) = new(min, max)
+    IU() = new(Int64[], Int64[])
+end
+
 mutable struct Settings
     n_items::Int64
     n_FS::Int64
@@ -178,6 +185,7 @@ mutable struct Settings
     Tg::Vector{Int64}
     FS::FS # friend Sets
     ES::ES # enemy Sets
+    IU::IU
     ol_max::Matrix{Float64}
     Settings(
         n_items,
@@ -191,6 +199,7 @@ mutable struct Settings
         Tg,
         FS,
         ES,
+        IU,
         ol_max,
     ) = new(
         n_items,
@@ -204,6 +213,7 @@ mutable struct Settings
         Tg,
         FS,
         ES,
+        IU,
         ol_max,
     ) # no pattern mode
     Settings() = new(
@@ -218,6 +228,7 @@ mutable struct Settings
         [1],
         FS(),
         ES(),
+        IU(),
         zeros(Int64, 0, 0),
     )
 end
@@ -359,22 +370,14 @@ mutable struct Output
     )
 end
 
-mutable struct IU
-    min::Vector{Int64}
-    max::Vector{Int64}
-    IU(min, max) = new(min, max)
-    IU() = new(Int64[], Int64[])
-end
-
 mutable struct Model
     settings::Settings
     constraints::Vector{Constraint}
-    IU::IU
     obj::Obj
     output::Output
-    Model(settings, constraints, IU, obj, output) =
-        new(settings, constraints, IU, obj, output)
-    Model() = new(Settings(), Constraint[], IU(), Obj(), Output())
+    Model(settings, constraints, obj, output) =
+        new(settings, constraints, obj, output)
+    Model() = new(Settings(), Constraint[], Obj(), Output())
 end
 
 mutable struct Opt

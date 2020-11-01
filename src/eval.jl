@@ -400,7 +400,7 @@ function analyse_NH(
                         NH_add = fill_up_feas(
                             NH₁,
                             v,
-                            ATAmodel.IU,
+                            ATAmodel.settings.IU,
                             ATAmodel.settings.FS,
                             constraints,
                             ATAmodel.settings.forced0[v],
@@ -416,7 +416,7 @@ function analyse_NH(
                             IIF[v],
                             opt_feas,
                             v,
-                            ATAmodel.IU,
+                            ATAmodel.settings.IU,
                             ATAmodel.settings.FS,
                             constraints,
                             ATAmodel.settings.forced0[v],
@@ -554,7 +554,7 @@ function analyse_NH(
                             n_FS,
                             n_items,
                         )
-                        iu = sum(NH₁.x, dims = 2) - ATAmodel.IU.max
+                        iu = sum(NH₁.x, dims = 2) - ATAmodel.settings.IU.max
                         iu = iu[iu.>0]
                         if size(iu, 1) == 0
                             NH₁.iu = 0
@@ -626,7 +626,7 @@ function analyse_NH(
                             # iu = copy(iu₀)
                             # iu[i₂]+= 1
                             # iu[h]-= 1
-                            iu = sum(NH₁.x, dims = 2) - ATAmodel.IU.max
+                            iu = sum(NH₁.x, dims = 2) - ATAmodel.settings.IU.max
                             iu = iu[iu.>0]
                             if size(iu, 1) == 0
                                 NH₁.iu = 0
@@ -797,7 +797,7 @@ function analyse_NH(
                         NH_add = fill_up_feas(
                             NH₁,
                             v,
-                            ATAmodel.IU,
+                            ATAmodel.settings.IU,
                             ATAmodel.settings.FS,
                             constraints,
                             ATAmodel.settings.forced0[v],
@@ -812,7 +812,7 @@ function analyse_NH(
                             IIF[v],
                             opt_feas,
                             v,
-                            ATAmodel.IU,
+                            ATAmodel.settings.IU,
                             ATAmodel.settings.FS,
                             constraints,
                             ATAmodel.settings.forced0[v],
@@ -938,7 +938,7 @@ function analyse_NH(
                         n_FS,
                         n_items,
                     )
-                    iu = sum(NH₁.x, dims = 2) - ATAmodel.IU.max
+                    iu = sum(NH₁.x, dims = 2) - ATAmodel.settings.IU.max
                     iu = iu[iu.>0]
                     if size(iu, 1) == 0
                         NH₁.iu = 0
@@ -1004,7 +1004,7 @@ function analyse_NH(
                         # iu = copy(iu₀)
                         # iu[i₂]+= 1
                         # iu[h]-= 1
-                        iu = sum(NH₁.x, dims = 2) - ATAmodel.IU.max
+                        iu = sum(NH₁.x, dims = 2) - ATAmodel.settings.IU.max
                         iu = iu[iu.>0]
                         if size(iu, 1) == 0
                             NH₁.iu = 0
@@ -1173,7 +1173,7 @@ function analyse_NH(
                         NH_add = fill_up_feas(
                             NH₁,
                             v,
-                            ATAmodel.IU,
+                            ATAmodel.settings.IU,
                             ATAmodel.settings.FS,
                             constraints,
                             ATAmodel.settings.forced0[v],
@@ -1188,7 +1188,7 @@ function analyse_NH(
                             ATAmodel.obj,
                             opt_feas,
                             v,
-                            ATAmodel.IU,
+                            ATAmodel.settings.IU,
                             ATAmodel.settings.FS,
                             constraints,
                             ATAmodel.settings.forced0[v],
@@ -1314,7 +1314,7 @@ function analyse_NH(
                         n_FS,
                         n_items,
                     )
-                    iu = sum(NH₁.x, dims = 2) - ATAmodel.IU.max
+                    iu = sum(NH₁.x, dims = 2) - ATAmodel.settings.IU.max
                     iu = iu[iu.>0]
                     if size(iu, 1) == 0
                         NH₁.iu = 0
@@ -1380,7 +1380,7 @@ function analyse_NH(
                         # iu = copy(iu₀)
                         # iu[i₂]+= 1
                         # iu[h]-= 1
-                        iu = sum(NH₁.x, dims = 2) - ATAmodel.IU.max
+                        iu = sum(NH₁.x, dims = 2) - ATAmodel.settings.IU.max
                         iu = iu[iu.>0]
                         if size(iu, 1) == 0
                             NH₁.iu = 0

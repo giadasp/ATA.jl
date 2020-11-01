@@ -86,7 +86,7 @@ function siman!(
         NH⁺.x = zeros(Float64, n_FS, T)
     end
     # compute f
-    iu = sum(NH⁺.x; dims = 2) - ATAmodel.IU.max
+    iu = sum(NH⁺.x; dims = 2) - ATAmodel.settings.IU.max
     iu = iu[iu.>0]
     if size(iu, 1) == 0
         NH⁺.iu = 0

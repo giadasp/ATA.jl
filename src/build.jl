@@ -252,13 +252,13 @@ function load_settings!(
                     string("- Sum of variables", Inputs.sum_vars, " will be constrained.\n")
             end
             if size(Inputs.item_use_min, 1) > 0
-                ATAmodel.IU.min = Inputs.item_use_min
+                ATAmodel.settings.IU.min = Inputs.item_use_min
                 message[2] = message[2] * "- Minimum item use constrained.\n"
             end
             if size(Inputs.item_use_max, 1) > 0
-                ATAmodel.IU.max = Inputs.item_use_max
+                ATAmodel.settings..max = Inputs.item_use_max
                 for v = 1:ATAmodel.settings.T
-                    x_forced0[v][findall(ATAmodel.IU.max .< 1)] .= false
+                    x_forced0[v][findall(ATAmodel.settings.IU.max .< 1)] .= false
                 end
                 message[2] = message[2] * "- Maximum item use constrained.\n"
             end
@@ -899,21 +899,21 @@ function group_by_friends!(ATAmodel::Model) #last
         ATAmodel.settings.forced0 = x_forced0_new
         DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0_new)
         #item use
-        item_use_min = ATAmodel.IU.min
-        item_use_max = ATAmodel.IU.max
+        item_use_min = ATAmodel.settings.IU.min
+        item_use_max = ATAmodel.settings.IU.max
         item_use_min_new = zeros(Int, n_FS)
         item_use_max_new = zeros(Int, n_FS)
         for fs = 1:n_FS
             item_use_min_new[fs] =
-                Int(maximum(ATAmodel.IU.min[ATAmodel.settings.FS.items[fs]]))
+                Int(maximum(ATAmodel.settings.IU.min[ATAmodel.settings.FS.items[fs]]))
             item_use_max_new[fs] =
-                Int(minimum(ATAmodel.IU.max[ATAmodel.settings.FS.items[fs]]))
+                Int(minimum(ATAmodel.settings.IU.max[ATAmodel.settings.FS.items[fs]]))
         end
         #enemy sets
 
         #update model
-        ATAmodel.IU.max = item_use_max_new
-        ATAmodel.IU.min = item_use_min_new
+        ATAmodel.settings.IU.max = item_use_max_new
+        ATAmodel.settings.IU.min = item_use_min_new
         open("OPT/Settings.jl", "a") do f
             write(f, "item_use_min = $item_use_min_new\n\n")
             write(f, "item_use_max = $item_use_max_new\n\n")

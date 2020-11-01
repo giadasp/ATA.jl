@@ -363,7 +363,7 @@ function item_char(
     theta::Vector{Float64};
     model = "2PL", #1PL, 2PL, 3PL
     parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
-    D = 1,#any number (1, 1.6)
+    D = 1,#any number (1, 1.7)
     derivatives = false,
 )
 

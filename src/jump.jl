@@ -117,8 +117,8 @@ function jumpATA!(
     end
 
     # item use
-    c += size(ATAmodel.IU.max, 1)
-    c += sum(ATAmodel.IU.min .> 0)
+    c += size(ATAmodel.settings.IU.max, 1)
+    c += sum(ATAmodel.settings.IU.min .> 0)
 
     #overlap old
     c += nPairs
@@ -219,16 +219,16 @@ function jumpATA!(
 
     # Item Use
     for i = 1:ATAmodel.settings.n_FS
-        if ATAmodel.IU.min[i] .> 0
+        if ATAmodel.settings.IU.min[i] .> 0
             JuMP.@constraint(
                 m,
-                ATAmodel.IU.min[i] - sum(x[i, t] for t = 1:ATAmodel.settings.T) <= 0
+                ATAmodel.settings.IU.min[i] - sum(x[i, t] for t = 1:ATAmodel.settings.T) <= 0
             ) # z[c])
             c += 1
         end
         JuMP.@constraint(
             m,
-            sum(x[i, t] for t = 1:ATAmodel.settings.T) - ATAmodel.IU.max[i] <= 0
+            sum(x[i, t] for t = 1:ATAmodel.settings.T) - ATAmodel.settings.IU.max[i] <= 0
         ) # z[c])
         c += 1
     end
