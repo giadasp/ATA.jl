@@ -54,9 +54,11 @@ function load_settings!(
         message[2] = message[2] * "- Item bank file read.\n"
     else
         push!(ATAmodel.output.infos,  ["danger", "Not a valid file for bank"])
+        return nothing
     end
     if !isfile(settings_file)
         push!(ATAmodel.output.infos,  ["danger", "Settings file not valid"])
+        return nothing
     else
         include(settings_file)
         ATAmodel.settings.n_items = Inputs.n_items
@@ -93,6 +95,7 @@ function load_settings!(
                 ) #nqp values in interval\r\n",
             else
                 push!(ATAmodel.output.infos,  ["danger", "Only 1PL, 2PL and 3PL IRT models are allowed."])
+                return nothing
             end
             CSV.write("OPT/IRT_parameters.csv", ATAmodel.settings.IRT.parameters)
             message[2] = message[2] * "- IRT item parameters loaded.\n"
@@ -326,6 +329,7 @@ function add_friends!(ATAmodel::Model)
     message = ["", ""]
     if !isfile("OPT/Settings.jl")
         push!(ATAmodel.output.infos, ["danger", "Run load_settings!(model) before!"])
+        return nothing
     else
         n_items = ATAmodel.settings.n_items
         FriendSets =
@@ -502,6 +506,7 @@ function add_constraints!(
     end
     if !isfile(constraints_file)
         push!(ATAmodel.output.infos,  ["danger", string(constraints_file, " doesn't exist.")])
+        return nothing
     else
         x_forced0 = ATAmodel.settings.forced0
         Categoricalconsts = CSV.read(constraints_file, delim = constraints_delim)
@@ -632,6 +637,7 @@ function add_overlap!(
     n_items = ATAmodel.settings.n_items
     if !isfile(overlap_file)
         push!(ATAmodel.output.infos, ["danger", string(overlap_file, " not found.\n")])
+        return nothing
     else
         opMatrix =
             Matrix{Int64}(CSV.read(overlap_file, delim = overlap_delim, header = false))
@@ -823,8 +829,8 @@ function add_obj_fun!(ATAmodel::Model)
             "danger",
             "- Only \"MAXIMIN\", \"CC\", \"\" (no objective) and \"custom\" are supported. \n",
         ])
+        return nothing
     end
-
     push!(ATAmodel.output.infos, message)
 end
 
@@ -844,9 +850,11 @@ function group_by_friends!(ATAmodel::Model) #last
     #only works for categorical variables and item use, all the other contraitns need expansion by FS_items
     if ATAmodel.settings.n_FS == 0
         push!(ATAmodel.output.infos, ["danger", "No friend sets found, run add_friends!(model) before.\n"])
+        return nothing
     end
     if size(ATAmodel.constraints[1].constr_b, 1) == 0
         push!(ATAmodel.output.infos, ["danger", "No constraints to group, run add_constraints!(model) before.\n"])
+        return nothing
     else
         A = Vector{Matrix{Float64}}(undef, ATAmodel.settings.T)
         b = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
