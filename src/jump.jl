@@ -342,5 +342,5 @@ function jumpATA!(
     DelimitedFiles.writedlm(string(results_folder, "/design.csv"), design)
     ATAmodel.output.design = design
     JLD2.@save string(results_folder, "/ATAmodel.jld2") ATAmodel
-    push!(ATAmodel.output.infos, message)
+    push!(ATAmodel.output.infos, ["success", message])
 end
