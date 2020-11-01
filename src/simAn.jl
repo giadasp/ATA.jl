@@ -69,11 +69,11 @@ function siman!(
             size(starting_design, 2) != ATAmodel.settings.T
         )
             message *= "- Starting design must be of size: (n_items x T).\n"
-            return message
+            push!(ATAmodel.output.infos, message)
         end
         if (any(starting_design != 0 && starting_design != 1))
             message *= "- Starting design must contain only 1 or 0.\n"
-            return message
+            push!(ATAmodel.output.infos, message)
         end
         x₀ = Float64.(starting_design)
     else
@@ -312,5 +312,5 @@ function siman!(
         write(io, string(ATAmodel.output.elapsed_time))
         return write(io, "\r\n")
     end
-    return message
+    push!(ATAmodel.output.infos, message)
 end

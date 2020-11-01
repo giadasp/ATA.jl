@@ -23,11 +23,11 @@ function jumpATA!(
             message *= "- Assembling tests with MAXIMIN..."
         else
             message *= "No IIF.jld2 file in OPT folder, Run add_obj_fun!() first!"
-            return message
+            push!(ATAmodel.output.infos, message)
         end
     elseif ATAmodel.obj.type == "CC"
         message *= "You must use the Simulated Annealing algorithm to assemble tests with CC objective function."
-        return message
+        push!(ATAmodel.output.infos, message)
     elseif ATAmodel.obj.type == ""
         IIF = []
         message *= "Assembling tests with NO objective function..."
@@ -182,7 +182,7 @@ function jumpATA!(
                 size(starting_design, 2) != ATAmodel.settings.T
             )
                 message *= "- Starting design must be of size: (n_FS x T).\n"
-                return message
+                push!(ATAmodel.output.infos, message)
             end
         else
             if (
@@ -190,12 +190,12 @@ function jumpATA!(
                 size(starting_design, 2) != ATAmodel.settings.T
             )
                 message *= "- Starting design must be of size: (n_items x T).\n"
-                return message
+                push!(ATAmodel.output.infos, message)
             end
         end
         if (any(starting_design != 0 && starting_design != 1))
             message *= "- Starting design must contain only 1 or 0.\n"
-            return message
+            push!(ATAmodel.output.infos, message)
         end
     else
         starting_design = zeros(ATAmodel.settings.n_FS, ATAmodel.settings.T)
@@ -342,5 +342,5 @@ function jumpATA!(
     DelimitedFiles.writedlm(string(results_folder, "/design.csv"), design)
     ATAmodel.output.design = design
     JLD2.@save string(results_folder, "/ATAmodel.jld2") ATAmodel
-    return message
+    push!(ATAmodel.output.infos, message)
 end
