@@ -256,7 +256,7 @@ function load_settings!(
                 message[2] = message[2] * "- Minimum item use constrained.\n"
             end
             if size(Inputs.item_use_max, 1) > 0
-                ATAmodel.settings..max = Inputs.item_use_max
+                ATAmodel.settings.IU.max = Inputs.item_use_max
                 for v = 1:ATAmodel.settings.T
                     x_forced0[v][findall(ATAmodel.settings.IU.max .< 1)] .= false
                 end
