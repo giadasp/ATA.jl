@@ -307,7 +307,6 @@ function load_settings!(
             )
         #update model
         JLD2.@save "OPT/ATAmodel.jld2" ATAmodel
-
     end
     message[1] = "success"
     push!(ATAmodel.output.infos, message)
@@ -328,7 +327,7 @@ It requires the [`load_settings!`](#ATA.load_settings!-Tuple{ATA.Model}) step.
 function add_friends!(ATAmodel::Model)
     message = ["", ""]
     if !isfile("OPT/Settings.jl")
-        push!(ATAmodel.output.infos, ["danger", "Run load_settings!(model) before!"])
+        push!(ATAmodel.output.infos, ["danger", "Run load_settings!(model) before!\n"])
         return nothing
     else
         n_items = ATAmodel.settings.n_items
@@ -385,7 +384,7 @@ function add_friends!(ATAmodel::Model)
         ATAmodel.settings.FS.items = FSItems
         ATAmodel.settings.FS.counts = FS_counts
         JLD2.@save "OPT/ATAmodel.jld2" Model
-        push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.")])
+        push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.\n")])
     end
 end
 
