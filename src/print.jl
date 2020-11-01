@@ -301,3 +301,24 @@ function print_results(ATAmodel; group_by_fs = false, results_folder = "RESULTS"
         println("No solution found")
     end
 end
+
+"""
+	print_infos(ATAmodel)
+
+# Description
+
+Print the results of each build step of the ATAmodel.
+
+# Arguments
+
+- **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nFSxT` if the items are grouped by friend sets. 
+"""
+function print_infos(ATAmodel::model)
+    for m in ATAmodel.output.infos
+        if m[1] == "danger"
+            printstyled(m[2]; color= :red)
+        else
+            printstyled(m[2]; color= :green)
+        end
+    end
+end
