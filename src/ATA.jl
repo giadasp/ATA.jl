@@ -4,8 +4,8 @@ module ATA
 import Printf
 import CSV
 import DelimitedFiles
-import DataFrames.DataFrames
-import Distributions.Distributions
+import DataFrames
+import Distributions
 import Distributed
 import Random
 import LinearAlgebra
