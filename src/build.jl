@@ -50,7 +50,7 @@ function load_settings!(
 )
     message = ["", ""]
     if isfile(bank_file)
-        ATAmodel.settings.bank = CSV.read(bank_file, delim = bank_delim)
+        ATAmodel.settings.bank = CSV.read(bank_file, DataFrames.DataFrame, delim = bank_delim)
         message[2] = message[2] * "- Item bank file read.\n"
     else
         push!(ATAmodel.output.infos,  ["danger", "Not a valid file for bank"])
@@ -508,7 +508,7 @@ function add_constraints!(
         return nothing
     else
         x_forced0 = ATAmodel.settings.forced0
-        Categoricalconsts = CSV.read(constraints_file, delim = constraints_delim)
+        Categoricalconsts = CSV.read(constraints_file, DataFrames.DataFrame, delim = constraints_delim)
         if size(Categoricalconsts, 1) == 0
             message[2] =
                 message[2] *
@@ -639,7 +639,7 @@ function add_overlap!(
         return nothing
     else
         opMatrix =
-            Matrix{Int64}(CSV.read(overlap_file, delim = overlap_delim, header = false))
+            Matrix{Int64}(CSV.read(overlap_file, DataFrames.DataFrame, delim = overlap_delim, header = false))
         if size(opMatrix, 1) > 0
             #ol_max = Vector{Vector{Int64}}(undef, T)
             # for t = 1:T

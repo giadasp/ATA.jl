@@ -67,7 +67,7 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
         #TIF e ICF
         if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
             if isfile("simPool.csv")
-                simPool = CSV.read("simPool.csv")
+                simPool = CSV.read("simPool.csv", DataFrames.DataFrame)
             else
                 simPool = Float64[]
             end
