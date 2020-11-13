@@ -378,7 +378,7 @@ function item_char(
         ])
     #pder =  eachslice(((1 .- p) .* p), dims = 1) .* a
     if derivatives
-        pder = mapslices(x -> (1 .- x) .* x .* a, p; dims = 1)
+        pder = mapslices(x -> (1 .- x) .* ((x .- c)./ (1 .- c)) .* a, p; dims = 1)
     end
 
     if model != "grm"
@@ -470,7 +470,7 @@ function item_info(
     if model != "grm"
         i = (a.^2 ) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2 
     else
-        i = pder.^2  ./ p
+        i = pder.^2 ./ p
         i = sum(i, dims = 3)[:, :, 1]
     end
     return i
