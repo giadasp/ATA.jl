@@ -468,9 +468,9 @@ function item_info(
     p, pder = item_char(pars, theta; model = model, parametrization = parametrization)
     nb = size(p, 3)
     if model != "grm"
-        i = (a .^ 2) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)) .^ 2
+        i = (a.^2 ) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2 
     else
-        i = pder .^ 2 ./ p
+        i = pder.^2  ./ p
         i = sum(i, dims = 3)[:, :, 1]
     end
     return i
