@@ -336,7 +336,7 @@ Print info of the last build step.
 """
 function print_last_info(ATAmodel::Model)
     m = ATAmodel.output.infos[end]
-    if ATAmodel.output.infos[1] == "danger"
+    if m[1] == "danger"
         printstyled(m[2]; color= :red)
     else
         printstyled(m[2]; color= :green)
