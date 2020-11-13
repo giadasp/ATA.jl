@@ -309,7 +309,8 @@ function load_settings!(
         JLD2.@save "OPT/ATAmodel.jld2" ATAmodel
     end
     message[1] = "success"
-    push!(ATAmodel.output.infos, message)
+    push!(ATAmodel.output.infos, message);
+    return nothing
 end
 
 """
@@ -386,6 +387,7 @@ function add_friends!(ATAmodel::Model)
         JLD2.@save "OPT/ATAmodel.jld2" Model
         push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.\n")])
     end
+    return nothing
 end
 
 """
@@ -464,6 +466,7 @@ function add_enemies!(ATAmodel::Model)
         JLD2.@save "OPT/ATAmodel.jld2" Model
         push!(ATAmodel.output.infos,  ["success", string("- ", nES, " enemy sets added. ")])
     end
+    return nothing
 end
 
 """
@@ -610,6 +613,7 @@ function add_constraints!(
         message[2] = message[2] * "- constraints added. \n"
     end
     push!(ATAmodel.output.infos, message)
+    return nothing
 end
 
 """
@@ -666,6 +670,7 @@ function add_overlap!(
         JLD2.@save "OPT/ATAmodel.jld2" ATAmodel
         push!(ATAmodel.output.infos,  ["success", "- Maximum overlap constrained.\n"])
     end
+    return nothing
 end
 
 """
@@ -716,6 +721,7 @@ function add_exp_score!(ATAmodel::Model)
     # end
     JLD2.@save "OPT/ICF.jld2" ICF
     push!(ATAmodel.output.infos,  ["success", "- Expected Score constrained.\n"])
+    return nothing
 end
 
 """
@@ -831,6 +837,7 @@ function add_obj_fun!(ATAmodel::Model)
         return nothing
     end
     push!(ATAmodel.output.infos, message)
+    return nothing
 end
 
 """
@@ -927,6 +934,7 @@ function group_by_friends!(ATAmodel::Model) #last
         end
         push!(ATAmodel.output.infos, ["success", string("- Grouped in ", n_FS, " Friend sets.\n")])
     end
+    return nothing
 end
 
 """
@@ -943,4 +951,5 @@ Useful for loading a custom starting design before the `assemble!` step or to pr
 """
 function load_design!(design::Matrix{Any}, ATAmodel::Model)
     ATAmodel.output.design = Float64.(design)
+    return nothing
 end
