@@ -465,7 +465,7 @@ function item_info(
 
     n_items = size(pars, 1)
     a, a2, b, c = _desume_pars(pars; model = model, parametrization = parametrization)
-    p, pder = item_char(pars, theta; model = model, parametrization = parametrization)
+    p, pder = item_char(pars, theta; model = model, parametrization = parametrization, derivatives = true)
     nb = size(p, 3)
     if model != "grm"
         i = (a.^2 ) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2 
