@@ -377,9 +377,6 @@ function item_char(
             D * (a[i] * theta[n] + a2[i] * b[i, j]) for i = 1:n_items, n = 1:N, j = 1:nb
         ])
     #pder =  eachslice(((1 .- p) .* p), dims = 1) .* a
-    if derivatives
-        pder = mapslices(x -> (1 .- x) .* ((x .- c)./ (1 .- c)) .* a, p; dims = 1)
-    end
 
     if model != "grm"
         p = c .+ ((1 .- c) .* p)
@@ -392,6 +389,9 @@ function item_char(
         # 	p[:, :, k] = p[:, :, k] - p[:, :, k-1]
         # 	pder[:, :, k] = pder[:, :, k] - pder[:, :, k-1]
         # end
+    end
+    if derivatives
+        pder = mapslices(x -> (1 .- x) .* ((x .- c)./ (1 .- c)) .* a, p; dims = 1)
     end
     return p, pder
 end
@@ -468,7 +468,8 @@ function item_info(
     p, pder = item_char(pars, theta; model = model, parametrization = parametrization, derivatives = true)
     nb = size(p, 3)
     if model != "grm"
-        i = (a.^2 ) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2 
+        #i = (a.^2 ) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2 
+        i = pder.^2 ./ (p .* (1 .- p))
     else
         i = pder.^2 ./ p
         i = sum(i, dims = 3)[:, :, 1]
