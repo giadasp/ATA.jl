@@ -13,7 +13,7 @@ ATAmodel = start_ATA()
 # 1. Add file with custom settings (Needed)
 load_settings!(
     ATAmodel;
-    settings_file = "SettingsATA.jl",
+    settings_file = "SettingsATA maximin.jl",
     bank_file = "data/Bank.csv",
     bank_delim = ";",
 )
@@ -91,7 +91,7 @@ verbosity = 2
 
 #! Termination criteria: 
 
-max_time = 10.0
+max_time = 500.0
 # Default: `1000.0`. Values: `[0, Inf)`.
 # Time limit in seconds.
 

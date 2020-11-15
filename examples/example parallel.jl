@@ -36,7 +36,7 @@ ATAmodel = start_ATA()
 # 1. Add file with custom settings (Needed)
 load_settings!(
     ATAmodel;
-    settings_file = "SettingsATA.jl",
+    settings_file = "SettingsATA maximin.jl",
     bank_file = "data/Bank.csv",
     bank_delim = ";",
 )
@@ -146,8 +146,8 @@ assemble!(
     n_fill = n_fill,
     feas_nh = feas_nh,
     opt_nh = opt_nh,
-    optimizer_attributes = optimizer_constructor,
-    optimizer_constructor = optimizer_attributes,
+    optimizer_attributes = optimizer_attributes,
+    optimizer_constructor = optimizer_constructor,
 )
 
 # All the settings and outputs from optimization are in ATAmodel object.

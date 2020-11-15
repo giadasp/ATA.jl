@@ -27,7 +27,7 @@ function siman!(
             " will be overwritten.\n",
         )
     end
-    if ATAmodel.obj.type == "MAXIMIN"
+    if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "MINIMAX"
         JLD2.@load "OPT/IIF.jld2" IIF
     elseif ATAmodel.obj.type == "CC"
         JLD2.@load "OPT/IIF_CC.jld2" IIF
@@ -68,12 +68,12 @@ function siman!(
             size(starting_design, 1) != n_FS ||
             size(starting_design, 2) != ATAmodel.settings.T
         )
-            message *= "- Starting design must be of size: (n_items x T).\n"
-            push!(ATAmodel.output.infos, message)
+            push!(ATAmodel.output.infos, ["danger", "- Starting design must be of size: (n_items x T).\n"])
+            return nothing
         end
         if (any(starting_design != 0 && starting_design != 1))
-            message *= "- Starting design must contain only 1 or 0.\n"
-            push!(ATAmodel.output.infos, message)
+            push!(ATAmodel.output.infos, ["danger", "- Starting design must contain only 1 or 0.\n"])
+            return nothing
         end
         x₀ = Float64.(starting_design)
     else
@@ -105,9 +105,11 @@ function siman!(
         NH⁺.ol = eval_overlap(NH⁺.x, FS_counts, ATAmodel.settings.ol_max, T, NH⁺.ol)
         if fF == false
             if ATAmodel.obj.type == "MAXIMIN"
-                NH⁺.obj[v2] = eval_TIF_MM_v(x_Iₜ, IIF[v2])
+                NH⁺.obj[v2] = eval_TIF_MMₜ(x_Iₜ, IIF[v2])
+            elseif ATAmodel.obj.type == "MINIMAX"
+                NH⁺.obj[v2] = eval_TIF_mmₜ(x_Iₜ, IIF[v2], ATAmodel.obj.targets[v2])
             elseif ATAmodel.obj.type == "CC"
-                NH⁺.obj[v2] = eval_TIF_CC_v(x_Iₜ, IIF[v2]; α = ATAmodel.obj.aux_float)
+                NH⁺.obj[v2] = eval_TIF_CCₜ(x_Iₜ, IIF[v2]; α = ATAmodel.obj.aux_float)
             elseif ATAmodel.obj.type == "custom"
                 NH⁺.obj = ATAmodel.obj.fun(x_Iₜ, ATAmodel.obj.args)
             end
@@ -312,5 +314,5 @@ function siman!(
         write(io, string(ATAmodel.output.elapsed_time))
         return write(io, "\r\n")
     end
-    push!(ATAmodel.output.infos, message)
+return nothing
 end

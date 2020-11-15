@@ -28,6 +28,14 @@ function jumpATA!(
     elseif ATAmodel.obj.type == "CC"
         message *= "You must use the Simulated Annealing algorithm to assemble tests with CC objective function."
         push!(ATAmodel.output.infos, message)
+    elseif ATAmodel.obj.type == "MINIMAX"
+        if isfile("OPT/IIF.jld2")
+            JLD2.@load "OPT/IIF.jld2" IIF
+            message *= "- Assembling tests with MINIMAX..."
+        else
+            message *= "No IIF.jld2 file in OPT folder, Run add_obj_fun!() first!"
+            push!(ATAmodel.output.infos, message)
+        end
     elseif ATAmodel.obj.type == ""
         IIF = []
         message *= "Assembling tests with NO objective function..."
@@ -55,7 +63,7 @@ function jumpATA!(
         end
     end
     #Group IIFs by friend set
-    if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+    if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
         IIF_new = [zeros(Float64, 0, 0) for t = 1:ATAmodel.settings.T]
         if ATAmodel.settings.n_FS != ATAmodel.settings.n_items
             #group IIFs
@@ -83,9 +91,8 @@ function jumpATA!(
             #group IIFs
             for t = 1:ATAmodel.settings.T
                 if size(ATAmodel.constraints[t].expected_score.val, 1) > 0
-                    ICF_new[t] = Matrix{Float64}(
-                        undef,
-                        size(ATAmodel.constraints[t].expected_score.val, 2),
+                    ICF_new[t] = zeros(Float64,
+                        size(ATAmodel.constraints[t].expected_score.val, 1),
                         ATAmodel.settings.n_FS,
                     )
                 end
@@ -95,10 +102,10 @@ function jumpATA!(
                     if size(ATAmodel.constraints[t].expected_score.val, 1) > 0
                         ICF_new[t][:, fs] = sum(
                             ATAmodel.constraints[t].expected_score.val[
-                                ATAmodel.settings.FS.items[fs],
                                 :,
+                                ATAmodel.settings.FS.items[fs],
                             ],
-                            dims = 1,
+                            dims = 2,
                         )
                     end
                 end
@@ -263,11 +270,10 @@ function jumpATA!(
             end
         end
     end
-
     #expected score
     for t = 1:ATAmodel.settings.T
         if size(ICF_new[t], 1) > 0
-            for k = 1:size(ICF_new, 1)
+            for k = 1:size(ICF_new[t], 1)
                 if ATAmodel.constraints[t].expected_score.min[k] > 0
                     JuMP.@constraint(
                         m,
@@ -334,6 +340,28 @@ function jumpATA!(
             end
         end
         JuMP.@objective(m, Min, (-w))
+    elseif ATAmodel.obj.type == "MINIMAX"
+        #Objective bound
+        JuMP.@variable(m, epsilon >= 0)
+        for t = 1:ATAmodel.settings.T
+            for k = 1:size(ATAmodel.obj.points[t], 1)
+                JuMP.@constraint(
+                    m,
+                    sum(
+                        round(IIF_new[t][k, i]; digits = 4) * x[i, t]
+                        for i = 1:ATAmodel.settings.n_FS
+                    ) - ATAmodel.obj.targets[t][k] <= epsilon
+                )
+                JuMP.@constraint(
+                    m,
+                    sum(
+                        round(IIF_new[t][k, i]; digits = 4) * x[i, t]
+                        for i = 1:ATAmodel.settings.n_FS
+                    ) - ATAmodel.obj.targets[t][k] >= - epsilon
+                )
+            end
+        end
+        JuMP.@objective(m, Min, epsilon)
     end
     JuMP.optimize!(m)
     message *= string("The model has termination status:", JuMP.termination_status(m))

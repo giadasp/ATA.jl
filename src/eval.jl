@@ -66,18 +66,12 @@ function eval_Exp_Scoreₜ(x_Iₜ::Vector{Float64}, expected_scoreₜ::ExpectedS
 end
 
 function eval_TIF_MMₜ(xₜ::Vector{Float64}, IIF::Matrix{Float64}) # x = I
-    K, I = size(IIF)
-    if K > 1
-        TIF = Inf
-        for k = 1:K
-            TIF = min(TIF, LinearAlgebra.dot(IIF[1, :], xₜ))#IIF[k, :]'*x) #minimum for all thetasopt
-        end
-    else
-        TIF = LinearAlgebra.BLAS.gemv('N', IIF, xₜ)[1]#IIF[1, :]'*x
-    end
-    return TIF::Float64
+    return minimum(LinearAlgebra.BLAS.gemv('N', IIF, xₜ))::Float64
 end
 
+function eval_TIF_mmₜ(xₜ::Vector{Float64}, IIF::Matrix{Float64}, targetsₜ::Vector{Float64}) # x = I
+    return -maximum(abs.(LinearAlgebra.BLAS.gemv('N', IIF, xₜ) - targetsₜ))::Float64
+end
 # ! not used anymore, item use is evaluated item by item
 # function eval_IU(x::Matrix{Float64}, T::Int64) #x = I*T
 # 	ItemUse = x * ones(T)
@@ -227,10 +221,65 @@ function fill_up_MAXIMIN(
     return NH::Neighbourhood
 end
 
+#warmup MAXIMIN
+function fill_up_MINIMAX(
+    NH::Neighbourhood,
+    IIFₜ::Matrix{Float64},
+    opt_feas::Float64,
+    v::Int64,
+    IU::IU,
+    FS::FS,
+    constraints::Constraint,
+    x_forced0ₜ::Vector{Bool},
+    n_items::Int64,
+    n_FS::Int64,
+    ol_maxₜ::Vector{Float64},
+)
+    f₀, TIF₀, infeas₀ = Inf, copy(NH.obj), Inf
+    T = size(NH.x, 2)
+    x₀ = copy(NH.x)
+    idxₜ₂ = setdiff(collect(1:n_FS), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
+    #idxₜ₂ = Random.shuffle!(idxₜ₂) # !removed
+    i⁺ = 1
+    iu₀ = sum(NH.x, dims = 2) - IU.max
+    ol₀ₜ = 0
+    iu⁺ = 0
+    for i₂ in idxₜ₂
+        if x_forced0ₜ[i₂]
+            x₁, TIF₁, infeas₁, iu = copy(x₀), copy(TIF₀), copy(infeas₀), copy(iu₀)
+            x₁[i₂, v] = one(Float64)
+            xₜ = copy(x₁[:, v])
+            iu[i₂] = iu[i₂] + 1
+            iu = iu[iu.>0]
+            if size(iu, 1) == 0
+                iu = 0
+            else
+                iu = sum(iu)
+            end
+            infeas₁, x_Iₜ = check_feas(FS, constraints, xₜ, n_FS, n_items)
+            TIF₁[v] = eval_TIF_mmₜ(x_Iₜ, IIFₜ)
+            ol = eval_overlap_v(xₜ, x₁, FS.counts, ol_maxₜ, v)
+            f₁ = (1 - opt_feas) * (infeas₁ + iu + ol) - opt_feas * minimum(TIF₁)
+            if (f₁ < f₀)
+                i⁺ = copy(i₂)
+                f₀, TIF₀, infeas₀ = copy(f₁), copy(TIF₁), copy(infeas₁)
+                iu⁺ = copy(iu)
+                ol₀ₜ = copy(ol)
+            end
+        end
+    end
+    NH.ol[v] = copy(ol₀ₜ)#0
+    NH.infeas[v] = copy(infeas₀)
+    NH.iu = copy(iu⁺)
+    NH.obj = copy(TIF₀)
+    NH.x[i⁺, v] = one(Float64)
+    return NH::Neighbourhood
+end
+
 #warmup MAXIMIN CC
 function fill_up_CC(
     NH::Neighbourhood,
-    obj::Obj,
+    α::Float64,
     IIFₜ::Array{Float64,3},
     opt_feas::Float64,
     v::Int64,
@@ -243,7 +292,6 @@ function fill_up_CC(
     ol_maxₜ::Vector{Float64},
 )
     f₀, TIF₀, infeas₀ = Inf, copy(NH.obj), Inf
-    α = obj.aux_float
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
     idxₜ₂ = setdiff(collect(1:n_FS), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
@@ -412,7 +460,7 @@ function analyse_NH(
                     else
                         NH_add = fill_up_CC(
                             NH₁,
-                            ATAmodel.obj,
+                            ATAmodel.obj.aux_float,
                             IIF[v],
                             opt_feas,
                             v,
@@ -737,7 +785,7 @@ function analyse_NH(
     return NH⁺::Neighbourhood
 end
 
-#MAXIMIN neighbourhood
+#MAXIMIN or MINIMAX neighbourhood
 function analyse_NH(
     NH_start::Neighbourhood,
     ATAmodel::Model,
@@ -806,8 +854,22 @@ function analyse_NH(
                             ATAmodel.settings.ol_max[:, v],
                         )
                         NH_add.f = opt_feas * NH_add.f
-                    else
+                    elseif ATAmodel.obj.type == "MAXIMIN"
                         NH_add = fill_up_MAXIMIN(
+                            NH₁,
+                            IIF[v],
+                            opt_feas,
+                            v,
+                            ATAmodel.settings.IU,
+                            ATAmodel.settings.FS,
+                            constraints,
+                            ATAmodel.settings.forced0[v],
+                            n_items,
+                            n_FS,
+                            ATAmodel.settings.ol_max[:, v],
+                        )
+                    elseif ATAmodel.obj.type == "MINIMAX"
+                        NH_add = fill_up_MINIMAX(
                             NH₁,
                             IIF[v],
                             opt_feas,

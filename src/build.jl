@@ -184,7 +184,7 @@ function load_settings!(
                     end
                 end
             end
-            message[2] = message[2] * "- Expected score variable and obj_points loaded.\n"
+            message[2] = message[2] * "- Expected score variable and expected_score_pts loaded.\n"
 
             if Inputs.expected_score_min != Float64[]
                 t1 = 1
@@ -252,7 +252,7 @@ function load_settings!(
                 end
                 message[2] =
                     message[2] *
-                    string("- Sum of variables", Inputs.sum_vars, " will be constrained.\n")
+                    string("- Sum of variables", Inputs.sum_vars, " constrained.\n")
             end
             if size(Inputs.item_use_min, 1) > 0
                 ATAmodel.settings.IU.min = Inputs.item_use_min
@@ -267,24 +267,51 @@ function load_settings!(
             end
             if Inputs.obj_type != ""
                 ATAmodel.obj.type = Inputs.obj_type
+                message[2] =
+                    message[2] * string("- ", ATAmodel.obj.type, " optimization type loaded.\n")
+            end
+            if Inputs.obj_type == "MAXIMIN" ||  Inputs.obj_type == "CC" || Inputs.obj_type == "MINIMAX"
+                if size(Inputs.obj_points, 1) > 0
+                    ATAmodel.obj.points = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
+                    t1 = 1
+                    for g = 1:ATAmodel.settings.n_groups
+                        for t = 1:ATAmodel.settings.Tg[g]
+                            ATAmodel.obj.points[t1] = Inputs.obj_points[g]
+                            t1 += 1
+                        end
+                    end
+                    message[2] = message[2] * "- Optimization points loaded.\n"
+                else
+                    push!(ATAmodel.output.infos, ["danger", "error: MAXIMIN, CC and MINIMAX objective types require optimization points. Use obj_points field in input settings."])
+                    return nothing
+                end
+            end
+            if Inputs.obj_type == "MINIMAX"
+                if (size(Inputs.obj_targets, 1) > 0) 
+                    ATAmodel.obj.targets = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
+                    t1 = 1
+                    for g = 1:ATAmodel.settings.n_groups
+                        if size(Inputs.obj_targets[g],1) != size(Inputs.obj_points[g],1)
+                            push!(ATAmodel.output.infos, ["danger", string("error: for group ", g, " size of obj_targets (", size(Inputs.obj_targets[g],1), ") is not the same as size of obj_points (", size(Inputs.obj_points[g],1), "). /n") ])
+                            return nothing
+                        end
+                        for t = 1:ATAmodel.settings.Tg[g]
+                            ATAmodel.obj.targets[t1] = Inputs.obj_targets[g]
+                            t1 += 1
+                        end
+                    end
+
+                    message[2] = message[2] * "- Targets loaded.\n"
+                else
+                    push!(ATAmodel.output.infos, ["danger", "error: MINIMAX objective type requires targets. Use obj_targets field in input settings."])
+                    return nothing
+                end
+            end
+            if (Inputs.obj_type == "custom") || (Inputs.obj_type == "CC")
                 ATAmodel.obj.aux_int = Inputs.obj_aux_int
                 ATAmodel.obj.aux_float = Inputs.obj_aux_float
-                message[2] =
-                    message[2] * "- Optimization type and objective function loaded.\n"
+                message[2] = message[2] * "- Auxiliars vars for optimization loaded.\n"
             end
-            if size(Inputs.obj_points, 1) > 0
-                ATAmodel.obj.points = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
-                t1 = 1
-                for g = 1:ATAmodel.settings.n_groups
-                    for t = 1:ATAmodel.settings.Tg[g]
-                        ATAmodel.obj.points[t1] = Inputs.obj_points[g]
-                        t1 += 1
-                    end
-                end
-                message[2] = message[2] * "- Points to optimize loaded.\n"
-            end
-
-            message[2] = message[2] * "- Auxiliars vars for optimization loaded.\n"
             #fictiuos friendSets
             ATAmodel.settings.FS.counts = ones(ATAmodel.settings.n_items)
             ATAmodel.settings.FS.sets = string.(collect(1:ATAmodel.settings.n_items))
@@ -294,16 +321,16 @@ function load_settings!(
                 val = Symbol.(Inputs.categories)
                 ATAmodel.output.categories = copy(val)
                 write(f, "categories = $val\n\n")
-                message[2] = message[2] * "- categories for output loaded.\n"
+                message[2] = message[2] * "- Categories for output loaded.\n"
             end
         end
         message[2] =
             message[2] * string(
-                "assemble ",
+                "ASSEMBLE ",
                 ATAmodel.settings.T,
-                " forms divided in ",
+                " FORMS DIVIDED IN ",
                 ATAmodel.settings.n_groups,
-                " groups.\n",
+                " GROUPS.\n",
             )
         #update model
         JLD2.@save "OPT/ATAmodel.jld2" ATAmodel
@@ -741,7 +768,7 @@ function add_obj_fun!(ATAmodel::Model)
     T = ATAmodel.settings.T
     n_items = ATAmodel.settings.n_items
     obj_points = ATAmodel.obj.points
-    if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+    if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
         IRT_parameters = ATAmodel.settings.IRT.parameters
         IRT_model = ATAmodel.settings.IRT.model
         IRT_D = ATAmodel.settings.IRT.D
@@ -822,9 +849,13 @@ function add_obj_fun!(ATAmodel::Model)
             end
             JLD2.@save "OPT/IIF_CC.jld2" IIF
             JLD2.@save "OPT/ICF_CC.jld2" ICF
-            message = ["success", "- MAXIMIN CC objective function applied.\n"]
+            message = ["success", "- IIFs for MAXIMIN CC objective function computed.\n"]
         else
-            message = ["success", "- MAXIMIN objective function applied.\n"]
+            if ATAmodel.obj.type == "MAXIMIN"
+                message = ["success", "- IIFs for MAXIMIN objective function computed.\n"]
+            else
+                message = ["success", "- IIFs for MINIMAX objective function computed.\n"]
+            end
         end
         open("OPT/Settings.jl", "a") do f
             write(f, "K = $K\n\n")
@@ -832,7 +863,7 @@ function add_obj_fun!(ATAmodel::Model)
     elseif !(ATAmodel.obj.type == "custom" || ATAmodel.obj.type == "")
         push!(ATAmodel.output.infos,  [
             "danger",
-            "- Only \"MAXIMIN\", \"CC\", \"\" (no objective) and \"custom\" are supported. \n",
+            "- Only \"MAXIMIN\", \"CC\", \"MINIMAX\", \"\" (no objective) and \"custom\" are supported. \n",
         ])
         return nothing
     end

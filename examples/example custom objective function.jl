@@ -18,7 +18,7 @@ ATAmodel = start_ATA()
 # 1. Add file with custom settings (Needed)
 load_settings!(
     ATAmodel;
-    settings_file = "SettingsATA.jl",
+    settings_file = "SettingsATA custom.jl",
     bank_file = "data/Bank.csv",
     bank_delim = ";",
 )

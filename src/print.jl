@@ -39,7 +39,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
             IIF_CC = copy(IIF)
             ICF_CC = copy(ICF)
         end
-        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
             JLD2.@load "OPT/IIF.jld2" IIF
         end
 	if isfile("OPT/ICF.jld2")
@@ -70,7 +70,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
         end
         #DelimitedFiles.writedlm(string(results_folder,"/olMatrixOUT.csv"),olMatrixOUT)
         #TIF e ICF
-        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
             if isfile("simPool.csv")
                 simPool = CSV.read("simPool.csv", DataFrames.DataFrame)
             else
@@ -146,7 +146,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
             end
             CSV.write(string(results_folder, "/TIFatTheta_k.csv"), TIFatTheta_k)
 
-	elseif ATAmodel.obj.type == "MAXIMIN"
+	elseif ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "MINIMAX"
             Estimated = Float64[]
             if isfile("simPool.csv")
                 True = Float64[]
@@ -173,7 +173,6 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                 DataFrames.DataFrames.names!(TIFatTheta_k, Symbol.(["Estimated", "True"]))
             end
             CSV.write(string(results_folder, "/TIFatTheta_k.csv"), TIFatTheta_k)
-
         end
 
         #expected score

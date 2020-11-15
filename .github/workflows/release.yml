@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - release
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        julia-version: [1.5.1]
+        julia-arch: [x86]
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{ matrix.julia-version }}
+
+      - name: Install dependencies
+        run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+
+      - name: Setup environment variables
+        run: |
+          VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' | tr -d '"' | tr -d \'`
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          REPO=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
+          echo "REPO=${REPO}" >> $GITHUB_ENV
+          DEVBRANCH=release
+          echo "DEVBRANCH=${DEVBRANCH}" >> $GITHUB_ENV
+          IS_SNAPSHOT=`if [[ "${VERSION}" == 0.* ]] ; then echo "true" ; else echo "false" ; fi`
+          echo "IS_SNAPSHOT=${IS_SNAPSHOT}" >> $GITHUB_ENV
+
+      - name: Build, deploy and upload docs
+        run: julia --project=docs --color=yes docs/make.jl
+        env:
+          REPO: ${{ env.REPO }}
+          DEVBRANCH: ${{ env.DEVBRANCH }}
+
+      - name: Compress target directories
+        run: |
+          zip -r ATA.zip src/ test/ LICENSE *.toml
+
+      - name: Upload Github Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: ${{ env.GITHUB_TOKEN }}
+          automatic_release_tag: v${{ env.VERSION }}
+          prerelease: ${{ env.IS_SNAPSHOT }}
+          title: v${{ env.VERSION }}
+          files: |
+            ATA.zip

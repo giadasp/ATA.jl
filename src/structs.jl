@@ -26,6 +26,7 @@ mutable struct InputSettings
     sum_vars_max::Vector{Vector{Float64}}
     obj_type::String
     obj_points::Vector{Vector{Float64}}
+    obj_targets::Vector{Vector{Float64}}
     obj_aux_int::Int64
     obj_aux_float::Float64
     categories::Vector{String}
@@ -57,6 +58,7 @@ mutable struct InputSettings
         sum_vars_max,
         obj_type,
         obj_points,
+        obj_targets,
         obj_aux_int,
         obj_aux_float,
         categories,
@@ -88,6 +90,7 @@ mutable struct InputSettings
         sum_vars_max,
         obj_type,
         obj_points,
+        obj_targets,
         obj_aux_int,
         obj_aux_float,
         categories,
@@ -116,6 +119,7 @@ mutable struct InputSettings
         Vector{Vector{Float64}}(undef, 0),
         Vector{Vector{Float64}}(undef, 0),
         Vector{Vector{String}}(undef, 0),
+        Vector{Vector{Float64}}(undef, 0),
         Vector{Vector{Float64}}(undef, 0),
         Vector{Vector{Float64}}(undef, 0),
         "",
@@ -308,16 +312,18 @@ mutable struct Obj
     sense::String
     type::String
     points::Vector{Vector{Float64}}
+    targets::Vector{Vector{Float64}}
     aux_int::Int64
     aux_float::Float64
     # must be test separable and accept x_Iₜ (design of test v, item level, not grouped by friend sets) as first argument and NamedTuple as second argument, it must return a Vector of Float64 with T elements.
     fun::Function
     args::NamedTuple # ex: (a = [0, 0, 0], b = "hello") 
-    obj(sense, type, points, aux_int, aux_float, fun, args) =
-        new(sense, type, points, aux_int, aux_float, fun, args)
+    obj(sense, type, points, targets, aux_int, aux_float, fun, args) =
+        new(sense, type, points, targets, aux_int, aux_float, fun, args)
     Obj() = new(
         "max",
         "",
+        Vector{Vector{Float64}}(undef, 0),
         Vector{Vector{Float64}}(undef, 0),
         zero(Int64),
         zero(Float64),
