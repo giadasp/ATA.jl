@@ -14,6 +14,7 @@ Documentation on exported functions available at [link](https://giadasp.github.i
 1. no objective;
 2. MAXIMIN TIF (minimum between multiple ability points supported);
 3. Chance-constrained MAXIMIN TIF.
+4. MINIMAX TIF (maximum between multiple ability points supported);
 
 ## Constraints
 
