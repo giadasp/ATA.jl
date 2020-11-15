@@ -328,7 +328,7 @@ function load_settings!(
             message[2] * string(
                 "ASSEMBLE ",
                 ATAmodel.settings.T,
-                " FORMS DIVIDED IN ",
+                " FORMS DIVIDED INTO ",
                 ATAmodel.settings.n_groups,
                 " GROUPS.\n",
             )
