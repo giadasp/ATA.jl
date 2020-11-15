@@ -77,11 +77,15 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
                 ATAmodel.settings.IRT.parameters,
                 ThetasPlot,
                 model = ATAmodel.settings.IRT.model,
+                parametrization = ATAmodel.settings.IRT.parametrization,
+                D = ATAmodel.settings.IRT.D,
             )
             ICFplot = item_char(
                 ATAmodel.settings.IRT.parameters,
                 ThetasPlot,
                 model = ATAmodel.settings.IRT.model,
+                parametrization = ATAmodel.settings.IRT.parametrization,
+                D = ATAmodel.settings.IRT.D,
             )[1][
                 :,
                 :,

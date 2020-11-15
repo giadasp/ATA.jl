@@ -107,6 +107,8 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                                 simPool,
                                 ATAmodel.obj.points[t][k],
                                 model = ATAmodel.settings.IRT.model,
+                                parametrization = ATAmodel.settings.IRT.parametrization,
+                                D = ATAmodel.settings.IRT.D,
                             )' * design[:, t],
                         )
                     end
@@ -162,6 +164,8 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                                 simPool,
                                 ATAmodel.obj.points[t][k],
                                 model = ATAmodel.settings.IRT.model,
+                                parametrization = ATAmodel.settings.IRT.parametrization,
+                                D = ATAmodel.settings.IRT.D,
                             )' * design[:, t],
                         )
                     end
