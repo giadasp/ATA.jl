@@ -40,7 +40,7 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
             ICF_CC = copy(ICF)
         end
 
-        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
             JLD2.@load "OPT/IIF.jld2" IIF
             JLD2.@load "OPT/ICF.jld2" ICF
         end
@@ -65,7 +65,7 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
         end
 
         #TIF e ICF
-        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC"
+        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
             if isfile("simPool.csv")
                 simPool = CSV.read("simPool.csv", DataFrames.DataFrame)
             else
