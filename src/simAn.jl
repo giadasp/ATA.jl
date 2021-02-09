@@ -246,11 +246,11 @@ function siman!(
             elseif (finish == 3) # evals max reached
                 println(" == > Maximum time reached <== ")
             end
-            Printf.@printf("\n obj. value:	%16.10f", NH⁺.f)
-            Printf.@printf("\n Optimality:	%16.10f", minimum(NH⁺.obj))
-            Printf.@printf("\n Infeasibility:	%16.10f", sum(NH⁺.infeas + NH⁺.ol) + NH⁺.iu)
-            Printf.@printf("\n Elapsed Time:	%16.10f", time() - start_time)
-            Printf.@printf("\n Best Neighbourhood:	%16.10f", bestNH)
+            Printf.@printf("\n obj. value:	%16.3f", NH⁺.f)
+            Printf.@printf("\n Optimality:	%16.3f", minimum(NH⁺.obj))
+            Printf.@printf("\n Infeasibility:	%16.3f", sum(NH⁺.infeas + NH⁺.ol) + NH⁺.iu)
+            Printf.@printf("\n Elapsed Time:	%16.1f", time() - start_time)
+            Printf.@printf("\n Best Neighbourhood:	%16.0f", bestNH)
             println("\n")
             println(hline)
         end
