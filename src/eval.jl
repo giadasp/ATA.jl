@@ -407,6 +407,8 @@ function analyse_NH(
         NH_start.obj = zeros(Float64, ATAmodel.settings.T)
     end
     NH₁ = Neighbourhood()
+    NH₀ = Neighbourhood()
+    NH⁺ = Neighbourhood()
     NH₁ = _mycopy(NH_start, NH₁)
     NH₀ = _mycopy(NH_start, NH₀)
     NH⁺ = _mycopy(NH_start, NH⁺)
@@ -807,6 +809,8 @@ function analyse_NH(
         NH_start.obj = zeros(Float64, ATAmodel.settings.T)
     end
     NH₁ = Neighbourhood()
+    NH₀ = Neighbourhood()
+    NH⁺ = Neighbourhood()
     NH₁ = _mycopy(NH_start, NH₁)
     NH₀ = _mycopy(NH_start, NH₀)
     NH⁺ = _mycopy(NH_start, NH⁺)
@@ -1198,9 +1202,12 @@ function analyse_NH(
         NH_start.obj = zeros(Float64, ATAmodel.settings.T)
     end
     NH₁ = Neighbourhood()
+    NH₀ = Neighbourhood()
+    NH⁺ = Neighbourhood()
     NH₁ = _mycopy(NH_start, NH₁)
     NH₀ = _mycopy(NH_start, NH₀)
     NH⁺ = _mycopy(NH_start, NH⁺)
+    
     f_star = ones(2) .* Inf
     f_evals = 0
     t = copy(start_temp)
