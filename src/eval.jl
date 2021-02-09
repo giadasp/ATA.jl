@@ -557,7 +557,7 @@ function analyse_NH(
             else
                 nI = n_item_sample
             end
-            Random.shuffle!(taken_items) # !removed
+            taken_items = Random.shuffle!(taken_items) # !removed
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
@@ -974,7 +974,7 @@ function analyse_NH(
             else
                 nI = n_item_sample
             end
-            Random.shuffle!(taken_items) # !removed
+            taken_items = Random.shuffle!(taken_items) # !removed
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
@@ -1359,7 +1359,7 @@ function analyse_NH(
             else
                 nI = n_item_sample
             end
-            Random.shuffle!(taken_items) # !removed
+            taken_items = Random.shuffle!(taken_items) # !removed
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
