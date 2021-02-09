@@ -495,7 +495,7 @@ function analyse_NH(
                     println("-Test ", v, " filled up with ", n_t, " items, ")
                 end
             end
-        end-#end of round, round = nRound
+        end#end of round, round = nRound
         NH₀ = _mycopy(NH₁, NH₀)
         NH₀.f = _comp_f(NH₀, opt_feas)
     end
@@ -895,7 +895,7 @@ function analyse_NH(
                     else
                         warmup[v] = false
                         #NH₁ = _mycopy(NH_add, NH₁)
-                        Printf.@printf("\n f₁:  %16.3", NH₁.f)
+                        Printf.@printf("\n f₁:  %16.3f", NH₁.f)
                         println("-Test ", v, " filled up with ", n_t, " items, ")
                     end
                 else
