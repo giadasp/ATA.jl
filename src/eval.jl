@@ -423,11 +423,12 @@ function analyse_NH(
     switches = 0
     removes = 0
     adds = 0
+
+
+    if n_fill > 0
     #warm up
     println("Fill-up starting...")
     round = 1
-
-    if n_fill > 0
         for round = 1:n_fill
             NH₁ = _mycopy(NH_start, NH₁)
             warmup = fill(true, T)
@@ -501,15 +502,16 @@ function analyse_NH(
         end#end of round, round = nRound
         NH₀ = _mycopy(NH₁, NH₀)
         NH₀.f = _comp_f(NH₀, opt_feas)
+        NH⁺ = _mycopy(NH₀, NH⁺)
+        println("End of fill-up")
+        if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
+            println("Feasible solution found in fill-up")
+            fF = false
+        else
+            println("Feasible solution not found in fill-up")
+        end
     end
-    NH⁺ = _mycopy(NH₀, NH⁺)
-    println("End of fill-up")
-    if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
-        println("Feasible solution found in fill-up")
-        fF = false
-    else
-        println("Feasible solution not found in fill-up")
-    end
+    
     if verbosity > 1
         print_neighbourhood(NH⁺)
     end
@@ -824,11 +826,12 @@ function analyse_NH(
     n_items = ATAmodel.settings.n_items
     n_fs = ATAmodel.settings.n_fs
     fs_counts = ATAmodel.settings.fs.counts * ones(Float64, T)'
-    #Fill up
-    println("Fill-up starting...")
+    
     round = 1
 
     if n_fill > 0
+        #Fill up
+        println("Fill-up starting...")
         for round = 1:n_fill
             NH₁ = _mycopy(NH_start, NH₁)
             warmup = fill(true, T)
@@ -915,16 +918,16 @@ function analyse_NH(
                 end
             end
         end #end of round, round = nRound
+        println("End of fill-up")
         NH₀ = _mycopy(NH₁, NH₀)
         NH₀.f = _comp_f(NH₀, opt_feas)
-    end
-    NH⁺ = _mycopy(NH₀, NH⁺)
-    println("End of fill-up")
-    if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
-        println("Feasible solution found in fill-up")
-        fF = false
-    else
-        println("Feasible solution not found in fill-up")
+        NH⁺ = _mycopy(NH₀, NH⁺)
+        if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
+            println("Feasible solution found in fill-up")
+            fF = false
+        else
+            println("Feasible solution not found in fill-up")
+        end
     end
     if verbosity > 1
         print_neighbourhood(NH⁺)
@@ -1221,11 +1224,12 @@ function analyse_NH(
     n_items = ATAmodel.settings.n_items
     n_fs = ATAmodel.settings.n_fs
     fs_counts = ATAmodel.settings.fs.counts * ones(Float64, T)'
+
+
+    if n_fill > 0
     #Fill up
     println("Fill-up starting...")
     round = 1
-
-    if n_fill > 0
         for round = 1:n_fill
             NH₁ = _mycopy(NH_start, NH₁)
             warmup = fill(true, T)
@@ -1300,15 +1304,16 @@ function analyse_NH(
         end #end of round, round = nRound
         NH₀ = _mycopy(NH₁, NH₀)
         NH₀.f = _comp_f(NH₀, opt_feas)
+        NH⁺ = _mycopy(NH₀, NH⁺)
+        println("End of fill-up")
+        if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
+            println("Feasible solution found in fill-up")
+            fF = false
+        else
+            println("Feasible solution not found in fill-up")
+        end
     end
-    NH⁺ = _mycopy(NH₀, NH⁺)
-    println("End of fill-up")
-    if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
-        println("Feasible solution found in fill-up")
-        fF = false
-    else
-        println("Feasible solution not found in fill-up")
-    end
+
     if verbosity > 1
         print_neighbourhood(NH⁺)
     end
