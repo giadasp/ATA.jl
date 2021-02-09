@@ -408,8 +408,9 @@ function analyse_NH(
     end
     NH₁ = Neighbourhood()
     NH₁ = _mycopy(NH_start, NH₁)
-    NH₀ = Neighbourhood()
-    NH⁺ = Neighbourhood()
+    NH₀ = _mycopy(NH_start, NH₀)
+    NH⁺ = _mycopy(NH_start, NH⁺)
+
     f_star = ones(2) .* Inf
     f_evals = 0
     t = copy(start_temp)
@@ -804,8 +805,8 @@ function analyse_NH(
     end
     NH₁ = Neighbourhood()
     NH₁ = _mycopy(NH_start, NH₁)
-    NH₀ = Neighbourhood()
-    NH⁺ = Neighbourhood()
+    NH₀ = _mycopy(NH_start, NH₀)
+    NH⁺ = _mycopy(NH_start, NH⁺)
     f_star = ones(2) .* Inf
     f_evals = 0
     t = copy(start_temp)
@@ -1191,8 +1192,8 @@ function analyse_NH(
     end
     NH₁ = Neighbourhood()
     NH₁ = _mycopy(NH_start, NH₁)
-    NH₀ = Neighbourhood()
-    NH⁺ = Neighbourhood()
+    NH₀ = _mycopy(NH_start, NH₀)
+    NH⁺ = _mycopy(NH_start, NH⁺)
     f_star = ones(2) .* Inf
     f_evals = 0
     t = copy(start_temp)
