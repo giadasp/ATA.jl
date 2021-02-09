@@ -1354,13 +1354,13 @@ function analyse_NH(
             #it<size(iteratorTestItem, 1) #
             #v = iteratorTestItem[it][2]
             #NH₀.x = copy(xnew)
-            taken_items = findall(NH₀.x[:, v] .== 1)
+            taken_items = findall(isone.(NH₀.x[:, v]))
             if n_item_sample > size(taken_items, 1)
                 nI = Int(size(taken_items, 1))
             else
                 nI = n_item_sample
             end
-            # Random.shuffle!(taken_items) # !removed
+            Random.shuffle!(taken_items) # !removed
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
