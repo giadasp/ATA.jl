@@ -485,8 +485,8 @@ function analyse_NH(
                         NH_add.ol,
                     )
                     Printf.@printf "."
-                    nₜ = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.fs.counts)
-                    #println("length for test ", v, ": ", nₜ)
+                    n_t = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.fs.counts)
+                    #println("length for test ", v, ": ", n_t)
                     if n_t <= constraints.length_max
                         NH₁ = _mycopy(NH_add, NH₁)
                     else
@@ -903,8 +903,8 @@ function analyse_NH(
                         NH_add.ol,
                     )
                     Printf.@printf "."
-                    nₜ = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.fs.counts)
-                    #println("length for test ", v, ": ", nₜ)
+                    n_t = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.fs.counts)
+                    #println("length for test ", v, ": ", n_t)
                     if n_t <= constraints.length_max
                         NH₁ = _mycopy(NH_add, NH₁)
                     else
@@ -1227,7 +1227,6 @@ function analyse_NH(
     n_fs = ATAmodel.settings.n_fs
     fs_counts = ATAmodel.settings.fs.counts * ones(Float64, T)'
 
-
     if n_fill > 0
     #Fill up
     println("Fill-up starting...")
@@ -1288,8 +1287,8 @@ function analyse_NH(
                         NH_add.ol,
                     )
                     Printf.@printf "."
-                    nₜ = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.fs.counts)
-                    #println("length for test ", v, ": ", nₜ)
+                    n_t = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.fs.counts)
+                    #println("length for test ", v, ": ", n_t)
                     if n_t <= constraints.length_max
                         NH₁ = _mycopy(NH_add, NH₁)
                     else
