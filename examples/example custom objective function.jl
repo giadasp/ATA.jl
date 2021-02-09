@@ -120,7 +120,7 @@ n_fill = 1
 # Number of fill-up phases, usually 1 is sufficient, if start_temp is high it can be higher. 
 # If a starting_design is supplied, it should be set to 0.
 
-verbosity = 2
+verbosity = 1
 # Default: 2. Values: `1` (minimal), `2` (detailed).
 # Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution.
 # The dots are the fill-up improvement steps.

@@ -1407,7 +1407,7 @@ function analyse_NH(
                         eval_overlap(NH₁.x, fs_counts, ATAmodel.settings.ol_max, T, NH₁.ol)
                     #NH₁.ol[v] = eval_overlap_v(NH₁.x[:, v], NH₁.x, ATAmodel.settings.fs.counts, ol_maxₜ, v)
                     if fF == false
-                        NH₁.obj = ATAmodel.obj.fun(x_Iₜ, ATAmodel.obj.args)
+                        NH₁.obj = ATAmodel.obj.fun(NH₁.x, ATAmodel.obj.args)
                     end
                     NH₁.f = _comp_f(NH₁, opt_feas)
                     f_evals += 1
@@ -1479,7 +1479,7 @@ function analyse_NH(
                             n_items,
                         )
                         if fF == false
-                            NH₁.obj[v] = eval_TIF_MMₜ(x_Iₜ, IIFₜ)
+                            NH₁.obj = ATAmodel.obj.fun(NH₁.x, ATAmodel.obj.args)
                         end
                         NH₁.ol = eval_overlap(
                             NH₁.x,
@@ -1539,8 +1539,8 @@ function analyse_NH(
                     ATAmodel.settings.n_items,
                     ATAmodel.settings.fs.items,
                 )
-                NH₀.obj[v] = eval_TIF_MMₜ(x_Iₜ, IIF[v])
             end
+            NH₀.obj = ATAmodel.obj.fun(NH₀.x, ATAmodel.obj.args)
             NH₀.f = _comp_f(NH₀, opt_feas)
             NH⁺ = _mycopy(NH₀, NH⁺)
         end
