@@ -131,7 +131,7 @@ function fill_up_feas(
     x₀ = copy(NH.x)
     xₜ = x₀[:, v]
     idxₜ₂ = findall(iszero.(xₜ)) #i₂ = 1, ..., I
-    Random.shuffle!(idxₜ₂) #removed
+    idxₜ₂ = Random.shuffle!(idxₜ₂) #removed
     i⁺ = copy(idxₜ₂[1])
     iu⁺ = 0
     iu₀ = sum(x₀, dims = 2) - iu.max
@@ -184,7 +184,7 @@ function fill_up_MAXIMIN(
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
     idxₜ₂ = findall(iszero.(x₀[:, v])) #i₂ = 1, ..., I
-    Random.shuffle!(idxₜ₂) # !removed
+    idxₜ₂ = Random.shuffle!(idxₜ₂) # !removed
     i⁺ = 1
     iu₀ = sum(NH.x, dims = 2) - iu.max
     ol₀ₜ = 0
@@ -239,7 +239,7 @@ function fill_up_MINIMAX(
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
     idxₜ₂ = findall(iszero.(x₀[:, v])) #i₂ = 1, ..., I
-    Random.shuffle!(idxₜ₂) # !removed
+    idxₜ₂ = Random.shuffle!(idxₜ₂) # !removed
     i⁺ = 1
     iu₀ = sum(NH.x, dims = 2) - iu.max
     ol₀ₜ = 0
@@ -295,7 +295,7 @@ function fill_up_CC(
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
     idxₜ₂ = findall(iszero.(x₀[:, v])) #i₂ = 1, ..., I
-    Random.shuffle!(idxₜ₂) # !removed
+    idxₜ₂ = Random.shuffle!(idxₜ₂) # !removed
     i⁺ = 1
     ol₀ₜ = 0
     iu₀ = sum(NH.x, dims = 2) - iu.max
@@ -350,7 +350,7 @@ function fill_up_custom(
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
     idxₜ₂ = findall(iszero.(x₀[:, v])) #i₂ = 1, ..., I
-    Random.shuffle!(idxₜ₂) # !removed
+    idxₜ₂ = Random.shuffle!(idxₜ₂) # !removed
     i⁺ = 1
     iu₀ = sum(NH.x, dims = 2) - iu.max
     ol₀ₜ = 0
@@ -665,7 +665,7 @@ function analyse_NH(
                         end
                     end
                     idxₜ₂ = findall(iszero.(NH₁.x[:, v]))
-                    Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
+                    idxₜ₂ = Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
                     betterFound = 0
                     i₃ = 0
                     x₋₁ = copy(NH₁.x)
@@ -1065,7 +1065,7 @@ function analyse_NH(
                 end
                 #try to switch
                 idxₜ₂ = findall(iszero.(NH₁.x[:, v])) 
-                Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
+                idxₜ₂ = Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
                 betterFound = 0
                 i₃ = 0
                 x₋₁ = copy(NH₁.x)
@@ -1450,7 +1450,7 @@ function analyse_NH(
                 end
                 #try to switch
                 idxₜ₂ = findall(iszero.(NH₁.x[:, v])) 
-                Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
+                idxₜ₂ = Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
                 betterFound = 0
                 i₃ = 0
                 x₋₁ = copy(NH₁.x)
