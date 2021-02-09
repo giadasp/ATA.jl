@@ -1183,6 +1183,7 @@ function analyse_NH(
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)
+    print_neighbourhood(NH⁺)
     return NH⁺::Neighbourhood
 end
 
@@ -1563,5 +1564,6 @@ function analyse_NH(
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)
+    print_neighbourhood(NH⁺)
     return NH⁺::Neighbourhood
 end
