@@ -100,15 +100,15 @@ function load_settings!(
             CSV.write("OPT/IRT_parameters.csv", ATAmodel.settings.IRT.parameters)
             message[2] = message[2] * "- IRT item parameters loaded.\n"
             if Inputs.enemy_sets_var != String[]
-                ATAmodel.settings.ES.var = Symbol.(Inputs.enemy_sets_var)
+                ATAmodel.settings.es.var = Symbol.(Inputs.enemy_sets_var)
                 val = Symbol.(Inputs.enemy_sets_var)
                 write(f, "enemy_sets_var = $val\n\n")
                 message[2] = message[2] * "- Variable for Enemy sets loaded.\n"
             end
             if Inputs.friend_sets_var != String[]
-                ATAmodel.settings.FS.var = Symbol.(Inputs.friend_sets_var)
+                ATAmodel.settings.fs.var = Symbol.(Inputs.friend_sets_var)
                 val = Symbol.(Inputs.friend_sets_var)
-                write(f, "ATAmodel.settings.FS.var = $val\n\n")
+                write(f, "ATAmodel.settings.fs.var = $val\n\n")
                 message[2] = message[2] * "- Variable for Friend sets loaded.\n"
             end
 
@@ -255,13 +255,13 @@ function load_settings!(
                     string("- Sum of variables", Inputs.sum_vars, " constrained.\n")
             end
             if size(Inputs.item_use_min, 1) > 0
-                ATAmodel.settings.IU.min = Inputs.item_use_min
+                ATAmodel.settings.iu.min = Inputs.item_use_min
                 message[2] = message[2] * "- Minimum item use constrained.\n"
             end
             if size(Inputs.item_use_max, 1) > 0
-                ATAmodel.settings.IU.max = Inputs.item_use_max
+                ATAmodel.settings.iu.max = Inputs.item_use_max
                 for v = 1:ATAmodel.settings.T
-                    x_forced0[v][findall(ATAmodel.settings.IU.max .< 1)] .= false
+                    x_forced0[v][findall(ATAmodel.settings.iu.max .< 1)] .= false
                 end
                 message[2] = message[2] * "- Maximum item use constrained.\n"
             end
@@ -313,9 +313,9 @@ function load_settings!(
                 message[2] = message[2] * "- Auxiliars vars for optimization loaded.\n"
             end
             #fictiuos friendSets
-            ATAmodel.settings.FS.counts = ones(ATAmodel.settings.n_items)
-            ATAmodel.settings.FS.sets = string.(collect(1:ATAmodel.settings.n_items))
-            ATAmodel.settings.FS.items = [[i] for i = 1:ATAmodel.settings.n_items]
+            ATAmodel.settings.fs.counts = ones(ATAmodel.settings.n_items)
+            ATAmodel.settings.fs.sets = string.(collect(1:ATAmodel.settings.n_items))
+            ATAmodel.settings.fs.items = [[i] for i = 1:ATAmodel.settings.n_items]
             ATAmodel.settings.forced0 = x_forced0
             if Inputs.categories != String[]
                 val = Symbol.(Inputs.categories)
@@ -363,17 +363,17 @@ function add_friends!(ATAmodel::Model)
             string.(unique(vcat([
                 unique(skipmissing(ATAmodel.settings.bank[
                     !,
-                    (ATAmodel.settings.FS.var[isv]),
-                ])) for isv = 1:(size(ATAmodel.settings.FS.var, 1))
+                    (ATAmodel.settings.fs.var[isv]),
+                ])) for isv = 1:(size(ATAmodel.settings.fs.var, 1))
             ]...)))
-        n_FS = size(FriendSets, 1)
-        FS_counts = zeros(Int, n_FS)
-        FSItems = [zeros(Int, 0) for i = 1:n_FS]
+        n_fs = size(FriendSets, 1)
+        fs_counts = zeros(Int, n_fs)
+        fs_items = [zeros(Int, 0) for i = 1:n_fs]
         single_items = Vector{Union{Missing,String}}([missing for i = 1:n_items])
         for i = 1:n_items
             units = [
-                ATAmodel.settings.bank[i, ATAmodel.settings.FS.var[isv]]
-                for isv = 1:(size(ATAmodel.settings.FS.var, 1))
+                ATAmodel.settings.bank[i, ATAmodel.settings.fs.var[isv]]
+                for isv = 1:(size(ATAmodel.settings.fs.var, 1))
             ]
             if all(ismissing.(units))
                 single_items[i] = string(i)
@@ -388,31 +388,31 @@ function add_friends!(ATAmodel::Model)
                     f_i += 1
                 end
                 for f in fs
-                    FSItems[f] = vcat(FSItems[f], i)
-                    FS_counts[f] += 1
+                    fs_items[f] = vcat(fs_items[f], i)
+                    fs_counts[f] += 1
                 end
             end
         end
-        push!(ATAmodel.settings.FS.var, :SINGLE_FS)
+        push!(ATAmodel.settings.fs.var, :SINGLE_fs)
         DataFrames.DataFrames.insertcols!(
             ATAmodel.settings.bank,
             size(ATAmodel.settings.bank, 2),
-            :SINGLE_FS => single_items,
+            :SINGLE_fs => single_items,
         )
-        items_single = findall(.!ismissing.(ATAmodel.settings.bank[!, :SINGLE_FS]))
-        FSItems = vcat(FSItems, [[i] for i in items_single])
-        FriendSets = vcat(FriendSets, ATAmodel.settings.bank[items_single, :SINGLE_FS])
-        FS_counts = vcat(FS_counts, ones(Int64, size(items_single, 1)))
-        n_FS = size(FS_counts, 1)
+        items_single = findall(.!ismissing.(ATAmodel.settings.bank[!, :SINGLE_fs]))
+        fs_items = vcat(fs_items, [[i] for i in items_single])
+        FriendSets = vcat(FriendSets, ATAmodel.settings.bank[items_single, :SINGLE_fs])
+        fs_counts = vcat(fs_counts, ones(Int64, size(items_single, 1)))
+        n_fs = size(fs_counts, 1)
         DelimitedFiles.writedlm("OPT/FriendSets.csv", FriendSets)
 
         #update model
-        ATAmodel.settings.n_FS = n_FS
-        ATAmodel.settings.FS.sets = FriendSets
-        ATAmodel.settings.FS.items = FSItems
-        ATAmodel.settings.FS.counts = FS_counts
+        ATAmodel.settings.n_fs = n_fs
+        ATAmodel.settings.fs.sets = FriendSets
+        ATAmodel.settings.fs.items = fs_items
+        ATAmodel.settings.fs.counts = fs_counts
         JLD2.@save "OPT/ATAmodel.jld2" Model
-        push!(ATAmodel.output.infos, ["success", string("- ", n_FS, " friend sets added.\n")])
+        push!(ATAmodel.output.infos, ["success", string("- ", n_fs, " friend sets added.\n")])
     end
     return nothing
 end
@@ -449,16 +449,16 @@ function add_enemies!(ATAmodel::Model)
         end
     end
 
-    if size(ATAmodel.settings.ES.var, 1) > 0
-        enemy_sets_var = ATAmodel.settings.ES.var
+    if size(ATAmodel.settings.es.var, 1) > 0
+        enemy_sets_var = ATAmodel.settings.es.var
         EnemySets = unique(vcat([
             unique(skipmissing(bank[!, (enemy_sets_var[isv])]))
             for isv = 1:(size(enemy_sets_var, 1))
         ]...))
         DelimitedFiles.writedlm("EnemySets.csv", EnemySets)
-        nES = size(EnemySets, 1)
-        sets = Vector{Vector{Int64}}(undef, nES)
-        for es = 1:nES
+        nes = size(EnemySets, 1)
+        sets = Vector{Vector{Int64}}(undef, nes)
+        for es = 1:nes
             sets[es] = Int64[]
             for t = 1:ATAmodel.settings.T
                 A[t] = vcat(A[t], zeros(ATAmodel.settings.n_items)')
@@ -468,7 +468,7 @@ function add_enemies!(ATAmodel::Model)
                     ((bank[!, (enemy_sets_var[isv])][i] == EnemySets[es]) == true)
                     for isv = 1:(size(enemy_sets_var, 1))
                 ]...)))
-                    #ESMaATAmodel.settings.Tg[n_items, es] = 1
+                    #esMaATAmodel.settings.Tg[n_items, es] = 1
                     for t = 1:ATAmodel.settings.T
                         A[t][end, i] = 1
                     end
@@ -484,14 +484,14 @@ function add_enemies!(ATAmodel::Model)
             DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
         end
         #update model
-        ATAmodel.settings.ES.names = EnemySets
-        ATAmodel.settings.ES.sets = sets
+        ATAmodel.settings.es.names = EnemySets
+        ATAmodel.settings.es.sets = sets
         for t = 1:ATAmodel.settings.T
             ATAmodel.constraints[t].constr_b = b[t]
             ATAmodel.constraints[t].constr_A = A[t]
         end
         JLD2.@save "OPT/ATAmodel.jld2" Model
-        push!(ATAmodel.output.infos,  ["success", string("- ", nES, " enemy sets added. ")])
+        push!(ATAmodel.output.infos,  ["success", string("- ", nes, " enemy sets added. ")])
     end
     return nothing
 end
@@ -884,8 +884,8 @@ Group the items by friend sets once the friend sets have been added to the `ATA.
 """
 function group_by_friends!(ATAmodel::Model) #last
     n_items = ATAmodel.settings.n_items
-    #only works for categorical variables and item use, all the other contraitns need expansion by FS_items
-    if ATAmodel.settings.n_FS == 0
+    #only works for categorical variables and item use, all the other contraitns need expansion by fs_items
+    if ATAmodel.settings.n_fs == 0
         push!(ATAmodel.output.infos, ["danger", "No friend sets found, run add_friends!(model) before.\n"])
         return nothing
     end
@@ -902,13 +902,13 @@ function group_by_friends!(ATAmodel::Model) #last
                 b[t] = ATAmodel.constraints[t].constr_b
             end
         end
-        n_FS = ATAmodel.settings.n_FS
+        n_fs = ATAmodel.settings.n_fs
         for t = 1:ATAmodel.settings.T
-            A_new[t] = Matrix{Float64}(undef, size(A[t], 1), n_FS)
+            A_new[t] = Matrix{Float64}(undef, size(A[t], 1), n_fs)
         end
-        for fs = 1:n_FS
+        for fs = 1:n_fs
             for t = 1:ATAmodel.settings.T
-                A_new[t][:, fs] = sum(A[t][:, ATAmodel.settings.FS.items[fs]], dims = 2)
+                A_new[t][:, fs] = sum(A[t][:, ATAmodel.settings.fs.items[fs]], dims = 2)
             end
         end
         for t = 1:ATAmodel.settings.T
@@ -916,10 +916,10 @@ function group_by_friends!(ATAmodel::Model) #last
             DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
             ATAmodel.constraints[t].constr_A = A_new[t]
         end
-        open("OPT/FSItems.jl", "w") do f
-            write(f, "FSItems = Vector{Vector{Int64}}(undef, $n_FS)\n")
-            for fs = 1:n_FS
-                write(f, string("FSItems[$fs] =", ATAmodel.settings.FS.items[fs], "\n"))
+        open("OPT/fs_items.jl", "w") do f
+            write(f, "fs_items = Vector{Vector{Int64}}(undef, $n_fs)\n")
+            for fs = 1:n_fs
+                write(f, string("fs_items[$fs] =", ATAmodel.settings.fs.items[fs], "\n"))
             end
         end
         open("OPT/Settings.jl", "a") do f
@@ -929,11 +929,11 @@ function group_by_friends!(ATAmodel::Model) #last
         x_forced0 = ATAmodel.settings.forced0
         x_forced0_new = Vector{Vector{Bool}}(undef, ATAmodel.settings.T)
         for v = 1:ATAmodel.settings.T
-            x_forced0_new[v] = fill(true, n_FS)
+            x_forced0_new[v] = fill(true, n_fs)
             for i = 1:ATAmodel.settings.n_items
                 if x_forced0[v][i] == false
-                    for fs = 1:n_FS
-                        if any(i .== ATAmodel.settings.FS.items[fs])
+                    for fs = 1:n_fs
+                        if any(i .== ATAmodel.settings.fs.items[fs])
                             x_forced0_new[v][fs] = false
                         end
                     end
@@ -944,26 +944,26 @@ function group_by_friends!(ATAmodel::Model) #last
         ATAmodel.settings.forced0 = x_forced0_new
         DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0_new)
         #item use
-        item_use_min = ATAmodel.settings.IU.min
-        item_use_max = ATAmodel.settings.IU.max
-        item_use_min_new = zeros(Int, n_FS)
-        item_use_max_new = zeros(Int, n_FS)
-        for fs = 1:n_FS
+        item_use_min = ATAmodel.settings.iu.min
+        item_use_max = ATAmodel.settings.iu.max
+        item_use_min_new = zeros(Int, n_fs)
+        item_use_max_new = zeros(Int, n_fs)
+        for fs = 1:n_fs
             item_use_min_new[fs] =
-                Int(maximum(ATAmodel.settings.IU.min[ATAmodel.settings.FS.items[fs]]))
+                Int(maximum(ATAmodel.settings.iu.min[ATAmodel.settings.fs.items[fs]]))
             item_use_max_new[fs] =
-                Int(minimum(ATAmodel.settings.IU.max[ATAmodel.settings.FS.items[fs]]))
+                Int(minimum(ATAmodel.settings.iu.max[ATAmodel.settings.fs.items[fs]]))
         end
         #enemy sets
 
         #update model
-        ATAmodel.settings.IU.max = item_use_max_new
-        ATAmodel.settings.IU.min = item_use_min_new
+        ATAmodel.settings.iu.max = item_use_max_new
+        ATAmodel.settings.iu.min = item_use_min_new
         open("OPT/Settings.jl", "a") do f
             write(f, "item_use_min = $item_use_min_new\n\n")
             write(f, "item_use_max = $item_use_max_new\n\n")
         end
-        push!(ATAmodel.output.infos, ["success", string("- Grouped in ", n_FS, " Friend sets.\n")])
+        push!(ATAmodel.output.infos, ["success", string("- Grouped in ", n_fs, " Friend sets.\n")])
     end
     return nothing
 end
@@ -973,7 +973,7 @@ end
 
 # Description
 
-Load a 0-1 `IxT` (or `nFSxT` if the items are grouped by friend sets) design matrix into the ATA model.
+Load a 0-1 `IxT` (or `nfsxT` if the items are grouped by friend sets) design matrix into the ATA model.
 Useful for loading a custom starting design before the `assemble!` step or to print/plot the features of the tests produced by a custom design before running `print_results`
 
 # Arguments

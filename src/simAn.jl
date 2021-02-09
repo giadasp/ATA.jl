@@ -44,14 +44,14 @@ function siman!(
     else
         fF = true
     end
-    ATAmodel.settings.n_FS = size(ATAmodel.settings.FS.items, 1)
+    ATAmodel.settings.n_fs = size(ATAmodel.settings.fs.items, 1)
     T = ATAmodel.settings.T
-    n_FS = ATAmodel.settings.n_FS
-    if n_FS == 0
-        n_FS = ATAmodel.settings.n_items
+    n_fs = ATAmodel.settings.n_fs
+    if n_fs == 0
+        n_fs = ATAmodel.settings.n_items
     end
     n_items = ATAmodel.settings.n_items
-    FS_counts = ATAmodel.settings.FS.counts * ones(Float64, T)'
+    fs_counts = ATAmodel.settings.fs.counts * ones(Float64, T)'
     iu⁺ = 0
     start_time = copy(time())
     nacc = 0 # total accepted trials
@@ -65,7 +65,7 @@ function siman!(
     # starting design check
     if size(starting_design, 1) > 0
         if (
-            size(starting_design, 1) != n_FS ||
+            size(starting_design, 1) != n_fs ||
             size(starting_design, 2) != ATAmodel.settings.T
         )
             push!(ATAmodel.output.infos, ["danger", "- Starting design must be of size: (n_items x T).\n"])
@@ -77,16 +77,16 @@ function siman!(
         end
         x₀ = Float64.(starting_design)
     else
-        x₀ = zeros(Float64, n_FS, ATAmodel.settings.T)
+        x₀ = zeros(Float64, n_fs, ATAmodel.settings.T)
     end
 
     NH⁺ = Neighbourhood(x₀, Inf, zeros(T), 1e6 * ones(T), 1e6 * ones(T), zero(Float64))
     bestNH = 1
     if size(x₀, 1) == 0
-        NH⁺.x = zeros(Float64, n_FS, T)
+        NH⁺.x = zeros(Float64, n_fs, T)
     end
     # compute f
-    iu = sum(NH⁺.x; dims = 2) - ATAmodel.settings.IU.max
+    iu = sum(NH⁺.x; dims = 2) - ATAmodel.settings.iu.max
     iu = iu[iu.>0]
     if size(iu, 1) == 0
         NH⁺.iu = 0
@@ -96,13 +96,13 @@ function siman!(
     t = copy(start_temp)
     for v2 = 1:T
         NH⁺.infeas[v2], x_Iₜ = check_feas(
-            ATAmodel.settings.FS,
+            ATAmodel.settings.fs,
             ATAmodel.constraints[v2],
             NH⁺.x[:, v2],
-            n_FS,
+            n_fs,
             n_items,
         )
-        NH⁺.ol = eval_overlap(NH⁺.x, FS_counts, ATAmodel.settings.ol_max, T, NH⁺.ol)
+        NH⁺.ol = eval_overlap(NH⁺.x, fs_counts, ATAmodel.settings.ol_max, T, NH⁺.ol)
         if fF == false
             if ATAmodel.obj.type == "MAXIMIN"
                 NH⁺.obj[v2] = eval_TIF_MMₜ(x_Iₜ, IIF[v2])
@@ -271,7 +271,7 @@ function siman!(
         end
         # j = 1
         # for v = 1:ATAmodel.settings.T
-        # 	for i = 1:ATAmodel.settings.n_FS
+        # 	for i = 1:ATAmodel.settings.n_fs
         # 		if NH⁺.x[i, v] == one(Float64)
         # 			if j == 1
         # 				NH⁺.x[i, v] = zero(Float64)
@@ -286,7 +286,7 @@ function siman!(
     JLD2.@save string(results_folder, "/ATAmodel.jld2") ATAmodel
     DelimitedFiles.writedlm(
         string(results_folder, "/design.csv"),
-        reshape(ATAmodel.output.design, n_FS, T),
+        reshape(ATAmodel.output.design, n_fs, T),
     )
     open(string(results_folder, "/ResultsATA.txt"), "w") do io
         write(io, "tests")

@@ -66,7 +66,7 @@ ATAmodel.obj.fun = function (x::Matrix{Float64}, obj_args::NamedTuple)
     for t = 1:T
         K, I = size(IIF[t])
         # ungroup items
-        xₜ = FS_to_items(x[:, t], obj_args.FS_items)
+        xₜ = fs_to_items(x[:, t], obj_args.fs_items)
         if K > 1
             TIF[t] = Inf
             for k = 1:K
@@ -84,7 +84,7 @@ ATAmodel.obj.fun = function (x::Matrix{Float64}, obj_args::NamedTuple)
 end
 
 ATAmodel.obj.args =
-    (IIF = FileIO.load("data/IIF.jld2", "IIF"), FS_items = ATAmodel.settings.FS.items)
+    (IIF = FileIO.load("data/IIF.jld2", "IIF"), fs_items = ATAmodel.settings.fs.items)
 
 # Assembly settings
 

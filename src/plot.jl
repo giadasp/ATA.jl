@@ -7,7 +7,7 @@ Plot the ICFs and TIFs of the assembled tests.
 
 # Arguments
 
-- **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nFSxT` if the items are grouped by friend sets. 
+- **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
 - **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.Model}).
 - **`results_folder`** : Optional. Default: "PLOTS". The folder in which the output is stored.
 """
@@ -25,10 +25,10 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
     if size(ATAmodel.output.design, 1) > 0
         n_items = ATAmodel.settings.n_items
         length_max = [ATAmodel.constraints[t].length_max for t = 1:T]
-        n_FS = size(ATAmodel.settings.FS.items, 1)
+        n_fs = size(ATAmodel.settings.fs.items, 1)
 
-        if n_FS < ATAmodel.settings.n_items
-            n = n_FS * T
+        if n_fs < ATAmodel.settings.n_items
+            n = n_fs * T
         else
             n = n_items * T
         end
@@ -46,12 +46,12 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
         end
 
         if group_by_fs == true
-            design = reshape(ATAmodel.output.design, n_FS, T)
+            design = reshape(ATAmodel.output.design, n_fs, T)
             new_design = zeros(Float64, n_items, T)
 
             for t = 1:T
                 new_design[
-                    vcat(ATAmodel.settings.FS.items[findall(
+                    vcat(ATAmodel.settings.fs.items[findall(
                         design[:, t] .== one(Float64),
                     )]...),
                     t,

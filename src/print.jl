@@ -7,7 +7,7 @@ Print the features of the assembled tests.
 
 # Arguments
 
-- **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nFSxT` if the items are grouped by friend sets. 
+- **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
 - **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.Model}).
 - **`results_folder`** : Optional. Default: "RESULTS". The folder in which the output is stored.
 """
@@ -26,9 +26,9 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
         n_items = ATAmodel.settings.n_items
         length_max = [ATAmodel.constraints[t].length_max for t = 1:T]
         categories = ATAmodel.output.categories
-        n_FS = size(ATAmodel.settings.FS.items, 1)
-        if n_FS < ATAmodel.settings.n_items
-            n = n_FS * T
+        n_fs = size(ATAmodel.settings.fs.items, 1)
+        if n_fs < ATAmodel.settings.n_items
+            n = n_fs * T
         else
             n = n_items * T
         end
@@ -46,11 +46,11 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
 	    JLD2.@load "OPT/ICF.jld2" ICF
 	end
         if group_by_fs == true
-            design = reshape(ATAmodel.output.design, n_FS, T)
+            design = reshape(ATAmodel.output.design, n_fs, T)
             new_design = zeros(Float64, n_items, T)
             for t = 1:T
                 new_design[
-                    vcat(ATAmodel.settings.FS.items[findall(
+                    vcat(ATAmodel.settings.fs.items[findall(
                         design[:, t] .== one(Float64),
                     )]...),
                     t,
@@ -181,11 +181,11 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
 
         #expected score
         if isfile("OPT/ICF.jld2")
-		ESprintIRT = Vector{Vector{Float64}}(undef, T)
+		esprintIRT = Vector{Vector{Float64}}(undef, T)
 		for t = 1:T
-		    ESprintIRT[t] = zeros(size(ICF[t], 1))
+		    esprintIRT[t] = zeros(size(ICF[t], 1))
 		    for k = 1:size(ICF[t], 1)
-			ESprintIRT[t][k] = ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
+			esprintIRT[t][k] = ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
 		    end
 		end
         end
@@ -212,7 +212,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
 		    for t = 1:T
 			DelimitedFiles.writedlm(
 			    io,
-			    vcat(t, round.(ESprintIRT[t], digits = 3))',
+			    vcat(t, round.(esprintIRT[t], digits = 3))',
 			    "\t",
 			)
 			write(io, "\r\n")

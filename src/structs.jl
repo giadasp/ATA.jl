@@ -156,8 +156,8 @@ mutable struct ES
     var::Vector{Symbol}
     names::Vector{String}
     sets::Vector{Vector{Int64}}
-    ES(var, names, sets) = new(var, names, sets)
-    ES() = new(Symbol[], String[], Vector{Vector{Int64}}(undef, 0))
+   ES(var, names, sets) = new(var, names, sets)
+   ES() = new(Symbol[], String[], Vector{Vector{Int64}}(undef, 0))
 end
 
 mutable struct ExpectedScore
@@ -179,7 +179,7 @@ end
 
 mutable struct Settings
     n_items::Int64
-    n_FS::Int64
+    n_fs::Int64
     bank::DataFrames.DataFrame
     IRT::IRT
     theta_bounds::Vector{Vector{Float64}}
@@ -187,13 +187,13 @@ mutable struct Settings
     n_groups::Int64
     T::Int64
     Tg::Vector{Int64}
-    FS::FS # friend Sets
-    ES::ES # enemy Sets
-    IU::IU
+    fs::FS # friend Sets
+    es::ES # enemy Sets
+    iu::IU
     ol_max::Matrix{Float64}
     Settings(
         n_items,
-        n_FS,
+        n_fs,
         bank,
         IRT,
         theta_bounds,
@@ -201,13 +201,13 @@ mutable struct Settings
         n_groups,
         T,
         Tg,
-        FS,
-        ES,
-        IU,
+        fs,
+        es,
+        iu,
         ol_max,
     ) = new(
         n_items,
-        n_FS,
+        n_fs,
         bank,
         IRT,
         theta_bounds,
@@ -215,9 +215,9 @@ mutable struct Settings
         n_groups,
         T,
         Tg,
-        FS,
-        ES,
-        IU,
+        fs,
+        es,
+        iu,
         ol_max,
     ) # no pattern mode
     Settings() = new(
@@ -318,7 +318,7 @@ mutable struct Obj
     # must be test separable and accept x_Iₜ (design of test v, item level, not grouped by friend sets) as first argument and NamedTuple as second argument, it must return a Vector of Float64 with T elements.
     fun::Function
     args::NamedTuple # ex: (a = [0, 0, 0], b = "hello") 
-    obj(sense, type, points, targets, aux_int, aux_float, fun, args) =
+    Obj(sense, type, points, targets, aux_int, aux_float, fun, args) =
         new(sense, type, points, targets, aux_int, aux_float, fun, args)
     Obj() = new(
         "max",

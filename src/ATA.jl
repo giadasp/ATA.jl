@@ -91,7 +91,7 @@ export mean,
     item_char,
     resp_gen,
     student_likelihood,
-    FS_to_items,#_mycopy,  fast_sort!, _myqle#, optimize
+    fs_to_items,#_mycopy,  fast_sort!, _myqle#, optimize
     run_app
 ATA
 

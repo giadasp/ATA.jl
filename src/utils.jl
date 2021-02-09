@@ -309,7 +309,7 @@ function _desume_pars(
 end
 
 """
-	FS_to_items(xₜ, n_items, FS_items)
+	fs_to_items(xₜ, n_items, fs_items)
 
 # Description
 
@@ -319,18 +319,18 @@ Ungroup items grouped by friend sets.
 
 - **`xₜ::Vector{Float64}`** : Required. grouped items 0-1 vector.
 - **`n_items::Int64`** : Required. Number if items.
-- **`FS_items::Vector{Vector{Int64}}`** : Required. vector of items included in the friend sets.
+- **`fs_items::Vector{Vector{Int64}}`** : Required. vector of items included in the friend sets.
 
 # Output
 
 - **`x_Iₜ::Vector{Float64}`** Returns a 0-1 vector at item level.
 
 """
-function FS_to_items(xₜ::Vector{Float64}, n_items::Int64, FS_items::Vector{Vector{Int64}})
+function fs_to_items(xₜ::Vector{Float64}, n_items::Int64, fs_items::Vector{Vector{Int64}})
     xₜ_taken = findall(xₜ .== one(Float64))
     x_Iₜ = zeros(Float64, n_items)
     for i in xₜ_taken
-        x_Iₜ[FS_items[i]] .= one(Float64)
+        x_Iₜ[fs_items[i]] .= one(Float64)
     end
     return x_Iₜ::Vector{Float64}
 end
