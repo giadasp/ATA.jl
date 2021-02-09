@@ -135,7 +135,7 @@ function siman!(
             # println("f was ", ATAmodel.output.neighbourhoods[NHs[p]].f)
             NH_proc = Neighbourhood()
             NH_proc = _mycopy(ATAmodel.output.neighbourhoods[NHs[p]], NH_proc)
-            if nh_tot > 1
+            if round > 1
                 #fill-up phase just in first round (first n_procs neighbourhoods)
                 n_fill = 0
             end
