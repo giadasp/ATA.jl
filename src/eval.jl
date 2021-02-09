@@ -510,7 +510,9 @@ function analyse_NH(
     else
         println("Feasible solution not found in fill-up")
     end
-    print_neighbourhood(NH⁺)
+    if verbosity > 1
+        print_neighbourhood(NH⁺)
+    end
     # statistics to repogeom_temp at each temp change, set back to zero
     coverage_ok = 0
     if n_test_sample > T
@@ -785,6 +787,7 @@ function analyse_NH(
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)
+    print_neighbourhood(NH⁺)
     return NH⁺::Neighbourhood
 end
 
@@ -923,7 +926,9 @@ function analyse_NH(
     else
         println("Feasible solution not found in fill-up")
     end
-    print_neighbourhood(NH⁺)
+    if verbosity > 1
+        print_neighbourhood(NH⁺)
+    end
     coverage_ok = 0
     if n_test_sample > T
         n_test_sample = T
@@ -1207,7 +1212,7 @@ function analyse_NH(
     NH₁ = _mycopy(NH_start, NH₁)
     NH₀ = _mycopy(NH_start, NH₀)
     NH⁺ = _mycopy(NH_start, NH⁺)
-    
+
     f_star = ones(2) .* Inf
     f_evals = 0
     t = copy(start_temp)
@@ -1303,7 +1308,9 @@ function analyse_NH(
     else
         println("Feasible solution not found in fill-up")
     end
-    print_neighbourhood(NH⁺)
+    if verbosity > 1
+        print_neighbourhood(NH⁺)
+    end
     coverage_ok = 0
     if n_test_sample > T
         n_test_sample = T

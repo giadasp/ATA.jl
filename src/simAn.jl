@@ -173,7 +173,7 @@ function siman!(
             open(string(results_folder, "/neigh_", nh_tot, "_f.csv"), "w") do io
                 return DelimitedFiles.writedlm(io, NH_proc.f)
             end
-            println("neighbourhood ", nh_tot, " fully explored, increase temperature")
+            println("\nNeighbourhood ", nh_tot, " fully explored, increase temperature")
         end
         for p in processors
             nh_tot = (NHs[end] * (round - 1)) + NHs[p]
