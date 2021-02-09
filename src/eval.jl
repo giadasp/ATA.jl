@@ -130,8 +130,8 @@ function fill_up_feas(
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
     xₜ = x₀[:, v]
-    idxₜ₂ = setdiff(collect(1:n_fs), findall(xₜ .== one(Float64))) #i₂ = 1, ..., I
-    #idxₜ₂ = Random.shuffle!(idxₜ₂) #removed
+    idxₜ₂ = findall(iszero.(xₜ)) #i₂ = 1, ..., I
+    Random.shuffle!(idxₜ₂) #removed
     i⁺ = copy(idxₜ₂[1])
     iu⁺ = 0
     iu₀ = sum(x₀, dims = 2) - iu.max
@@ -183,8 +183,8 @@ function fill_up_MAXIMIN(
     f₀, TIF₀, infeas₀ = Inf, copy(NH.obj), Inf
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
-    idxₜ₂ = setdiff(collect(1:n_fs), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
-    #idxₜ₂ = Random.shuffle!(idxₜ₂) # !removed
+    idxₜ₂ = findall(iszero.(x₀[:, v])) #i₂ = 1, ..., I
+    Random.shuffle!(idxₜ₂) # !removed
     i⁺ = 1
     iu₀ = sum(NH.x, dims = 2) - iu.max
     ol₀ₜ = 0
@@ -238,8 +238,8 @@ function fill_up_MINIMAX(
     f₀, TIF₀, infeas₀ = Inf, copy(NH.obj), Inf
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
-    idxₜ₂ = setdiff(collect(1:n_fs), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
-    #idxₜ₂ = Random.shuffle!(idxₜ₂) # !removed
+    idxₜ₂ = findall(iszero.(x₀[:, v])) #i₂ = 1, ..., I
+    Random.shuffle!(idxₜ₂) # !removed
     i⁺ = 1
     iu₀ = sum(NH.x, dims = 2) - iu.max
     ol₀ₜ = 0
@@ -294,8 +294,8 @@ function fill_up_CC(
     f₀, TIF₀, infeas₀ = Inf, copy(NH.obj), Inf
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
-    idxₜ₂ = setdiff(collect(1:n_fs), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
-    #idxₜ₂ = Random.shuffle!(idxₜ₂) #! removed
+    idxₜ₂ = findall(iszero.(x₀[:, v])) #i₂ = 1, ..., I
+    Random.shuffle!(idxₜ₂) # !removed
     i⁺ = 1
     ol₀ₜ = 0
     iu₀ = sum(NH.x, dims = 2) - iu.max
@@ -349,8 +349,8 @@ function fill_up_custom(
     f₀, obj_fun₀, infeas₀ = Inf, copy(NH.obj), Inf
     T = size(NH.x, 2)
     x₀ = copy(NH.x)
-    idxₜ₂ = setdiff(collect(1:n_fs), findall(x₀[:, v] .== one(Float64))) #i₂ = 1, ..., I
-    #idxₜ₂ = Random.shuffle!(idxₜ₂) # !removed
+    idxₜ₂ = findall(iszero.(x₀[:, v])) #i₂ = 1, ..., I
+    Random.shuffle!(idxₜ₂) # !removed
     i⁺ = 1
     iu₀ = sum(NH.x, dims = 2) - iu.max
     ol₀ₜ = 0
@@ -530,7 +530,7 @@ function analyse_NH(
         weights = StatsBase.ProbabilityWeights(weights)
         #determine test order
         #testOrder = StatsBase.sample(collect(1:T), weights, n_test_sample, replace = false)
-        #testOrder = Random.shuffle!(collect(1:ATAmodel.settings.T))
+        #Random.shuffle!(testOrder)
         testOrder = sortperm(weights, rev = true)
         #println("test order = ", Int.(testOrder))
         v₂ = 0
@@ -551,13 +551,13 @@ function analyse_NH(
             #it<size(iteratorTestItem, 1) #
             #v = iteratorTestItem[it][2]
             #NH₀.x = copy(xnew)
-            taken_items = findall(NH₀.x[:, v] .== 1)
+            taken_items = findall(isone.(NH₀.x[:, v]))
             if n_item_sample > size(taken_items, 1)
                 nI = Int(size(taken_items, 1))
             else
                 nI = n_item_sample
             end
-            #taken_items = Random.shuffle!(taken_items) #reset #removed
+            Random.shuffle!(taken_items) # !removed
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
@@ -664,7 +664,8 @@ function analyse_NH(
                             end
                         end
                     end
-                    idxₜ₂ = findall(NH₁.x[:, v] .== zero(Float64))#Random.shuffle!(findall(NH₁.x[:, v] .== zero(Float64)))#i₂ = 1, ..., I
+                    idxₜ₂ = findall(iszero.(NH₁.x[:, v]))
+                    Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
                     betterFound = 0
                     i₃ = 0
                     x₋₁ = copy(NH₁.x)
@@ -946,7 +947,7 @@ function analyse_NH(
         weights = StatsBase.ProbabilityWeights(weights)
         #determine test order
         #testOrder = StatsBase.sample(collect(1:T), weights, n_test_sample, replace = false)
-        #testOrder = Random.shuffle!(collect(1:ATAmodel.settings.T))
+        #Random.shuffle!(testOrder)
         testOrder = sortperm(weights, rev = true)
         #println("test order = ", Int.(testOrder))
         v₂ = 0
@@ -967,13 +968,13 @@ function analyse_NH(
             #it<size(iteratorTestItem, 1) #
             #v = iteratorTestItem[it][2]
             #NH₀.x = copy(xnew)
-            taken_items = findall(NH₀.x[:, v] .== 1)
+            taken_items = findall(isone.(NH₀.x[:, v]))
             if n_item_sample > size(taken_items, 1)
                 nI = Int(size(taken_items, 1))
             else
                 nI = n_item_sample
             end
-            # #Random.shuffle!(taken_items) #reset
+            Random.shuffle!(taken_items) # !removed
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
@@ -1063,7 +1064,8 @@ function analyse_NH(
                     end
                 end
                 #try to switch
-                idxₜ₂ = findall(NH₁.x[:, v] .== zero(Float64)) #Random.shuffle!(findall(NH₁.x[:, v] .== zero(Float64)))#i₂ = 1, ..., I
+                idxₜ₂ = findall(iszero.(NH₁.x[:, v])) 
+                Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
                 betterFound = 0
                 i₃ = 0
                 x₋₁ = copy(NH₁.x)
@@ -1331,7 +1333,7 @@ function analyse_NH(
         weights = StatsBase.ProbabilityWeights(weights)
         #determine test order
         #testOrder = StatsBase.sample(collect(1:T), weights, n_test_sample, replace = false)
-        #testOrder = Random.shuffle!(collect(1:ATAmodel.settings.T))
+        #Random.shuffle!(testOrder)
         testOrder = sortperm(weights, rev = true)
         #println("test order = ", Int.(testOrder))
         v₂ = 0
@@ -1358,7 +1360,7 @@ function analyse_NH(
             else
                 nI = n_item_sample
             end
-            # Random.shuffle!(taken_items) #reset
+            # Random.shuffle!(taken_items) # !removed
             # exit2 = 0
             # if iteratorTestItem[it][1]>size(taken_items, 1)
             # 	exit2 = 1
@@ -1447,7 +1449,8 @@ function analyse_NH(
                     end
                 end
                 #try to switch
-                idxₜ₂ = findall(NH₁.x[:, v] .== zero(Float64)) #Random.shuffle!(findall(NH₁.x[:, v] .== zero(Float64)))#i₂ = 1, ..., I
+                idxₜ₂ = findall(iszero.(NH₁.x[:, v])) 
+                Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
                 betterFound = 0
                 i₃ = 0
                 x₋₁ = copy(NH₁.x)
