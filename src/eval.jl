@@ -631,7 +631,8 @@ function analyse_NH(
                                 convergence = 0
                                 NH⁺ = _mycopy(NH₁, NH⁺)
                                 if verbosity == 2
-                                    println("f⁺ = ", NH⁺.f, ", test = ", v)
+                                    Printf.@printf("\n f⁺ : %5.3f", NH⁺.f)
+                                    Printf.@printf(" in test : %5d",v)
                                 else
                                     Printf.@printf "+"
                                 end
@@ -711,7 +712,8 @@ function analyse_NH(
                                     convergence = 0
                                     NH⁺ = _mycopy(NH₁, NH⁺)
                                     if verbosity == 2
-                                        println("f⁺ = ", NH⁺.f, ", t = ", v)
+                                        Printf.@printf("\n f⁺ : %5.3f", NH⁺.f)
+                                        Printf.@printf(" in test : %5d",v)
                                     else
                                         Printf.@printf "+"
                                     end
@@ -756,7 +758,7 @@ function analyse_NH(
         #if exit == 0
         if f_star[2] == f_star[1]
             convergence += 1
-            Printf.@printf("	%16.0f", convergence)
+            Printf.@printf("	%5d", convergence)
         end
         #println("convergence is ", convergence)
         # ? how many are equal f₀ in the last iterations?
@@ -773,9 +775,9 @@ function analyse_NH(
         end
         if verbosity == 2
             println("\n")
-            Printf.@printf("\n  f⁺: %16.3f", NH⁺.f)
-            Printf.@printf("\n  f₀: %16.3f", NH₀.f)
-            Printf.@printf("\n  Local convergence:  %16.0f", convergence)
+            Printf.@printf("\n  f⁺: %5.3f", NH⁺.f)
+            Printf.@printf("\n  f₀: %5.3f", NH₀.f)
+            Printf.@printf("\n  Local convergence:  %5d", convergence)
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)
@@ -1020,7 +1022,8 @@ function analyse_NH(
                             convergence = 0
                             NH⁺ = _mycopy(NH₁, NH⁺)
                             if verbosity == 2
-                                println("f⁺ = ", NH⁺.f, ", t = ", v)
+                                Printf.@printf("\n f⁺ : %5.3f", NH⁺.f)
+                                Printf.@printf(" in test : %5d",v)
                             else
                                 Printf.@printf "+"
                             end
@@ -1099,7 +1102,8 @@ function analyse_NH(
                                 convergence = 0
                                 NH⁺ = _mycopy(NH₁, NH⁺)
                                 if verbosity == 2
-                                    println("f⁺ = ", NH⁺.f, ", t = ", v)
+                                    Printf.@printf("\n f⁺ : %5.3f", NH⁺.f)
+                                    Printf.@printf(" in test : %5d",v)
                                 else
                                     Printf.@printf "+"
                                 end
@@ -1160,9 +1164,9 @@ function analyse_NH(
         end
         if verbosity == 2
             println("\n")
-            Printf.@printf("\n  f⁺:	%16.3f", NH⁺.f)
-            Printf.@printf("\n  f₀:	%16.3f", NH₀.f)
-            Printf.@printf("\n  Convergence:	%16.0f", convergence)
+            Printf.@printf("\n  f⁺:	%5.3f", NH⁺.f)
+            Printf.@printf("\n  f₀:	%5.3f", NH₀.f)
+            Printf.@printf("\n  Convergence:	%5d", convergence)
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)
@@ -1393,7 +1397,8 @@ function analyse_NH(
                             convergence = 0
                             NH⁺ = _mycopy(NH₁, NH⁺)
                             if verbosity == 2
-                                println("f⁺ = ", NH⁺.f, ", t = ", v)
+                                Printf.@printf("\n f⁺ : %5.3f", NH⁺.f)
+                                Printf.@printf(" in test : %5d",v)
                             else
                                 Printf.@printf "+"
                             end
@@ -1472,7 +1477,8 @@ function analyse_NH(
                                 convergence = 0
                                 NH⁺ = _mycopy(NH₁, NH⁺)
                                 if verbosity == 2
-                                    println("f⁺ = ", NH⁺.f, ", t = ", v)
+                                    Printf.@printf("\n f⁺ : %5.3f", NH⁺.f)
+                                    Printf.@printf(" in test : %5d",v)
                                 else
                                     Printf.@printf "+"
                                 end
@@ -1533,9 +1539,9 @@ function analyse_NH(
         end
         if verbosity == 2
             println("\n")
-            Printf.@printf("\n  f⁺:	%16.3f", NH⁺.f)
-            Printf.@printf("\n  f₀:	%16.3f", NH₀.f)
-            Printf.@printf("\n  Convergence:	%16.3f", convergence)
+            Printf.@printf("\n  f⁺:	%5.3f", NH⁺.f)
+            Printf.@printf("\n  f₀:	%5.3f", NH₀.f)
+            Printf.@printf("\n  Convergence:	%5d", convergence)
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)

@@ -775,11 +775,14 @@ function resp_gen(
 end
 
 function print_neighbourhood(x::Neighbourhood)
-    Printf.@printf("\n  f :	%16.3f", x.f)
-    Printf.@printf("\n  infeas :	")
-    map( x -> Printf.@printf("%16.3f", x), x.infeas)
-    Printf.@printf("\n  overlaps :	")
-    map( x -> Printf.@printf("%16.3f", x), x.ol)
-    Printf.@printf("\n  item use :	")
-    map( x -> Printf.@printf("%16.3f", x), x.iu)
+    Printf.@printf("\n  f : %5.3f", x.f)
+    Printf.@printf("\n  infeas :	[")
+    map( x -> Printf.@printf(" %5.1f", x), x.infeas)
+    Printf.@printf("    ]")
+    Printf.@printf("\n  overlaps :	[")
+    map( x -> Printf.@printf("  %5.1f", x), x.ol)
+    Printf.@printf("    ]")
+    Printf.@printf("\n  item use :	[")
+    map( x -> Printf.@printf("  %5.1f", x), x.iu)
+    Printf.@printf("    ]\n")
 end
