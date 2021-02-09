@@ -135,6 +135,10 @@ function siman!(
             # println("f was ", ATAmodel.output.neighbourhoods[NHs[p]].f)
             NH_proc = Neighbourhood()
             NH_proc = _mycopy(ATAmodel.output.neighbourhoods[NHs[p]], NH_proc)
+            if nh_tot > 1
+                #fill-up phase just in first round (first n_procs neighbourhoods)
+                n_fill = 0
+            end
             NH_proc = analyse_NH(
                 NH_proc,
                 ATAmodel,
@@ -246,11 +250,11 @@ function siman!(
             elseif (finish == 3) # evals max reached
                 println(" == > Maximum time reached <== ")
             end
-            Printf.@printf("\n obj. value:	%16.3f", NH⁺.f)
-            Printf.@printf("\n Optimality:	%16.3f", minimum(NH⁺.obj))
-            Printf.@printf("\n Infeasibility:	%16.3f", sum(NH⁺.infeas + NH⁺.ol) + NH⁺.iu)
-            Printf.@printf("\n Elapsed Time:	%16.1f", time() - start_time)
-            Printf.@printf("\n Best Neighbourhood:	%16.0f", bestNH)
+            Printf.@printf("\n obj. value:	%5.1f", NH⁺.f)
+            Printf.@printf("\n Optimality:	%5.1f", minimum(NH⁺.obj))
+            Printf.@printf("\n Infeasibility:	%5.1f", sum(NH⁺.infeas + NH⁺.ol) + NH⁺.iu)
+            Printf.@printf("\n Elapsed Time:	%5.1f", time() - start_time)
+            Printf.@printf("\n Best Neighbourhood:	%5d", bestNH)
             println("\n")
             println(hline)
         end
