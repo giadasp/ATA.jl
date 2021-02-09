@@ -127,7 +127,7 @@ verbosity = 2
 
 #! Termination criteria: 
 
-max_time = 10.0
+max_time = 100.0
 # Default: `1000.0`. Values: `[0, Inf)`.
 # Time limit in seconds.
 
