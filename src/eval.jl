@@ -234,6 +234,7 @@ function fill_up_MINIMAX(
     n_items::Int64,
     n_fs::Int64,
     ol_maxₜ::Vector{Float64},
+    targets::Vector{Float64}
 )
     f₀, TIF₀, infeas₀ = Inf, copy(NH.obj), Inf
     T = size(NH.x, 2)
@@ -257,7 +258,7 @@ function fill_up_MINIMAX(
                 iu = sum(iu)
             end
             infeas₁, x_Iₜ = check_feas(fs, constraints, xₜ, n_fs, n_items)
-            TIF₁[v] = eval_TIF_mmₜ(x_Iₜ, IIFₜ)
+            TIF₁[v] = eval_TIF_mmₜ(x_Iₜ, IIFₜ, targets)
             ol = eval_overlap_v(xₜ, x₁, fs.counts, ol_maxₜ, v)
             f₁ = (1 - opt_feas) * (infeas₁ + iu + ol) - opt_feas * minimum(TIF₁)
             if (f₁ < f₀)
@@ -893,6 +894,7 @@ function analyse_NH(
                             n_items,
                             n_fs,
                             ATAmodel.settings.ol_max[:, v],
+                            ATAmodel.obj.targets
                         )
                     end
                     NH_add.ol = eval_overlap(
