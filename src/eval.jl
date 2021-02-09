@@ -729,7 +729,8 @@ function analyse_NH(
                                     # NH₀.ol = eval_overlap(NH₀.x, fs_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
                                     # NH₀.f = _comp_f(NH₀, opt_feas)
                                     if verbosity == 2
-                                        println("SA: f₀ = ", NH₀.f, ", t = ", v)
+                                        Printf.@printf("\n f₀ : %5.3f", NH₀.f)
+                                        Printf.@printf(" in test : %5d",v)
                                     else
                                         Printf.@printf "_"
                                     end
@@ -758,7 +759,7 @@ function analyse_NH(
         #if exit == 0
         if f_star[2] == f_star[1]
             convergence += 1
-            Printf.@printf("	%5d", convergence)
+            Printf.@printf(" %5d", convergence)
         end
         #println("convergence is ", convergence)
         # ? how many are equal f₀ in the last iterations?
@@ -1040,7 +1041,8 @@ function analyse_NH(
                             #NH₀.ol = eval_overlap(NH₀.x, fs_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
                             #NH₀.f = _comp_f(NH₀, opt_feas)
                             if verbosity == 2
-                                println("SA: f₀ = ", NH₀.f, ", t = ", v)
+                                Printf.@printf("\n f₀ : %5.3f", NH₀.f)
+                                Printf.@printf(" in test : %5d",v)
                             else
                                 Printf.@printf "_"
                             end
@@ -1119,7 +1121,8 @@ function analyse_NH(
                                 # NH₀.ol = eval_overlap(NH₀.x, fs_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
                                 # NH₀.f = _comp_f(NH₀, opt_feas)
                                 if verbosity == 2
-                                    println("SA: f₀ = ", NH₀.f, ", t = ", v)
+                                    Printf.@printf("\n f₀ : %5.3f", NH₀.f)
+                                    Printf.@printf(" in test : %5d",v)
                                 else
                                     Printf.@printf "_"
                                 end
@@ -1147,7 +1150,7 @@ function analyse_NH(
         #if exit == 0
         if f_star[2] == f_star[1]
             convergence += 1
-            println(convergence)
+            Printf.@printf(" %3d", convergence)
         end
         #println("convergence is ", convergence)
         #how many equal f₀ in the last iterations?
@@ -1522,7 +1525,7 @@ function analyse_NH(
         #if exit == 0
         if f_star[2] == f_star[1]
             convergence += 1
-            println(convergence)
+            Printf.@printf(" %5d", convergence)
         end
         #println("convergence is ", convergence)
         #how many equal f₀ in the last iterations?
