@@ -12,4 +12,4 @@ makedocs(
     pages = ["index.md", "utils.md", "build.md", "opt.md", "print.md", "examples.md"],
 )
 
-deploydocs(repo = "github.com/giadasp/ATA.jl.git", devurl = "docs")
+deploydocs(repo = "github.com/giadasp/ATA.jl.git", devurl = "docs", devbranch = "release")
