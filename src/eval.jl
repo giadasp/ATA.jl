@@ -487,7 +487,7 @@ function analyse_NH(
                         NH₁ = _mycopy(NH_add, NH₁)
                     else
                         warmup[v] = false
-                        println("f₁:", NH₁.f)
+                        Printf.@printf("\n  f₁:	%16.3f", NH₁.f)
                         println("-Test ", v, " filled up with ", n_t, " items, ")
                     end
                 else
@@ -495,7 +495,7 @@ function analyse_NH(
                     println("-Test ", v, " filled up with ", n_t, " items, ")
                 end
             end
-        end #end of round, round = nRound
+        end-#end of round, round = nRound
         NH₀ = _mycopy(NH₁, NH₀)
         NH₀.f = _comp_f(NH₀, opt_feas)
     end
@@ -507,10 +507,7 @@ function analyse_NH(
     else
         println("Feasible solution not found in fill-up")
     end
-    println("f = ", NH⁺.f)
-    println("infeas = ", NH⁺.infeas)
-    println("ol = ", NH⁺.ol)
-    println("iu = ", NH⁺.iu)
+    print_neighbourhood(NH⁺)
     # statistics to repogeom_temp at each temp change, set back to zero
     coverage_ok = 0
     if n_test_sample > T
@@ -634,7 +631,7 @@ function analyse_NH(
                                 convergence = 0
                                 NH⁺ = _mycopy(NH₁, NH⁺)
                                 if verbosity == 2
-                                    println("f⁺ = ", NH⁺.f, ", t = ", v)
+                                    println("f⁺ = ", NH⁺.f, ", test = ", v)
                                 else
                                     Printf.@printf "+"
                                 end
@@ -759,7 +756,7 @@ function analyse_NH(
         #if exit == 0
         if f_star[2] == f_star[1]
             convergence += 1
-            Printf.@printf("	%16.10f", convergence)
+            Printf.@printf("	%16.0f", convergence)
         end
         #println("convergence is ", convergence)
         # ? how many are equal f₀ in the last iterations?
@@ -776,9 +773,9 @@ function analyse_NH(
         end
         if verbosity == 2
             println("\n")
-            Printf.@printf("\n  f⁺:	%16.10f", NH⁺.f)
-            Printf.@printf("\n  f₀:	%16.10f", NH₀.f)
-            Printf.@printf("\n  Local convergence:	%16.10f", convergence)
+            Printf.@printf("\n  f⁺: %16.3f", NH⁺.f)
+            Printf.@printf("\n  f₀: %16.3f", NH₀.f)
+            Printf.@printf("\n  Local convergence:  %16.0f", convergence)
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)
@@ -898,7 +895,7 @@ function analyse_NH(
                     else
                         warmup[v] = false
                         #NH₁ = _mycopy(NH_add, NH₁)
-                        println("f₁:", NH₁.f)
+                        Printf.@printf("\n f₁:  %16.3", NH₁.f)
                         println("-Test ", v, " filled up with ", n_t, " items, ")
                     end
                 else
@@ -918,10 +915,7 @@ function analyse_NH(
     else
         println("Feasible solution not found in fill-up")
     end
-    println("f = ", NH⁺.f)
-    println("infeas = ", NH⁺.infeas)
-    println("ol = ", NH⁺.ol)
-    println("iu = ", NH⁺.iu)
+    print_neighbourhood(NH⁺)
     coverage_ok = 0
     if n_test_sample > T
         n_test_sample = T
@@ -1166,9 +1160,9 @@ function analyse_NH(
         end
         if verbosity == 2
             println("\n")
-            Printf.@printf("\n  f⁺:	%16.10f", NH⁺.f)
-            Printf.@printf("\n  f₀:	%16.10f", NH₀.f)
-            Printf.@printf("\n  Convergence:	%16.10f", convergence)
+            Printf.@printf("\n  f⁺:	%16.3f", NH⁺.f)
+            Printf.@printf("\n  f₀:	%16.3f", NH₀.f)
+            Printf.@printf("\n  Convergence:	%16.0f", convergence)
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)
@@ -1274,7 +1268,7 @@ function analyse_NH(
                     else
                         warmup[v] = false
                         #NH₁ = _mycopy(NH_add, NH₁)
-                        println("f₁:", NH₁.f)
+                        Printf.@printf("\n f₁:  ", NH₁.f)
                         println("-Test ", v, " filled up with ", n_t, " items, ")
                     end
                 else
@@ -1294,10 +1288,7 @@ function analyse_NH(
     else
         println("Feasible solution not found in fill-up")
     end
-    println("f = ", NH⁺.f)
-    println("infeas = ", NH⁺.infeas)
-    println("ol = ", NH⁺.ol)
-    println("iu = ", NH⁺.iu)
+    print_neighbourhood(NH⁺)
     coverage_ok = 0
     if n_test_sample > T
         n_test_sample = T
@@ -1542,9 +1533,9 @@ function analyse_NH(
         end
         if verbosity == 2
             println("\n")
-            Printf.@printf("\n  f⁺:	%16.10f", NH⁺.f)
-            Printf.@printf("\n  f₀:	%16.10f", NH₀.f)
-            Printf.@printf("\n  Convergence:	%16.10f", convergence)
+            Printf.@printf("\n  f⁺:	%16.3f", NH⁺.f)
+            Printf.@printf("\n  f₀:	%16.3f", NH₀.f)
+            Printf.@printf("\n  Convergence:	%16.3f", convergence)
             println("\n")
         end
     end #end of NH coverage (coverage_ok = 1)
