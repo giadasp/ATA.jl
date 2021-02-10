@@ -117,6 +117,8 @@ function siman!(
     end
     NH⁺.f = _comp_f(NH⁺, opt_feas)
     f⁺ = copy(NH⁺.f)
+    println("Starting solution: ")
+    print_neighbourhood(NH⁺)
     if (Distributed.nprocs() > 1)
         processors = collect(1:(Distributed.nprocs()-1))
     else

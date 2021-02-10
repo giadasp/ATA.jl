@@ -8,6 +8,7 @@ using ATA
 # For load data to input in custom obj_fun:
 using CSV
 using FileIO
+using LinearAlgebra
 
 # If you prefere to use Julia code:
 
@@ -61,19 +62,19 @@ ATAmodel.obj.type = "custom"
 
 ATAmodel.obj.fun = function (x::Matrix{Float64}, obj_args::NamedTuple)
     IIF = obj_args.IIF
-    T = size(IIF, 1)
+    T = obj_args.T
     TIF = zeros(Float64, T)
     for t = 1:T
         K, I = size(IIF[t])
         # ungroup items
-        xₜ = fs_to_items(x[:, t], obj_args.fs_items)
+        xₜ = fs_to_items(x[:, t], I, obj_args.fs_items)
         if K > 1
             TIF[t] = Inf
             for k = 1:K
-                TIF[t] = min(TIF, LinearAlgebra.dot(IIF[1, :], xₜ))
+                TIF[t] = min(TIF[t], LinearAlgebra.dot(IIF[t][k, :], xₜ))
             end
         else
-            TIF[t] = LinearAlgebra.BLAS.gemv('N', IIF, xₜ)[1]
+            TIF[t] = LinearAlgebra.dot(IIF[t][1, :], xₜ)[1]
         end
     end
     min_TIF = minimum(TIF)
@@ -84,7 +85,7 @@ ATAmodel.obj.fun = function (x::Matrix{Float64}, obj_args::NamedTuple)
 end
 
 ATAmodel.obj.args =
-    (IIF = FileIO.load("data/IIF.jld2", "IIF"), fs_items = ATAmodel.settings.fs.items)
+    (T = ATAmodel.settings.T, IIF = FileIO.load("data/IIF.jld2", "IIF"), fs_items = ATAmodel.settings.fs.items)
 
 # Assembly settings
 
