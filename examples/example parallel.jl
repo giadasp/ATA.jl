@@ -76,7 +76,7 @@ solver = "siman";
 
 # SIMAN (Suggested for Large scale ATA):
 
-start_temp = 1.0;
+start_temp = 0.0001;
 # Default: `0.1`. Values:  `[0, Inf]`. 
 # Starting temperature, set to minimum for short journeys (if 0 worse solutions will never be accepted).
 
@@ -113,7 +113,7 @@ max_time = 200.0;
 # Default: `1000.0`. Values: `[0, Inf)`.
 # Time limit in seconds.
 
-max_conv = 3;
+max_conv = 10;
 # Default: `2`. Values: `[1, Inf)`. 
 # Maximum convergence, stop when, after max_conv rounds no improvements have been found. 
 # Set to minimum for shallow analysis, increase it for deep analysis of neighbourhoods.

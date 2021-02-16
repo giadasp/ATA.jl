@@ -186,7 +186,7 @@ function load_settings!(
             end
             message[2] = message[2] * "- Expected score variable and expected_score_pts loaded.\n"
 
-            if Inputs.expected_score_min != Float64[]
+            if size(Inputs.expected_score_min, 1) > 0
                 t1 = 1
                 for g = 1:ATAmodel.settings.n_groups
                     for t = 1:ATAmodel.settings.Tg[g]
@@ -197,7 +197,7 @@ function load_settings!(
                 end
                 message[2] = message[2] * "- Minimum expected score constrained.\n"
             end
-            if Inputs.expected_score_max != Float64[]
+            if size(Inputs.expected_score_max, 1) > 0
                 t1 = 1
                 for g = 1:ATAmodel.settings.n_groups
                     for t = 1:ATAmodel.settings.Tg[g]
