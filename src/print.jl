@@ -258,7 +258,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                         round.(
                             [
                                 sum(skipmissing(
-                                    ATAmodel.settings.bank[var] .* design[:, t],
+                                    ATAmodel.settings.bank[!,var] .* design[:, t],
                                 )) for t = 1:T
                             ],
                             digits = 3,
