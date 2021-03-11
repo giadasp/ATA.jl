@@ -44,7 +44,7 @@ Summarizing features of the assembled tests and Plots of the ICFs and TIFs are a
 
 If you want to play with this package:
 
-Install Julia-1.5.1 at `https://julialang.org/downloads/`
+Install Julia-1.6.0-rc1 at `https://julialang.org/downloads/`
 
 run `Julia.exe` and type:
 

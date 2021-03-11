@@ -1,138 +1,109 @@
-# cd("folder in which the package is saved")
-# using Pkg
-# Pkg.activate(".")  # required
-# Pkg.instantiate()
+################################################################################
+###                    Parallel siman algorithm                           ######
+################################################################################
+
+#1. First, save the package folder in your pc.
+#2. Then, modify all the input files (included this) in the test folder as required.
+#3. When the ATA model is ready, run Julia.exe and write:
 # cd("where your input files are")
-using ATA 
+# include("LocalTest.jl")
 
-# For load data to input in custom obj_fun:
-using CSV
-using FileIO
-using LinearAlgebra
+#Beta: for running ATA with multiple cores do:
+#add julia.exe to the windows path and run Julia with the command prompt:
+#julia -p <numberOfCores>
 
-# If you prefere to use Julia code:
+using Distributed  #this is not needed if Julia has been run with <numberOfCores> >1
+@everywhere using ATA
+@everywhere cd("where your input files are")
 
-# for resetting the ATA process (Needed)
-ATAmodel = start_ATA()
+#Input files needed: settingsATA.jl, Bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
+#settingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...
+#CategoricalConstraints.csv : categorical constraints
+#OverlapMatrix.csv : maximum overlap allowed between test forms, it is a TxT matrix. If the assembly is non parallel (i.e. there is more than one group of parallel tests, n_groups>1)
+#it is a n_groups x n_groups matrix.
+#BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
-# Each of the following commands returns a string vector, the second element is a message describing the result.
-# 1. Add file with custom settings (Needed)
-load_settings!(
-    ATAmodel;
-    settings_file = "SettingsATA custom.jl",
-    bank_file = "data/Bank.csv",
+# 1. Start ATA and add file with custom settings (Needed)
+ATAmodel = start_ATA(;
+    settings_file = "SettingsATA minimax.jl",
+    bank_file = "data/bank.csv",
     bank_delim = ";",
-)
+);
 print_last_info(ATAmodel)
 
 # 2. Add friend set variables (Optional)
-add_friends!(ATAmodel)
+add_friends!(ATAmodel);
 print_last_info(ATAmodel)
 
 # 3. Add enemy set variables (Optional)
-add_enemies!(ATAmodel)
+add_enemies!(ATAmodel);
 print_last_info(ATAmodel)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(
-    ATAmodel;
-    constraints_file = "Constraints.csv",
-    constraints_delim = ";",
-)
+add_constraints!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim = ";");
 print_last_info(ATAmodel)
 
 # 5. Add overlap maxima (Optional)
-add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
+add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";");
 print_last_info(ATAmodel)
 
 # 6. Add expected score constraints (Optional)
-add_exp_score!(ATAmodel)
+add_exp_score!(ATAmodel);
 print_last_info(ATAmodel)
 
 # 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
-group_by_friends!(ATAmodel)
+group_by_friends!(ATAmodel);
 print_last_info(ATAmodel)
 
 # 8. Add objective function (Optional)
-add_obj_fun!(ATAmodel)
+add_obj_fun!(ATAmodel);
 print_last_info(ATAmodel)
 
-# custom objective type, function and arguments
-ATAmodel.obj.type = "custom"
+#Assembly settings
 
-ATAmodel.obj.fun = function (x::Matrix{Float64}, obj_args::NamedTuple)
-    IIF = obj_args.IIF
-    T = obj_args.T
-    TIF = zeros(Float64, T)
-    for t = 1:T
-        K, I = size(IIF[t])
-        # ungroup items
-        xₜ = fs_to_items(x[:, t], I, obj_args.fs_items)
-        if K > 1
-            TIF[t] = Inf
-            for k = 1:K
-                TIF[t] = min(TIF[t], LinearAlgebra.dot(IIF[t][k, :], xₜ))
-            end
-        else
-            TIF[t] = LinearAlgebra.dot(IIF[t][1, :], xₜ)[1]
-        end
-    end
-    min_TIF = minimum(TIF)
-    TIF = [min_TIF for t = 1:T]
-    # Must return a vector of length T.
-    # The resulting objective function is the minimum of all values in this vector.
-    return TIF::Vector{Float64}
-end
-
-ATAmodel.obj.args =
-    (T = ATAmodel.settings.T, IIF = FileIO.load("data/IIF.jld2", "IIF"), fs_items = ATAmodel.settings.fs.items)
-
-# Assembly settings
-
-# SIMAN (Suggested for Large scale ATA):
 # Set the solver, "siman" for simulated annealing, "jumpATA" for MILP solver.
-solver = "siman"
+solver = "siman";
 
 # SIMAN (Suggested for Large scale ATA):
 
-start_temp = 0.0001
+start_temp = 0.001;
 # Default: `0.1`. Values:  `[0, Inf]`. 
 # Starting temperature, set to minimum for short journeys (if 0 worse solutions will never be accepted).
 
-geom_temp = 0.1
+geom_temp = 0.1;
 # Default: `0.1`. Values:  `[0, Inf)`.
 # Decreasing geometric factor.
 
-n_item_sample = Inf
+n_item_sample = Inf;
 # Default: 1. Values: `[1, Inf]`. 
 # Number of items to alter. Set to minimum for a shallow analysis, 
 # set to maximum for a deep analysis of the neighbourhoods.
 
-n_test_sample = ATAmodel.settings.T
+n_test_sample = Inf;
 # Default: 1. Values: `[1, Inf]`. 
 # Number of tests to alter. Set to minimum for a shallow analysis, set to maximum for a deep analysis of the neighbourhoods.
 
-opt_feas = 0.9
+opt_feas = 0.9;
 # Default: 0.0. Values: `[0, Inf)`. 
 # Optimality/feasibility balancer, if 0 only feasibility of solution is analysed. Viceversa, if 1, only optimality is considered (uncontrained model). All the other values are accepted but produce uninterpretable results.
 
-n_fill = 1
+n_fill = 1;
 # Default: 1. Values: `[0, Inf)`.
 # Number of fill-up phases, usually 1 is sufficient, if start_temp is high it can be higher. 
 # If a starting_design is supplied, it should be set to 0.
 
-verbosity = 1
+verbosity = 1;
 # Default: 2. Values: `1` (minimal), `2` (detailed).
 # Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution.
 # The dots are the fill-up improvement steps.
 
 #! Termination criteria: 
 
-max_time = 100.0
+max_time = 500.0;
 # Default: `1000.0`. Values: `[0, Inf)`.
 # Time limit in seconds.
 
-max_conv = 5
+max_conv = 5;
 # Default: `2`. Values: `[1, Inf)`. 
 # Maximum convergence, stop when, after max_conv rounds no improvements have been found. 
 # Set to minimum for shallow analysis, increase it for deep analysis of neighbourhoods.
@@ -145,8 +116,7 @@ opt_nh = Inf
 # Default: `5`. Values: `[1, Inf)`. 
 # Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
 
-
-# 9. assemble
+#9. assemble
 assemble!(
     ATAmodel;
     solver = solver,
@@ -160,9 +130,7 @@ assemble!(
     opt_feas = opt_feas,
     n_fill = n_fill,
     feas_nh = feas_nh,
-    opt_nh = opt_nh,# ,
-    # optimizer_attributes = optimizer_constructor,
-    # optimizer_constructor =optimizer_attributes
+    opt_nh = opt_nh,
 )
 
 # All the settings and outputs from optimization are in ATAmodel object.
@@ -170,11 +138,17 @@ assemble!(
 # A summary of the resulting tests is available in results_folder/Results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
-
-ATAmodel.obj.type = "MAXIMIN"
 print_results(ATAmodel; group_by_fs = true, results_folder = "RESULTS")
 
 
 #]add https://github.com/giadasp/ATAPlot.jl
 using ATAPlot
 plot_results(ATAmodel; group_by_fs = true, results_folder = "PLOTS")
+
+#to stop all the processes do:
+#ctrl+C
+#interrupt()
+#addprocs(numberOfProcs)
+#@everywhere cd("where your input files are")
+#include("LocalTest.jl")
+#Julia will compile the package again.

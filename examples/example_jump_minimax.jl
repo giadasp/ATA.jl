@@ -1,24 +1,13 @@
-# cd("folder in which the package is saved")
-# using Pkg
-# Pkg.activate(".")  # required
-# Pkg.instantiate()
-# cd("where your input files are")
 using ATA
 using JuMP
 # add Cbc by running import Pkg; Pkg.add("Cbc")
 using Cbc
+# cd("where your input files are")
 
-# Each of the following commands returns a string vector, the second element is a message describing the result.
-# 1. Add file with custom settings (Needed)
-# for resetting the ATA process (Needed)
-ATAmodel = start_ATA()
-
-# Each of the following commands returns a string vector, the second element is a message describing the result.
-# 1. Add file with custom settings (Needed)
-load_settings!(
-    ATAmodel;
-    settings_file = "SettingsATA maximin.jl",
-    bank_file = "data/Bank.csv",
+# 1. Start ATA and add file with custom settings (Needed)
+ATAmodel = start_ATA(
+    settings_file = "SettingsATA minimax.jl",
+    bank_file = "data/bank.csv",
     bank_delim = ";",
 )
 print_last_info(ATAmodel)
@@ -32,16 +21,12 @@ add_enemies!(ATAmodel)
 print_last_info(ATAmodel)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(
-    ATAmodel;
-    constraints_file = "Constraints.csv",
-    constraints_delim = ";",
-)
+add_constraints!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim = ";")
 print_last_info(ATAmodel)
 
 # 5. Add overlap maxima (Optional)
-add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
-print_last_info(ATAmodel)
+#add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
+#print_last_info(ATAmodel)
 
 # 6. Add expected score constraints (Optional)
 add_exp_score!(ATAmodel)

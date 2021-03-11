@@ -13,10 +13,9 @@
 #julia -p <numberOfCores>
 
 using Distributed  #this is not needed if Julia has been run with <numberOfCores> >1
-@everywhere cd("folder in which the package is saved")
 @everywhere using ATA
+@everywhere cd("where your input files are")
 
-#@everywhere cd("where your input files are")
 #Input files needed: settingsATA.jl, Bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
 #settingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...
 #CategoricalConstraints.csv : categorical constraints
@@ -24,15 +23,10 @@ using Distributed  #this is not needed if Julia has been run with <numberOfCores
 #it is a n_groups x n_groups matrix.
 #BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
-# for resetting the ATA process (Needed)
-ATAmodel = start_ATA();
-
-# Each of the following commands returns a string vector, the second element is a message describing the result.
-# 1. Add file with custom settings (Needed)
-load_settings!(
-    ATAmodel;
+# 1. Start ATA and add file with custom settings (Needed)
+ATAmodel = start_ATA(;
     settings_file = "SettingsATA maximin.jl",
-    bank_file = "data/Bank.csv",
+    bank_file = "data/bank.csv",
     bank_delim = ";",
 );
 print_last_info(ATAmodel)
@@ -46,11 +40,7 @@ add_enemies!(ATAmodel);
 print_last_info(ATAmodel)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(
-    ATAmodel;
-    constraints_file = "Constraints.csv",
-    constraints_delim = ";",
-);
+add_constraints!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim = ";");
 print_last_info(ATAmodel)
 
 # 5. Add overlap maxima (Optional)
@@ -58,8 +48,8 @@ add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";");
 print_last_info(ATAmodel)
 
 # 6. Add expected score constraints (Optional)
-add_exp_score!(ATAmodel);
-print_last_info(ATAmodel)
+# add_exp_score!(ATAmodel);
+# print_last_info(ATAmodel)
 
 # 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
 group_by_friends!(ATAmodel);
@@ -76,7 +66,7 @@ solver = "siman";
 
 # SIMAN (Suggested for Large scale ATA):
 
-start_temp = 0.0001;
+start_temp = 0.001;
 # Default: `0.1`. Values:  `[0, Inf]`. 
 # Starting temperature, set to minimum for short journeys (if 0 worse solutions will never be accepted).
 
@@ -84,7 +74,7 @@ geom_temp = 0.1;
 # Default: `0.1`. Values:  `[0, Inf)`.
 # Decreasing geometric factor.
 
-n_item_sample = Inf;
+n_item_sample = 1;
 # Default: 1. Values: `[1, Inf]`. 
 # Number of items to alter. Set to minimum for a shallow analysis, 
 # set to maximum for a deep analysis of the neighbourhoods.
@@ -93,7 +83,7 @@ n_test_sample = Inf;
 # Default: 1. Values: `[1, Inf]`. 
 # Number of tests to alter. Set to minimum for a shallow analysis, set to maximum for a deep analysis of the neighbourhoods.
 
-opt_feas = 0.1;
+opt_feas = 0.9;
 # Default: 0.0. Values: `[0, Inf)`. 
 # Optimality/feasibility balancer, if 0 only feasibility of solution is analysed. Viceversa, if 1, only optimality is considered (uncontrained model). All the other values are accepted but produce uninterpretable results.
 
@@ -102,14 +92,14 @@ n_fill = 1;
 # Number of fill-up phases, usually 1 is sufficient, if start_temp is high it can be higher. 
 # If a starting_design is supplied, it should be set to 0.
 
-verbosity = 2;
+verbosity = 1;
 # Default: 2. Values: `1` (minimal), `2` (detailed).
 # Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution.
 # The dots are the fill-up improvement steps.
 
 #! Termination criteria: 
 
-max_time = 200.0;
+max_time = 500.0;
 # Default: `1000.0`. Values: `[0, Inf)`.
 # Time limit in seconds.
 
@@ -140,7 +130,7 @@ assemble!(
     opt_feas = opt_feas,
     n_fill = n_fill,
     feas_nh = feas_nh,
-    opt_nh = opt_nh
+    opt_nh = opt_nh,
 )
 
 # All the settings and outputs from optimization are in ATAmodel object.

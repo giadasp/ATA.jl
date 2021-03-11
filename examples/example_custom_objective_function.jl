@@ -1,20 +1,14 @@
-# cd("folder in which the package is saved")
-# using Pkg
-# Pkg.activate(".")  # required
-# Pkg.instantiate()
-# cd("the path of this file")
 using ATA
+# For load data to input in custom obj_fun:
+using CSV
+using FileIO
+using LinearAlgebra
+cd("where your input files are")
 
-
-# for resetting the ATA process (Needed)
-ATAmodel = start_ATA()
-
-# Each of the following commands returns a string vector, the second element is a message describing the result.
-# 1. Add file with custom settings (Needed)
-load_settings!(
-    ATAmodel;
-    settings_file = "SettingsATA maximin.jl",
-    bank_file = "data/Bank.csv",
+# 1. Start ATA and add file with custom settings (Needed)
+ATAmodel = start_ATA(;
+    settings_file = "settingsATA custom.jl",
+    bank_file = "data/bank.csv",
     bank_delim = ";",
 )
 print_last_info(ATAmodel)
@@ -28,11 +22,7 @@ add_enemies!(ATAmodel)
 print_last_info(ATAmodel)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(
-    ATAmodel;
-    constraints_file = "Constraints.csv",
-    constraints_delim = ";",
-)
+add_constraints!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim = ";")
 print_last_info(ATAmodel)
 
 # 5. Add overlap maxima (Optional)
@@ -47,12 +37,42 @@ print_last_info(ATAmodel)
 group_by_friends!(ATAmodel)
 print_last_info(ATAmodel)
 
-# 8. Add objective function (Optional)
-add_obj_fun!(ATAmodel)
-print_last_info(ATAmodel)
+# custom objective type, function and arguments
+ATAmodel.obj.name = "custom"
+
+ATAmodel.obj.fun = function (x::Matrix{Float64}, obj_args::NamedTuple)
+    IIF = obj_args.IIF
+    T = obj_args.T
+    TIF = zeros(Float64, T)
+    for t = 1:T
+        K, I = size(IIF[t])
+        # ungroup items
+        xₜ = fs_to_items(x[:, t], I, obj_args.fs_items)
+        if K > 1
+            TIF[t] = Inf
+            for k = 1:K
+                TIF[t] = min(TIF[t], LinearAlgebra.dot(IIF[t][k, :], xₜ))
+            end
+        else
+            TIF[t] = LinearAlgebra.dot(IIF[t][1, :], xₜ)[1]
+        end
+    end
+    min_TIF = minimum(TIF)
+    TIF = [min_TIF for t = 1:T]
+    # Must return a vector of length T.
+    # The resulting objective function is the minimum of all values in this vector.
+    return TIF::Vector{Float64}
+end
+
+ATAmodel.obj.args = (
+    T = ATAmodel.settings.T,
+    IIF = FileIO.load("data/IIF.jld2", "IIF"),
+    fs_items = ATAmodel.settings.fs.items,
+)
 
 # Assembly settings
 
+# SIMAN (Suggested for Large scale ATA):
 # Set the solver, "siman" for simulated annealing, "jumpATA" for MILP solver.
 solver = "siman"
 
@@ -84,14 +104,14 @@ n_fill = 1
 # Number of fill-up phases, usually 1 is sufficient, if start_temp is high it can be higher. 
 # If a starting_design is supplied, it should be set to 0.
 
-verbosity = 2
+verbosity = 1
 # Default: 2. Values: `1` (minimal), `2` (detailed).
 # Verbosity level. In the console '+' stands for improvement, '_' for accepting worse solution.
 # The dots are the fill-up improvement steps.
 
 #! Termination criteria: 
 
-max_time = 500.0
+max_time = 100.0
 # Default: `1000.0`. Values: `[0, Inf)`.
 # Time limit in seconds.
 
@@ -108,9 +128,6 @@ opt_nh = Inf
 # Default: `5`. Values: `[1, Inf)`. 
 # Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
 
-results_folder = "RESULTS"
-# Default: `"RESULTS"`. 
-# The folder in which the results of the optimization are saved
 
 # 9. assemble
 assemble!(
@@ -126,8 +143,9 @@ assemble!(
     opt_feas = opt_feas,
     n_fill = n_fill,
     feas_nh = feas_nh,
-    opt_nh = opt_nh,
-    results_folder = results_folder,
+    opt_nh = opt_nh,# ,
+    # optimizer_attributes = optimizer_constructor,
+    # optimizer_constructor =optimizer_attributes
 )
 
 # All the settings and outputs from optimization are in ATAmodel object.
@@ -136,7 +154,9 @@ assemble!(
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
 
+ATAmodel.obj.name = "MAXIMIN"
 print_results(ATAmodel; group_by_fs = true, results_folder = "RESULTS")
+
 
 #]add https://github.com/giadasp/ATAPlot.jl
 using ATAPlot

@@ -1,7 +1,7 @@
 Inputs = InputSettings(
 
     # 1. T
-    [4, 4, 4],
+    [8, 8, 8],
     # 2. n_items
     Int(366),
     # 3. n_groups
@@ -18,7 +18,7 @@ Inputs = InputSettings(
     # 6. IRT_parameters
     ["b"],
     # 7. IRT_parametrization
-    "at-b",
+    "at-ab",
     # 8. IRT_D
     1,
 
@@ -90,7 +90,7 @@ Inputs = InputSettings(
     # 27. obj_points (required in MAXIMIN, CC, MINIMAX)
     [[-0.60], [0.30], [0.60]],
     # 28. obj_targets (required in MINIMAX)
-    [[9.0], [9.0], [9.0]],
+    [[7.5], [7.5], [7.5]],
     # 29. obj_aux_int
     zero(Float64),
     # 30. obj_aux_float

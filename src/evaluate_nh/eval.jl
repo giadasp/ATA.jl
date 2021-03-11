@@ -1,0 +1,8 @@
+include("tif/eval_tif.jl")
+include("constraints/eval_constraints.jl")
+include("fill_up/fill_up.jl")
+include("maximin.jl")
+include("cc_maximin.jl")
+include("minimax.jl")
+include("no_obj.jl")
+include("custom.jl")

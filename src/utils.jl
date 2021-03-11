@@ -280,9 +280,9 @@ function _desume_pars(
     nb = 0
     # TODO grm
     for n in names(pars)
-         if startswith(string(n), "b")
-             nb += 1
-             b = hcat(b, pars[!, n])
+        if startswith(string(n), "b")
+            nb += 1
+            b = hcat(b, pars[!, n])
         end
     end
     # nd = 0
@@ -304,7 +304,7 @@ function _desume_pars(
         b = -b
     elseif parametrization == "at+ab" #a*(theta + b)
         a2 = copy(a)
-    end 
+    end
     return a, a2, b, c
 end
 
@@ -391,7 +391,7 @@ function item_char(
         # end
     end
     if derivatives
-        pder = mapslices(x -> (1 .- x) .* ((x .- c)./ (1 .- c)) .* a, p; dims = 1)
+        pder = mapslices(x -> (1 .- x) .* ((x .- c) ./ (1 .- c)) .* a, p; dims = 1)
     end
     return p, pder
 end
@@ -465,13 +465,19 @@ function item_info(
 
     n_items = size(pars, 1)
     a, a2, b, c = _desume_pars(pars; model = model, parametrization = parametrization)
-    p, pder = item_char(pars, theta; model = model, parametrization = parametrization, derivatives = true)
+    p, pder = item_char(
+        pars,
+        theta;
+        model = model,
+        parametrization = parametrization,
+        derivatives = true,
+    )
     nb = size(p, 3)
     if model != "grm"
         #i = (a.^2 ) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2 
-        i = pder.^2 ./ (p .* (1 .- p))
+        i = pder .^ 2 ./ (p .* (1 .- p))
     else
-        i = pder.^2 ./ p
+        i = pder .^ 2 ./ p
         i = sum(i, dims = 3)[:, :, 1]
     end
     return i
@@ -503,13 +509,7 @@ function item_info(
     parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
     D = 1,
 ) #true, false
-    return item_info(
-        pars,
-        [theta],
-        model = model,
-        parametrization = parametrization, 
-        D = D,
-    )
+    return item_info(pars, [theta], model = model, parametrization = parametrization, D = D)
 end
 
 function student_likelihood(
@@ -774,15 +774,24 @@ function resp_gen(
     return resp
 end
 
+function sum_pos(x::Vector{Float64})
+    x = x[x.>0]
+    if size(x, 1) == 0
+        return zero(Float64)::Float64
+    else
+        return sum(x)::Float64
+    end
+end
+
 function print_neighbourhood(x::Neighbourhood)
     Printf.@printf("\n  f : %5.3f", x.f)
     Printf.@printf("\n  infeas :	[")
-    map( x -> Printf.@printf(" %5.1f", x), x.infeas)
+    map(x -> Printf.@printf(" %5.1f", x), x.infeas)
     Printf.@printf("    ]")
     Printf.@printf("\n  overlaps :	[")
-    map( x -> Printf.@printf("  %5.1f", x), x.ol)
+    map(x -> Printf.@printf("  %5.1f", x), x.ol)
     Printf.@printf("    ]")
     Printf.@printf("\n  item use :	[")
-    map( x -> Printf.@printf("  %5.1f", x), x.iu)
+    map(x -> Printf.@printf("  %5.1f", x), x.iu)
     Printf.@printf("    ]\n")
 end

@@ -7,19 +7,25 @@ Plot the ICFs and TIFs of the assembled tests.
 
 # Arguments
 
-- **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
-- **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.Model}).
+- **`ATAmodel::AbstractModel`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
+- **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.AbstractModel}).
 - **`results_folder`** : Optional. Default: "PLOTS". The folder in which the output is stored.
 """
-function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
+function plot_results(
+    ATAmodel::AbstractModel;
+    group_by_fs = false,
+    results_folder = "PLOTS",
+)
     if !(results_folder in readdir())
         mkdir(results_folder)
     else
-        println(string(
-            "You have already a folder with this name, files in ",
-            results_folder,
-            " will be overwritten.\n",
-        ))
+        println(
+            string(
+                "You have already a folder with this name, files in ",
+                results_folder,
+                " will be overwritten.\n",
+            ),
+        )
     end
     T = ATAmodel.settings.T
     if size(ATAmodel.output.design, 1) > 0
@@ -33,14 +39,16 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
             n = n_items * T
         end
 
-        if ATAmodel.obj.type == "CC"
+        if ATAmodel.obj.name == "CCMAXIMIN"
             JLD2.@load "OPT/IIF_CC.jld2" IIF
             JLD2.@load "OPT/ICF_CC.jld2" ICF
             IIF_CC = copy(IIF)
             ICF_CC = copy(ICF)
         end
 
-        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
+        if ATAmodel.obj.name == "MAXIMIN" ||
+           ATAmodel.obj.name == "CCMAXIMIN" ||
+           ATAmodel.obj.name == "MINIMAX"
             JLD2.@load "OPT/IIF.jld2" IIF
             JLD2.@load "OPT/ICF.jld2" ICF
         end
@@ -51,9 +59,11 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
 
             for t = 1:T
                 new_design[
-                    vcat(ATAmodel.settings.fs.items[findall(
-                        design[:, t] .== one(Float64),
-                    )]...),
+                    vcat(
+                        ATAmodel.settings.fs.items[findall(
+                            design[:, t] .== one(Float64),
+                        )]...,
+                    ),
                     t,
                 ] .= one(Float64)
             end
@@ -65,7 +75,9 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
         end
 
         #TIF e ICF
-        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
+        if ATAmodel.obj.name == "MAXIMIN" ||
+           ATAmodel.obj.name == "CCMAXIMIN" ||
+           ATAmodel.obj.name == "MINIMAX"
             if isfile("simPool.csv")
                 simPool = CSV.read("simPool.csv", DataFrames.DataFrame)
             else
@@ -108,7 +120,7 @@ function plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
                 results_folder = results_folder,
             )
 
-            if ATAmodel.obj.type == "CC"
+            if ATAmodel.obj.name == "CCMAXIMIN"
                 ATAPlot.plot_ATA_CC(
                     ATAmodel,
                     IIFf,
