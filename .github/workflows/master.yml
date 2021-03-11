@@ -1,0 +1,51 @@
+name: Master docs build
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        julia-version: [1.6.0-rc1]
+        julia-arch: [x86]
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{ matrix.julia-version }}
+
+      - name: Install dependencies
+        run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+
+      - name: Setup environment variables
+        run: |
+          VERSION=`cat Project.toml | grep "version" | cut -d '=' -f2 | tr -d ' ' | tr -d '"' | tr -d \'`
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          REPO=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
+          echo "REPO=${REPO}" >> $GITHUB_ENV
+          DEVBRANCH=master
+          echo "DEVBRANCH=${DEVBRANCH}" >> $GITHUB_ENV
+          IS_SNAPSHOT=`if [[ "${VERSION}" == 0.* ]] ; then echo "true" ; else echo "false" ; fi`
+          echo "IS_SNAPSHOT=${IS_SNAPSHOT}" >> $GITHUB_ENV
+
+      - name: Build, deploy and upload docs
+        run: julia --project=docs --color=yes docs/make.jl
+        env:
+          REPO: ${{ env.REPO }}
+          DEVBRANCH: ${{ env.DEVBRANCH }}
+

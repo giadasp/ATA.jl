@@ -1,8 +1,8 @@
-include("eval.jl")
+include("evaluate_nh/eval.jl")
 
 # optimize with simulated annealing
 function siman!(
-    ATAmodel::Model;
+    ATAmodel::AbstractModel;
     starting_design = Matrix{Float64}(undef, 0, 0),
     results_folder = "RESULTS",
     start_temp = 0.1,
@@ -27,15 +27,7 @@ function siman!(
             " will be overwritten.\n",
         )
     end
-    if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "MINIMAX"
-        JLD2.@load "OPT/IIF.jld2" IIF
-    elseif ATAmodel.obj.type == "CC"
-        JLD2.@load "OPT/IIF_CC.jld2" IIF
-    elseif ATAmodel.obj.type == ""
-        opt_nh = 0
-    elseif ATAmodel.obj.type == "custom"
-        IIF = zeros(Float64, ATAmodel.settings.T)
-    end
+
     ##
     nNH = feas_nh + opt_nh
     opt_nh = feas_nh + 1
@@ -68,11 +60,17 @@ function siman!(
             size(starting_design, 1) != n_fs ||
             size(starting_design, 2) != ATAmodel.settings.T
         )
-            push!(ATAmodel.output.infos, ["danger", "- Starting design must be of size: (n_items x T).\n"])
+            push!(
+                ATAmodel.output.infos,
+                ["danger", "- Starting design must be of size: (n_items x T).\n"],
+            )
             return nothing
         end
         if (any(starting_design != 0 && starting_design != 1))
-            push!(ATAmodel.output.infos, ["danger", "- Starting design must contain only 1 or 0.\n"])
+            push!(
+                ATAmodel.output.infos,
+                ["danger", "- Starting design must contain only 1 or 0.\n"],
+            )
             return nothing
         end
         x₀ = Float64.(starting_design)
@@ -86,13 +84,8 @@ function siman!(
         NH⁺.x = zeros(Float64, n_fs, T)
     end
     # compute f
-    iu = sum(NH⁺.x; dims = 2) - ATAmodel.settings.iu.max
-    iu = iu[iu.>0]
-    if size(iu, 1) == 0
-        NH⁺.iu = 0
-    else
-        NH⁺.iu = sum(iu)
-    end
+    iu = sum(NH⁺.x; dims = 2)[:, 1] - ATAmodel.settings.iu.max
+    NH⁺.iu = sum_pos(iu)
     t = copy(start_temp)
     for v2 = 1:T
         NH⁺.infeas[v2], x_Iₜ = check_feas(
@@ -104,27 +97,27 @@ function siman!(
         )
         NH⁺.ol = eval_overlap(NH⁺.x, fs_counts, ATAmodel.settings.ol_max, T, NH⁺.ol)
         if fF == false
-            if ATAmodel.obj.type == "MAXIMIN"
-                NH⁺.obj[v2] = eval_TIF_MMₜ(x_Iₜ, IIF[v2])
-            elseif ATAmodel.obj.type == "MINIMAX"
-                NH⁺.obj[v2] = eval_TIF_mmₜ(x_Iₜ, IIF[v2], ATAmodel.obj.targets[v2])
-            elseif ATAmodel.obj.type == "CC"
-                NH⁺.obj[v2] = eval_TIF_CCₜ(x_Iₜ, IIF[v2]; α = ATAmodel.obj.aux_float)
-            elseif ATAmodel.obj.type == "custom"
+            if ATAmodel.obj.name in ["MAXIMIN", "MINIMAX", "CCMAXIMIN"]
+                NH⁺.obj[v2] = eval_TIFₜ(x_Iₜ, ATAmodel.obj.cores[v2])
+            elseif ATAmodel.obj.name == "custom"
                 NH⁺.obj = ATAmodel.obj.fun(x_Iₜ, ATAmodel.obj.args)
             end
         end
     end
     NH⁺.f = _comp_f(NH⁺, opt_feas)
-    f⁺ = copy(NH⁺.f)
+    if sum(NH⁺.x) <= 1.0
+        f⁺ = Inf
+    else
+        f⁺ = copy(NH⁺.f)
+    end
     println("Starting solution: ")
     print_neighbourhood(NH⁺)
     if (Distributed.nprocs() > 1)
-        processors = collect(1:(Distributed.nprocs()-1))
+        workers = collect(1:(Distributed.nprocs()-1))
     else
-        processors = [one(Int64)]
+        workers = [one(Int64)]
     end
-    NHs = copy(processors)
+    NHs = copy(workers)
     ATAmodel.output.neighbourhoods = [Neighbourhood() for n = 1:NHs[end]]
     for nh = 1:NHs[end]
         ATAmodel.output.neighbourhoods[nh] =
@@ -132,7 +125,8 @@ function siman!(
     end
     round = 1
     while finish == 0
-        Distributed.@sync Distributed.@distributed for p in processors
+        #for each proc in nprocs analyse nh
+        Distributed.@sync Distributed.@distributed for p in workers
             nh_tot = (NHs[end] * (round - 1)) + NHs[p]
             # println("f was ", ATAmodel.output.neighbourhoods[NHs[p]].f)
             NH_proc = Neighbourhood()
@@ -143,8 +137,7 @@ function siman!(
             end
             NH_proc = analyse_NH(
                 NH_proc,
-                ATAmodel,
-                IIF;
+                ATAmodel;
                 fF = fF,
                 n_fill = n_fill,
                 opt_feas = opt_feas,
@@ -177,7 +170,8 @@ function siman!(
             end
             println("\nNeighbourhood ", nh_tot, " fully explored, increase temperature")
         end
-        for p in processors
+        #save last nprocs nhs in text files
+        for p in workers
             nh_tot = (NHs[end] * (round - 1)) + NHs[p]
             ATAmodel.output.neighbourhoods[NHs[p]].x = DelimitedFiles.readdlm(
                 string(results_folder, "/neigh_", nh_tot, "_x.csv"),
@@ -222,12 +216,12 @@ function siman!(
         # NH+= 1
         # find best nh
         f_loc, nh_loc = findmin([ATAmodel.output.neighbourhoods[n].f for n = 1:NHs[end]])
+        # copy first best result as benchmark (avoid to keep empty design as best solution in large scale models)
         if f_loc <= f⁺
             bestNH = (NHs[end] * (round - 1)) + nh_loc
             f⁺ = copy(f_loc)
             NH⁺ = _mycopy(ATAmodel.output.neighbourhoods[nh_loc], NH⁺)
         end
-
         # NHs = NHs.+Distributed.nprocs()
         if NHs[end] * round + 1 > feas_nh
             fF = false
@@ -320,5 +314,5 @@ function siman!(
         write(io, string(ATAmodel.output.elapsed_time))
         return write(io, "\r\n")
     end
-return nothing
+    return nothing
 end

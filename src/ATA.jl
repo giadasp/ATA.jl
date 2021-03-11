@@ -13,11 +13,12 @@ import JLD2
 import StatsBase
 using Requires
 
-include("structs.jl")
+include("structs/ata_model.jl")
 include("utils.jl")
-include("build.jl")
+include("build/build.jl")
 include("opt.jl")
 include("print.jl")
+
 
 function __init__()
     @require Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76" begin
@@ -73,7 +74,6 @@ end
 
 export mean,
     start_ATA,
-    load_settings!,
     add_friends!,
     add_enemies!,
     add_constraints!,

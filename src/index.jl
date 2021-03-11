@@ -1,2 +1,0 @@
-
-app.layout = sidepanel.layout

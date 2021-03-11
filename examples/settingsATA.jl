@@ -90,7 +90,7 @@ Inputs = InputSettings(
     # 27. obj_points (required in MAXIMIN, CC, MINIMAX)
     [[-0.60], [0.30], [0.60]],
     # 28. obj_targets (required in MINIMAX)
-    Vector{Vector{Float64}}(undef,0),
+    Vector{Vector{Float64}}(),
     # 29. obj_aux_int
     zero(Float64),
     # 30. obj_aux_float

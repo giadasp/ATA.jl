@@ -7,19 +7,25 @@ Print the features of the assembled tests.
 
 # Arguments
 
-- **`ATAmodel::Model`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
+- **`ATAmodel::AbstractModel`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
 - **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.Model}).
 - **`results_folder`** : Optional. Default: "RESULTS". The folder in which the output is stored.
 """
-function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "RESULTS")
+function print_results(
+    ATAmodel::AbstractModel;
+    group_by_fs = false,
+    results_folder = "RESULTS",
+)
     if !(results_folder in readdir())
         mkdir(results_folder)
     else
-        println(string(
-            "You have already a folder with this name, files in ",
-            results_folder,
-            " will be overwritten.\n",
-        ))
+        println(
+            string(
+                "You have already a folder with this name, files in ",
+                results_folder,
+                " will be overwritten.\n",
+            ),
+        )
     end
     if size(ATAmodel.output.design, 1) > 0
         T = ATAmodel.settings.T
@@ -33,26 +39,30 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
             n = n_items * T
         end
 
-        if ATAmodel.obj.type == "CC"
+        if ATAmodel.obj.name == "CCMAXIMIN"
             JLD2.@load "OPT/IIF_CC.jld2" IIF
             JLD2.@load "OPT/ICF_CC.jld2" ICF
             IIF_CC = copy(IIF)
             ICF_CC = copy(ICF)
         end
-        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
+        if ATAmodel.obj.name == "MAXIMIN" ||
+           ATAmodel.obj.name == "CCMAXIMIN" ||
+           ATAmodel.obj.name == "MINIMAX"
             JLD2.@load "OPT/IIF.jld2" IIF
         end
-	if isfile("OPT/ICF.jld2")
-	    JLD2.@load "OPT/ICF.jld2" ICF
-	end
+        if isfile("OPT/ICF.jld2")
+            JLD2.@load "OPT/ICF.jld2" ICF
+        end
         if group_by_fs == true
             design = reshape(ATAmodel.output.design, n_fs, T)
             new_design = zeros(Float64, n_items, T)
             for t = 1:T
                 new_design[
-                    vcat(ATAmodel.settings.fs.items[findall(
-                        design[:, t] .== one(Float64),
-                    )]...),
+                    vcat(
+                        ATAmodel.settings.fs.items[findall(
+                            design[:, t] .== one(Float64),
+                        )]...,
+                    ),
                     t,
                 ] .= one(Float64)
             end
@@ -70,7 +80,9 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
         end
         #DelimitedFiles.writedlm(string(results_folder,"/olMatrixOUT.csv"),olMatrixOUT)
         #TIF e ICF
-        if ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "CC" || ATAmodel.obj.type == "MINIMAX"
+        if ATAmodel.obj.name == "MAXIMIN" ||
+           ATAmodel.obj.name == "CCMAXIMIN" ||
+           ATAmodel.obj.name == "MINIMAX"
             if isfile("simPool.csv")
                 simPool = CSV.read("simPool.csv", DataFrames.DataFrame)
             else
@@ -78,7 +90,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
             end
         end
         #save values
-        if ATAmodel.obj.type == "CC"
+        if ATAmodel.obj.name == "CCMAXIMIN"
             min = Float64[]
             First = Float64[]
             Median = Float64[]
@@ -90,7 +102,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                 True = Float64[]
             end
             Distributed.@sync for t = 1:T
-                K = size(ATAmodel.obj.points[t], 1)
+                K = size(ATAmodel.obj.cores[t].points, 1)
                 for k = 1:K
                     IIF_t = (IIF_CC[t][k, :, :]' * design[:, t])
                     min = vcat(min, minimum(IIF_t))
@@ -98,14 +110,15 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                     Median = vcat(Median, StatsBase.quantile(IIF_t, [0.5]))
                     Third = vcat(Third, StatsBase.quantile(IIF_t, [0.75]))
                     max = vcat(max, maximum(IIF_t))
-                    Alpha = vcat(Alpha, StatsBase.quantile(IIF_t, [ATAmodel.obj.aux_float]))
+                    Alpha =
+                        vcat(Alpha, StatsBase.quantile(IIF_t, ATAmodel.obj.cores[t].alpha))
                     Estimated = vcat(Estimated, IIF[t][k, :]' * design[:, t])
                     if isfile("simPool.csv")
                         True = vcat(
                             True,
                             item_info(
                                 simPool,
-                                ATAmodel.obj.points[t][k],
+                                ATAmodel.obj.cores[t].points[k],
                                 model = ATAmodel.settings.IRT.model,
                                 parametrization = ATAmodel.settings.IRT.parametrization,
                                 D = ATAmodel.settings.IRT.D,
@@ -127,7 +140,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                         "Median",
                         "0.75-Qle",
                         "max",
-                        string(ATAmodel.obj.aux_float, "-Qle"),
+                        string(ATAmodel.obj.cores[1].alpha, "-Qle"),
                         "Estimated",
                         "True",
                     ]),
@@ -141,20 +154,20 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                         "Median",
                         "0.75-Qle",
                         "max",
-                        string(ATAmodel.obj.aux_float, "-Qle"),
+                        string(ATAmodel.obj.cores[1].alpha, "-Qle"),
                         "Estimated",
                     ]),
                 )
             end
             CSV.write(string(results_folder, "/TIFatTheta_k.csv"), TIFatTheta_k)
 
-	elseif ATAmodel.obj.type == "MAXIMIN" || ATAmodel.obj.type == "MINIMAX"
+        elseif ATAmodel.obj.name == "MAXIMIN" || ATAmodel.obj.name == "MINIMAX"
             Estimated = Float64[]
             if isfile("simPool.csv")
                 True = Float64[]
             end
             for t = 1:T
-                K = size(ATAmodel.obj.points[t], 1)
+                K = size(ATAmodel.obj.cores[t].points, 1)
                 for k = 1:K
                     Estimated = vcat(Estimated, IIF[t][k, :]' * design[:, t])
                     if isfile("simPool.csv")
@@ -162,7 +175,7 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                             True,
                             item_info(
                                 simPool,
-                                ATAmodel.obj.points[t][k],
+                                ATAmodel.obj.cores[t].points[k],
                                 model = ATAmodel.settings.IRT.model,
                                 parametrization = ATAmodel.settings.IRT.parametrization,
                                 D = ATAmodel.settings.IRT.D,
@@ -181,15 +194,15 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
 
         #expected score
         if isfile("OPT/ICF.jld2")
-		esprintIRT = Vector{Vector{Float64}}(undef, T)
-		for t = 1:T
-		    esprintIRT[t] = zeros(size(ICF[t], 1))
-		    for k = 1:size(ICF[t], 1)
-			esprintIRT[t][k] = ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
-		    end
-		end
+            esprintIRT = Vector{Vector{Float64}}(undef, T)
+            for t = 1:T
+                esprintIRT[t] = zeros(size(ICF[t], 1))
+                for k = 1:size(ICF[t], 1)
+                    esprintIRT[t][k] = ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
+                end
+            end
         end
-									
+
         #number of items
         n = sum(design, dims = 1)
         design_items = zeros(Int64, Int(maximum(n)), T)
@@ -208,15 +221,15 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
             write(io, "\r\n")
             write(io, "expected score")
             write(io, "\r\n")
-	    if isfile("OPT/ICF.jld2")
-		    for t = 1:T
-			DelimitedFiles.writedlm(
-			    io,
-			    vcat(t, round.(esprintIRT[t], digits = 3))',
-			    "\t",
-			)
-			write(io, "\r\n")
-		    end
+            if isfile("OPT/ICF.jld2")
+                for t = 1:T
+                    DelimitedFiles.writedlm(
+                        io,
+                        vcat(t, round.(esprintIRT[t], digits = 3))',
+                        "\t",
+                    )
+                    write(io, "\r\n")
+                end
             end
             if size(categories, 1) > 0
                 write(io, "Categorical variables")
@@ -257,9 +270,11 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                         io,
                         round.(
                             [
-                                sum(skipmissing(
-                                    ATAmodel.settings.bank[!,var] .* design[:, t],
-                                )) for t = 1:T
+                                sum(
+                                    skipmissing(
+                                        ATAmodel.settings.bank[!, var] .* design[:, t],
+                                    ),
+                                ) for t = 1:T
                             ],
                             digits = 3,
                         )',
@@ -275,19 +290,6 @@ function print_results(ATAmodel::Model; group_by_fs = false, results_folder = "R
                 DelimitedFiles.writedlm(io, olMatrixOUT, "\t")
                 write(io, "\r\n")
             end
-            # if size(summarize,1)>0
-            # write(io,"quantitative variables")
-            # write(io,"\r\n")
-            #   for summ in 1:size(summarize[:,1],1)
-            # vals=[summarize[summ][2](skipmissing(ATAmodel.settings.bank[Symbol(summarize[summ][1])][design[:,t].==1]))   for t=1:T]
-            # write(io,string(summarize[summ][1]))
-            # write(io,",")
-            # write(io,string(summarize[summ][2]))
-            # write(io,",")
-            # DelimitedFiles.writedlm(io,vals',",")
-            # write(io,"\n")
-            # end
-            # end
             write(io, "Item use")
             write(io, "\r\n")
             iu = [sum(design[i, :]) for i = 1:ATAmodel.settings.n_items]
@@ -310,18 +312,18 @@ end
 
 # Description
 
-Print the results of each build step of the ATAmodel.
+Print the results of each build step of the ATA model.
 
 # Arguments
 
-- **`ATAmodel::Model`** : Required. Model processed with build functions.
+- **`ATAmodel::AbstractModel`** : Required. Model processed with build functions.
 """
-function print_infos(ATAmodel::Model)
+function print_infos(ATAmodel::AbstractModel)
     for m in ATAmodel.output.infos
         if m[1] == "danger"
-            printstyled(m[2]; color= :red)
+            printstyled(m[2]; color = :red)
         else
-            printstyled(m[2]; color= :green)
+            printstyled(m[2]; color = :green)
         end
     end
 end
@@ -335,13 +337,13 @@ Print info of the last build step.
 
 # Arguments
 
-- **`ATAmodel::Model`** : Required. Model processed with build functions.
+- **`ATAmodel::AbstractModel`** : Required. Model processed with build functions.
 """
-function print_last_info(ATAmodel::Model)
+function print_last_info(ATAmodel::AbstractModel)
     m = ATAmodel.output.infos[end]
     if m[1] == "danger"
-        printstyled(m[2]; color= :red)
+        printstyled(m[2]; color = :red)
     else
-        printstyled(m[2]; color= :green)
+        printstyled(m[2]; color = :green)
     end
 end
