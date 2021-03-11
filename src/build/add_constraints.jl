@@ -1,7 +1,7 @@
 
 
 """
-add_constraints!(ATAmodel::AbstractModel; constraints_file = "Constraints.csv", constraints_delim = ";")
+add_constraints!(ata_model::AbstractModel; constraints_file = "Constraints.csv", constraints_delim = ";")
 
 # Description
 
@@ -10,41 +10,41 @@ It requires the [`start_ATA`](#ATA.start_ATA) step.
 
 # Arguments
 
-- **`ATAmodel::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
 - **`constraints_file`** : Optional. Default: "Constraints.csv". The path of the file containing the categorical and sum constraints in the form of custom-separated values.
 - **`constraints_delim`** : Optional. Default: ";". The custom-separator for the `constraints_file`.
 
 """
 function add_constraints!(
-    ATAmodel::AbstractModel;
+    ata_model::AbstractModel;
     constraints_file = "Constraints.csv",
     constraints_delim = ";",
 )
     message = ["", ""]
-    n_items = ATAmodel.settings.n_items
-    bank = ATAmodel.settings.bank
-    A = Vector{Matrix{Float64}}(undef, ATAmodel.settings.T)
-    b = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
-    if size(ATAmodel.constraints[1].constr_b, 1) > 0
-        for t = 1:ATAmodel.settings.T
-            A[t] = copy(ATAmodel.constraints[t].constr_A)
-            b[t] = copy(ATAmodel.constraints[t].constr_b)
+    n_items = ata_model.settings.n_items
+    bank = ata_model.settings.bank
+    A = Vector{Matrix{Float64}}(undef, ata_model.settings.T)
+    b = Vector{Vector{Float64}}(undef, ata_model.settings.T)
+    if size(ata_model.constraints[1].constr_b, 1) > 0
+        for t = 1:ata_model.settings.T
+            A[t] = copy(ata_model.constraints[t].constr_A)
+            b[t] = copy(ata_model.constraints[t].constr_b)
         end
     else
-        for t = 1:ATAmodel.settings.T
-            A[t] = zeros(Float64, 0, ATAmodel.settings.n_items)
+        for t = 1:ata_model.settings.T
+            A[t] = zeros(Float64, 0, ata_model.settings.n_items)
             b[t] = Vector{Float64}(undef, 0)
         end
 
     end
     if !isfile(constraints_file)
         push!(
-            ATAmodel.output.infos,
+            ata_model.output.infos,
             ["danger", string(constraints_file, " doesn't exist.")],
         )
         return nothing
     else
-        x_forced0 = ATAmodel.settings.forced0
+        x_forced0 = ata_model.settings.forced0
         Categoricalconsts =
             CSV.read(constraints_file, DataFrames.DataFrame, delim = constraints_delim)
         if size(Categoricalconsts, 1) == 0
@@ -53,18 +53,18 @@ function add_constraints!(
                 string("No lines in file ", constraints_file, " nothing added.\n")
         else
             Categoricalconsts.var = Symbol.(Categoricalconsts.var)
-            CatCons = Vector{Vector{Float64}}(undef, ATAmodel.settings.T)
-            for g = 1:ATAmodel.settings.n_groups
+            CatCons = Vector{Vector{Float64}}(undef, ata_model.settings.T)
+            for g = 1:ata_model.settings.n_groups
                 if g > 1
                     tests = collect(
                         (sum(
-                            ATAmodel.settings.Tg[1:(g-1)],
+                            ata_model.settings.Tg[1:(g-1)],
                         )+1):(sum(
-                            ATAmodel.settings.Tg[1:(g-1)],
-                        )+ATAmodel.settings.Tg[g]),
+                            ata_model.settings.Tg[1:(g-1)],
+                        )+ata_model.settings.Tg[g]),
                     )
                 else
-                    tests = collect(1:ATAmodel.settings.Tg[1])
+                    tests = collect(1:ata_model.settings.Tg[1])
                 end
                 GroupCatCons = findall((Categoricalconsts.group .== g))
                 for con in GroupCatCons
@@ -91,7 +91,7 @@ function add_constraints!(
                         if !ismissing(Categoricalconsts[con, :max])
                             indices =
                                 string.(
-                                    ATAmodel.settings.bank[
+                                    ata_model.settings.bank[
                                         !,
                                         Symbol.(Categoricalconsts[con, :var]),
                                     ],
@@ -119,39 +119,39 @@ function add_constraints!(
                 end
             end
             #add quantitative constraints
-            for t = 1:ATAmodel.settings.T
-                for var = 1:size(ATAmodel.constraints[t].sum_vars, 1)
+            for t = 1:ata_model.settings.T
+                for var = 1:size(ata_model.constraints[t].sum_vars, 1)
                     vals = copy(
-                        ATAmodel.settings.bank[!, ATAmodel.constraints[t].sum_vars[var]],
+                        ata_model.settings.bank[!, ata_model.constraints[t].sum_vars[var]],
                     )
                     vals[findall(ismissing.(vals))] .= 0.0
-                    if !ismissing(ATAmodel.constraints[t].sum_vars_min[var])
+                    if !ismissing(ata_model.constraints[t].sum_vars_min[var])
                         A[t] = vcat(A[t], .-vals')
-                        push!(b[t], -ATAmodel.constraints[t].sum_vars_min[var])
+                        push!(b[t], -ata_model.constraints[t].sum_vars_min[var])
                     end
-                    if !ismissing(ATAmodel.constraints[t].sum_vars_max[var])
+                    if !ismissing(ata_model.constraints[t].sum_vars_max[var])
                         A[t] = vcat(A[t], vals')
-                        push!(b[t], ATAmodel.constraints[t].sum_vars_max[var])
+                        push!(b[t], ata_model.constraints[t].sum_vars_max[var])
                     end
                 end
             end
             message[2] = message[2] * "- Sum variables constraints added. \n"
-            for t = 1:ATAmodel.settings.T
+            for t = 1:ata_model.settings.T
                 DelimitedFiles.writedlm("OPT/A_$t.csv", A[t])
                 DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
             end
             DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0)
         end
         #update model
-        ATAmodel.settings.forced0 = x_forced0
-        for t = 1:ATAmodel.settings.T
-            ATAmodel.constraints[t].constr_b = b[t]
-            ATAmodel.constraints[t].constr_A = A[t]
+        ata_model.settings.forced0 = x_forced0
+        for t = 1:ata_model.settings.T
+            ata_model.constraints[t].constr_b = b[t]
+            ata_model.constraints[t].constr_A = A[t]
         end
-        JLD2.@save "OPT/ATAmodel.jld2" AbstractModel
+        JLD2.@save "OPT/ata_model.jld2" AbstractModel
         message[1] = "success"
         message[2] = message[2] * "- constraints added. \n"
     end
-    push!(ATAmodel.output.infos, message)
+    push!(ata_model.output.infos, message)
     return nothing
 end

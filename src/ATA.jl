@@ -18,6 +18,7 @@ include("utils.jl")
 include("build/build.jl")
 include("opt.jl")
 include("print.jl")
+include("compact_ata.jl")
 
 
 function __init__()
@@ -92,7 +93,9 @@ export mean,
     resp_gen,
     student_likelihood,
     fs_to_items,#_mycopy,  fast_sort!, _myqle#, optimize
-    run_app
+    run_app,
+    compact_ata
+    
 ATA
 
 end

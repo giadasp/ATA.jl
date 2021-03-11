@@ -1,6 +1,6 @@
 
 """
-add_friends!(ATAmodel::AbstractModel)
+add_friends!(ata_model::AbstractModel)
 
 # Description
 
@@ -9,15 +9,15 @@ It requires the [`start_ATA`](#ATA.startATA) step.
 
 # Arguments
 
-- **`ATAmodel::AbstractModel`** : Required. The model built with `start_ATA()` function.
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` function.
 """
-function add_friends!(ATAmodel::AbstractModel)
+function add_friends!(ata_model::AbstractModel)
     message = ["", ""]
     if !isfile("OPT/Settings.jl")
-        push!(ATAmodel.output.infos, ["danger", "Run start_ATA before!\n"])
+        push!(ata_model.output.infos, ["danger", "Run start_ATA before!\n"])
         return nothing
     else
-        n_items = ATAmodel.settings.n_items
+        n_items = ata_model.settings.n_items
         FriendSets =
             string.(
                 unique(
@@ -25,12 +25,12 @@ function add_friends!(ATAmodel::AbstractModel)
                         [
                             unique(
                                 skipmissing(
-                                    ATAmodel.settings.bank[
+                                    ata_model.settings.bank[
                                         !,
-                                        (ATAmodel.settings.fs.var[isv]),
+                                        (ata_model.settings.fs.var[isv]),
                                     ],
                                 ),
-                            ) for isv = 1:(size(ATAmodel.settings.fs.var, 1))
+                            ) for isv = 1:(size(ata_model.settings.fs.var, 1))
                         ]...,
                     ),
                 ),
@@ -41,8 +41,8 @@ function add_friends!(ATAmodel::AbstractModel)
         single_items = Vector{Union{Missing,String}}([missing for i = 1:n_items])
         for i = 1:n_items
             units = [
-                ATAmodel.settings.bank[i, ATAmodel.settings.fs.var[isv]] for
-                isv = 1:(size(ATAmodel.settings.fs.var, 1))
+                ata_model.settings.bank[i, ata_model.settings.fs.var[isv]] for
+                isv = 1:(size(ata_model.settings.fs.var, 1))
             ]
             if all(ismissing.(units))
                 single_items[i] = string(i)
@@ -62,27 +62,27 @@ function add_friends!(ATAmodel::AbstractModel)
                 end
             end
         end
-        push!(ATAmodel.settings.fs.var, :SINGLE_fs)
+        push!(ata_model.settings.fs.var, :SINGLE_fs)
         DataFrames.DataFrames.insertcols!(
-            ATAmodel.settings.bank,
-            size(ATAmodel.settings.bank, 2),
+            ata_model.settings.bank,
+            size(ata_model.settings.bank, 2),
             :SINGLE_fs => single_items,
         )
-        items_single = findall(.!ismissing.(ATAmodel.settings.bank[!, :SINGLE_fs]))
+        items_single = findall(.!ismissing.(ata_model.settings.bank[!, :SINGLE_fs]))
         fs_items = vcat(fs_items, [[i] for i in items_single])
-        FriendSets = vcat(FriendSets, ATAmodel.settings.bank[items_single, :SINGLE_fs])
+        FriendSets = vcat(FriendSets, ata_model.settings.bank[items_single, :SINGLE_fs])
         fs_counts = vcat(fs_counts, ones(Int64, size(items_single, 1)))
         n_fs = size(fs_counts, 1)
         DelimitedFiles.writedlm("OPT/FriendSets.csv", FriendSets)
 
         #update model
-        ATAmodel.settings.n_fs = n_fs
-        ATAmodel.settings.fs.sets = FriendSets
-        ATAmodel.settings.fs.items = fs_items
-        ATAmodel.settings.fs.counts = fs_counts
-        JLD2.@save "OPT/ATAmodel.jld2" AbstractModel
+        ata_model.settings.n_fs = n_fs
+        ata_model.settings.fs.sets = FriendSets
+        ata_model.settings.fs.items = fs_items
+        ata_model.settings.fs.counts = fs_counts
+        JLD2.@save "OPT/ata_model.jld2" AbstractModel
         push!(
-            ATAmodel.output.infos,
+            ata_model.output.infos,
             ["success", string("- ", n_fs, " friend sets added.\n")],
         )
     end

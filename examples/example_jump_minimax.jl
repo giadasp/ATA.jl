@@ -5,40 +5,40 @@ using Cbc
 # cd("where your input files are")
 
 # 1. Start ATA and add file with custom settings (Needed)
-ATAmodel = start_ATA(
+ata_model = start_ATA(
     settings_file = "SettingsATA minimax.jl",
     bank_file = "data/bank.csv",
     bank_delim = ";",
 )
-print_last_info(ATAmodel)
+print_last_info(ata_model)
 
 # 2. Add friend set variables (Optional)
-add_friends!(ATAmodel)
-print_last_info(ATAmodel)
+add_friends!(ata_model)
+print_last_info(ata_model)
 
 # 3. Add enemy set variables (Optional)
-add_enemies!(ATAmodel)
-print_last_info(ATAmodel)
+add_enemies!(ata_model)
+print_last_info(ata_model)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim = ";")
-print_last_info(ATAmodel)
+add_constraints!(ata_model; constraints_file = "Constraints.csv", constraints_delim = ";")
+print_last_info(ata_model)
 
 # 5. Add overlap maxima (Optional)
-#add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
-#print_last_info(ATAmodel)
+#add_overlap!(ata_model; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
+#print_last_info(ata_model)
 
 # 6. Add expected score constraints (Optional)
-add_exp_score!(ATAmodel)
-print_last_info(ATAmodel)
+add_exp_score!(ata_model)
+print_last_info(ata_model)
 
 # 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
-group_by_friends!(ATAmodel)
-print_last_info(ATAmodel)
+group_by_friends!(ata_model)
+print_last_info(ata_model)
 
 # 8. Add objective function (Optional)
-add_obj_fun!(ATAmodel)
-print_last_info(ATAmodel)
+add_obj_fun!(ata_model)
+print_last_info(ata_model)
 
 # Assembly settings
 
@@ -53,20 +53,20 @@ optimizer_attributes = [("seconds", 500), ("logLevel", 1)]
 
 # 9. assemble
 assemble!(
-    ATAmodel;
+    ata_model;
     solver = solver,
     optimizer_attributes = optimizer_attributes,
     optimizer_constructor = optimizer_constructor,
 )
 
-# All the settings and outputs from optimization are in ATAmodel object.
+# All the settings and outputs from optimization are in ata_model object.
 # See the struct in ATA.jl to understand how to retrieve all the information.
 # A summary of the resulting tests is available in results_folder/Results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
 
-print_results(ATAmodel; group_by_fs = true, results_folder = "RESULTS")
+print_results(ata_model; group_by_fs = true, results_folder = "RESULTS")
 
 #]add https://github.com/giadasp/ATAPlot.jl
 using ATAPlot
-plot_results(ATAmodel; group_by_fs = true, results_folder = "PLOTS")
+plot_results(ata_model; group_by_fs = true, results_folder = "PLOTS")

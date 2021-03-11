@@ -24,40 +24,40 @@ using Distributed  #this is not needed if Julia has been run with <numberOfCores
 #BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
 # 1. Start ATA and add file with custom settings (Needed)
-ATAmodel = start_ATA(;
+ata_model = start_ATA(;
     settings_file = "SettingsATA maximin.jl",
     bank_file = "data/bank.csv",
     bank_delim = ";",
 );
-print_last_info(ATAmodel)
+print_last_info(ata_model)
 
 # 2. Add friend set variables (Optional)
-add_friends!(ATAmodel);
-print_last_info(ATAmodel)
+add_friends!(ata_model);
+print_last_info(ata_model)
 
 # 3. Add enemy set variables (Optional)
-add_enemies!(ATAmodel);
-print_last_info(ATAmodel)
+add_enemies!(ata_model);
+print_last_info(ata_model)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(ATAmodel; constraints_file = "Constraints.csv", constraints_delim = ";");
-print_last_info(ATAmodel)
+add_constraints!(ata_model; constraints_file = "Constraints.csv", constraints_delim = ";");
+print_last_info(ata_model)
 
 # 5. Add overlap maxima (Optional)
-add_overlap!(ATAmodel; overlap_file = "OverlapMatrix.csv", overlap_delim = ";");
-print_last_info(ATAmodel)
+add_overlap!(ata_model; overlap_file = "OverlapMatrix.csv", overlap_delim = ";");
+print_last_info(ata_model)
 
 # 6. Add expected score constraints (Optional)
-# add_exp_score!(ATAmodel);
-# print_last_info(ATAmodel)
+# add_exp_score!(ata_model);
+# print_last_info(ata_model)
 
 # 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
-group_by_friends!(ATAmodel);
-print_last_info(ATAmodel)
+group_by_friends!(ata_model);
+print_last_info(ata_model)
 
 # 8. Add objective function (Optional)
-add_obj_fun!(ATAmodel);
-print_last_info(ATAmodel)
+add_obj_fun!(ata_model);
+print_last_info(ata_model)
 
 #Assembly settings
 
@@ -118,7 +118,7 @@ opt_nh = Inf
 
 #9. assemble
 assemble!(
-    ATAmodel;
+    ata_model;
     solver = solver,
     max_time = max_time,
     start_temp = start_temp,
@@ -133,17 +133,17 @@ assemble!(
     opt_nh = opt_nh,
 )
 
-# All the settings and outputs from optimization are in ATAmodel object.
+# All the settings and outputs from optimization are in ata_model object.
 # See the struct in ATA.jl to understand how to retrieve all the information.
 # A summary of the resulting tests is available in results_folder/Results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "RESULTS/ResultsATA.jl"
-print_results(ATAmodel; group_by_fs = true, results_folder = "RESULTS")
+print_results(ata_model; group_by_fs = true, results_folder = "RESULTS")
 
 
 #]add https://github.com/giadasp/ATAPlot.jl
 using ATAPlot
-plot_results(ATAmodel; group_by_fs = true, results_folder = "PLOTS")
+plot_results(ata_model; group_by_fs = true, results_folder = "PLOTS")
 
 #to stop all the processes do:
 #ctrl+C

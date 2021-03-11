@@ -1,5 +1,5 @@
 """
-	plot_results(ATAmodel; group_by_fs = false, results_folder = "PLOTS")
+	plot_results(ata_model; group_by_fs = false, results_folder = "PLOTS")
 
 # Description
 
@@ -7,12 +7,12 @@ Plot the ICFs and TIFs of the assembled tests.
 
 # Arguments
 
-- **`ATAmodel::AbstractModel`** : Required. The model built with `ATA` fuctions, `ATAmodel.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
+- **`ata_model::AbstractModel`** : Required. The model built with `ATA` fuctions, `ata_model.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
 - **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.AbstractModel}).
 - **`results_folder`** : Optional. Default: "PLOTS". The folder in which the output is stored.
 """
 function plot_results(
-    ATAmodel::AbstractModel;
+    ata_model::AbstractModel;
     group_by_fs = false,
     results_folder = "PLOTS",
 )
@@ -21,46 +21,46 @@ function plot_results(
     else
         println(
             string(
-                "You have already a folder with this name, files in ",
+                "There is already a folder with this name, files in ",
                 results_folder,
                 " will be overwritten.\n",
             ),
         )
     end
-    T = ATAmodel.settings.T
-    if size(ATAmodel.output.design, 1) > 0
-        n_items = ATAmodel.settings.n_items
-        length_max = [ATAmodel.constraints[t].length_max for t = 1:T]
-        n_fs = size(ATAmodel.settings.fs.items, 1)
+    T = ata_model.settings.T
+    if size(ata_model.output.design, 1) > 0
+        n_items = ata_model.settings.n_items
+        length_max = [ata_model.constraints[t].length_max for t = 1:T]
+        n_fs = size(ata_model.settings.fs.items, 1)
 
-        if n_fs < ATAmodel.settings.n_items
+        if n_fs < ata_model.settings.n_items
             n = n_fs * T
         else
             n = n_items * T
         end
 
-        if ATAmodel.obj.name == "CCMAXIMIN"
+        if ata_model.obj.name == "CCMAXIMIN"
             JLD2.@load "OPT/IIF_CC.jld2" IIF
             JLD2.@load "OPT/ICF_CC.jld2" ICF
             IIF_CC = copy(IIF)
             ICF_CC = copy(ICF)
         end
 
-        if ATAmodel.obj.name == "MAXIMIN" ||
-           ATAmodel.obj.name == "CCMAXIMIN" ||
-           ATAmodel.obj.name == "MINIMAX"
+        if ata_model.obj.name == "MAXIMIN" ||
+           ata_model.obj.name == "CCMAXIMIN" ||
+           ata_model.obj.name == "MINIMAX"
             JLD2.@load "OPT/IIF.jld2" IIF
             JLD2.@load "OPT/ICF.jld2" ICF
         end
 
         if group_by_fs == true
-            design = reshape(ATAmodel.output.design, n_fs, T)
+            design = reshape(ata_model.output.design, n_fs, T)
             new_design = zeros(Float64, n_items, T)
 
             for t = 1:T
                 new_design[
                     vcat(
-                        ATAmodel.settings.fs.items[findall(
+                        ata_model.settings.fs.items[findall(
                             design[:, t] .== one(Float64),
                         )]...,
                     ),
@@ -71,13 +71,13 @@ function plot_results(
             design = new_design
             DelimitedFiles.writedlm(string(results_folder, "/designItemLevel.csv"), design)
         else
-            design = reshape(ATAmodel.output.design, n_items, T)
+            design = reshape(ata_model.output.design, n_items, T)
         end
 
         #TIF e ICF
-        if ATAmodel.obj.name == "MAXIMIN" ||
-           ATAmodel.obj.name == "CCMAXIMIN" ||
-           ATAmodel.obj.name == "MINIMAX"
+        if ata_model.obj.name == "MAXIMIN" ||
+           ata_model.obj.name == "CCMAXIMIN" ||
+           ata_model.obj.name == "MINIMAX"
             if isfile("simPool.csv")
                 simPool = CSV.read("simPool.csv", DataFrames.DataFrame)
             else
@@ -86,18 +86,18 @@ function plot_results(
 
             ThetasPlot = collect(range(-4, stop = 4, length = 101)) #nqp values in interval/r/n",
             IIFplot = item_info(
-                ATAmodel.settings.IRT.parameters,
+                ata_model.settings.IRT.parameters,
                 ThetasPlot,
-                model = ATAmodel.settings.IRT.model,
-                parametrization = ATAmodel.settings.IRT.parametrization,
-                D = ATAmodel.settings.IRT.D,
+                model = ata_model.settings.IRT.model,
+                parametrization = ata_model.settings.IRT.parametrization,
+                D = ata_model.settings.IRT.D,
             )
             ICFplot = item_char(
-                ATAmodel.settings.IRT.parameters,
+                ata_model.settings.IRT.parameters,
                 ThetasPlot,
-                model = ATAmodel.settings.IRT.model,
-                parametrization = ATAmodel.settings.IRT.parametrization,
-                D = ATAmodel.settings.IRT.D,
+                model = ata_model.settings.IRT.model,
+                parametrization = ata_model.settings.IRT.parametrization,
+                D = ata_model.settings.IRT.D,
             )[1][
                 :,
                 :,
@@ -112,7 +112,7 @@ function plot_results(
             end
 
             ATAPlot.plot_ATA(
-                ATAmodel,
+                ata_model,
                 IIFf,
                 ICFf,
                 design;
@@ -120,9 +120,9 @@ function plot_results(
                 results_folder = results_folder,
             )
 
-            if ATAmodel.obj.name == "CCMAXIMIN"
+            if ata_model.obj.name == "CCMAXIMIN"
                 ATAPlot.plot_ATA_CC(
-                    ATAmodel,
+                    ata_model,
                     IIFf,
                     ICFf,
                     design;

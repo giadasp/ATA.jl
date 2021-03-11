@@ -1,5 +1,5 @@
 """
-load_design!(design::Matrix{Any}, ATAmodel::AbstractModel)
+load_design!(design::Matrix{Any}, ata_model::AbstractModel)
 
 # Description
 
@@ -8,9 +8,9 @@ Useful for loading a custom starting design before the `assemble!` step or to pr
 
 # Arguments
 
-- **`ATAmodel::AbstractModel`** : Required. The model built with `start_ATA()`, settings loaded by [`start_ATA`](#ATA.start_ATA).
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()`, settings loaded by [`start_ATA`](#ATA.start_ATA).
 """
-function load_design!(design::Matrix{Any}, ATAmodel::AbstractModel)
-    ATAmodel.output.design = Float64.(design)
+function load_design!(design::Matrix{Any}, ata_model::AbstractModel)
+    ata_model.output.design = Float64.(design)
     return nothing
 end

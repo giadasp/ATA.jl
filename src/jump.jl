@@ -1,59 +1,60 @@
 function jumpATA!(
-    ATAmodel::AbstractModel;
+    ata_model::AbstractModel;
     starting_design = Matrix{Float64}(undef, 0, 0),
     results_folder = "RESULTS",
     optimizer_constructor = "GLPK",
     optimizer_attributes = [("tm_lim", 500000), ("msg_lev", 3)],
+    kwargs...
 )
     message = ""
     if !(results_folder in readdir())
         mkdir(results_folder)
     else
         message *= string(
-            "You have already a folder with this name, files in ",
+            "There is already a folder with this name, files in ",
             results_folder,
             " will be overwritten.\n",
         )
     end
 
-    n_items = ATAmodel.settings.n_items
-    if ATAmodel.obj.name == "MAXIMIN"
+    n_items = ata_model.settings.n_items
+    if ata_model.obj.name == "MAXIMIN"
         if isfile("OPT/IIF.jld2")
             JLD2.@load "OPT/IIF.jld2" IIF
             message *= "- Assembling tests with MAXIMIN..."
         else
             message *= "No IIF.jld2 file in OPT folder, Run add_obj_fun!() first!"
-            push!(ATAmodel.output.infos, message)
+            push!(ata_model.output.infos, message)
         end
-    elseif ATAmodel.obj.name == "CCMAXIMIN"
+    elseif ata_model.obj.name == "CCMAXIMIN"
         message *= "You must use the Simulated Annealing algorithm to assemble tests with CC objective function."
-        push!(ATAmodel.output.infos, message)
-    elseif ATAmodel.obj.name == "MINIMAX"
+        push!(ata_model.output.infos, message)
+    elseif ata_model.obj.name == "MINIMAX"
         if isfile("OPT/IIF.jld2")
             JLD2.@load "OPT/IIF.jld2" IIF
             message *= "- Assembling tests with MINIMAX..."
         else
             message *= "No IIF.jld2 file in OPT folder, Run add_obj_fun!() first!"
-            push!(ATAmodel.output.infos, message)
+            push!(ata_model.output.infos, message)
         end
-    elseif ATAmodel.obj.name == ""
+    elseif ata_model.obj.name == ""
         IIF = []
         message *= "Assembling tests with NO objective function..."
     end
 
-    if ATAmodel.settings.n_fs == 0
-        ATAmodel.settings.n_fs = ATAmodel.settings.n_items
+    if ata_model.settings.n_fs == 0
+        ata_model.settings.n_fs = ata_model.settings.n_items
     end
 
     ################################################################################
     #                                overlap
     ################################################################################	
-    opMatrix = ATAmodel.settings.ol_max
+    opMatrix = ata_model.settings.ol_max
     nPairs = 0
     if size(opMatrix, 1) > 0
-        Pairs_t = _combinations(ATAmodel.settings.T)
+        Pairs_t = _combinations(ata_model.settings.T)
         nPairs_t = size(Pairs_t, 1)
-        Pairs = _combinations(ATAmodel.settings.T)
+        Pairs = _combinations(ata_model.settings.T)
         nPairs = size(Pairs, 1)
         ol_max = Array{Int64,1}(undef, nPairs)
         fInd = [Pairs[pair][1] for pair = 1:nPairs]
@@ -63,52 +64,52 @@ function jumpATA!(
         end
     end
     #Group IIFs by friend set
-    if ATAmodel.obj.name == "MAXIMIN" ||
-       ATAmodel.obj.name == "CCMAXIMIN" ||
-       ATAmodel.obj.name == "MINIMAX"
-        IIF_new = [zeros(Float64, 0, 0) for t = 1:ATAmodel.settings.T]
-        if ATAmodel.settings.n_fs != ATAmodel.settings.n_items
+    if ata_model.obj.name == "MAXIMIN" ||
+       ata_model.obj.name == "CCMAXIMIN" ||
+       ata_model.obj.name == "MINIMAX"
+        IIF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
+        if ata_model.settings.n_fs != ata_model.settings.n_items
             #group IIFs
-            for t = 1:ATAmodel.settings.T
+            for t = 1:ata_model.settings.T
                 if size(IIF, 1) > 0
                     IIF_new[t] =
-                        Matrix{Float64}(undef, size(IIF[t], 1), ATAmodel.settings.n_fs)
+                        Matrix{Float64}(undef, size(IIF[t], 1), ata_model.settings.n_fs)
                 end
             end
-            for fs = 1:ATAmodel.settings.n_fs
-                for t = 1:ATAmodel.settings.T
+            for fs = 1:ata_model.settings.n_fs
+                for t = 1:ata_model.settings.T
                     if size(IIF[t], 1) > 0
                         IIF_new[t][:, fs] =
-                            sum(IIF[t][:, ATAmodel.settings.fs.items[fs]], dims = 2)
+                            sum(IIF[t][:, ata_model.settings.fs.items[fs]], dims = 2)
                     end
                 end
             end
         else
             IIF_new = IIF
             ICF_new =
-                [ATAmodel.constraints[t].expected_score.val for t = 1:ATAmodel.settings.T]
+                [ata_model.constraints[t].expected_score.val for t = 1:ata_model.settings.T]
         end
     end
     # group expected score by friend set
-    ICF_new = [zeros(Float64, 0, 0) for t = 1:ATAmodel.settings.T]
-    if ATAmodel.settings.n_fs != ATAmodel.settings.n_items
+    ICF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
+    if ata_model.settings.n_fs != ata_model.settings.n_items
         #group IIFs
-        for t = 1:ATAmodel.settings.T
-            if size(ATAmodel.constraints[t].expected_score.val, 1) > 0
+        for t = 1:ata_model.settings.T
+            if size(ata_model.constraints[t].expected_score.val, 1) > 0
                 ICF_new[t] = zeros(
                     Float64,
-                    size(ATAmodel.constraints[t].expected_score.val, 1),
-                    ATAmodel.settings.n_fs,
+                    size(ata_model.constraints[t].expected_score.val, 1),
+                    ata_model.settings.n_fs,
                 )
             end
         end
-        for fs = 1:ATAmodel.settings.n_fs
-            for t = 1:ATAmodel.settings.T
-                if size(ATAmodel.constraints[t].expected_score.val, 1) > 0
+        for fs = 1:ata_model.settings.n_fs
+            for t = 1:ata_model.settings.T
+                if size(ata_model.constraints[t].expected_score.val, 1) > 0
                     ICF_new[t][:, fs] = sum(
-                        ATAmodel.constraints[t].expected_score.val[
+                        ata_model.constraints[t].expected_score.val[
                             :,
-                            ATAmodel.settings.fs.items[fs],
+                            ata_model.settings.fs.items[fs],
                         ],
                         dims = 2,
                     )
@@ -116,33 +117,33 @@ function jumpATA!(
             end
         end
     else
-        ICF_new = [ATAmodel.constraints[t].expected_score.val for t = 1:ATAmodel.settings.T]
+        ICF_new = [ata_model.constraints[t].expected_score.val for t = 1:ata_model.settings.T]
     end
     ################################################################################
     #                                count constraints
     ################################################################################
     c = 1
     #length
-    for t = 1:ATAmodel.settings.T
-        c += ATAmodel.constraints[t].length_max .> 0 ? 1 : 0
-        c += ATAmodel.constraints[t].length_min .> 0 ? 1 : 0
+    for t = 1:ata_model.settings.T
+        c += ata_model.constraints[t].length_max .> 0 ? 1 : 0
+        c += ata_model.constraints[t].length_min .> 0 ? 1 : 0
     end
 
     # item use
-    c += size(ATAmodel.settings.iu.max, 1)
-    c += sum(ATAmodel.settings.iu.min .> 0)
+    c += size(ata_model.settings.iu.max, 1)
+    c += sum(ata_model.settings.iu.min .> 0)
 
     #overlap old
     c += nPairs
 
     #expected score
-    for t = 1:ATAmodel.settings.T
+    for t = 1:ata_model.settings.T
         if size(ICF_new[t], 1) > 0
             for k = 1:size(ICF_new[t], 1)
-                if ATAmodel.constraints[t].expected_score.min[k] > 0
+                if ata_model.constraints[t].expected_score.min[k] > 0
                     c += 1
                 end
-                if ATAmodel.constraints[t].expected_score.max[k] < 1
+                if ata_model.constraints[t].expected_score.max[k] < 1
                     c += 1
                 end
             end
@@ -150,9 +151,9 @@ function jumpATA!(
     end
 
     #constraints
-    for t = 1:ATAmodel.settings.T
-        if size(ATAmodel.constraints[t].constr_A, 1) > 0
-            c += size(ATAmodel.constraints[t].constr_A, 1)
+    for t = 1:ata_model.settings.T
+        if size(ata_model.constraints[t].constr_A, 1) > 0
+            c += size(ata_model.constraints[t].constr_A, 1)
         end
     end
     ncons = copy(c) - 1
@@ -188,36 +189,36 @@ function jumpATA!(
 
     #starting design check
     if size(starting_design, 1) > 0
-        if ATAmodel.settings.n_fs != ATAmodel.settings.n_items
+        if ata_model.settings.n_fs != ata_model.settings.n_items
             if (
-                size(starting_design, 1) != ATAmodel.settings.n_fs ||
-                size(starting_design, 2) != ATAmodel.settings.T
+                size(starting_design, 1) != ata_model.settings.n_fs ||
+                size(starting_design, 2) != ata_model.settings.T
             )
                 message *= "- Starting design must be of size: (n_fs x T).\n"
-                push!(ATAmodel.output.infos, message)
+                push!(ata_model.output.infos, message)
             end
         else
             if (
-                size(starting_design, 1) != ATAmodel.settings.n_items ||
-                size(starting_design, 2) != ATAmodel.settings.T
+                size(starting_design, 1) != ata_model.settings.n_items ||
+                size(starting_design, 2) != ata_model.settings.T
             )
                 message *= "- Starting design must be of size: (n_items x T).\n"
-                push!(ATAmodel.output.infos, message)
+                push!(ata_model.output.infos, message)
             end
         end
         if (any(starting_design != 0 && starting_design != 1))
             message *= "- Starting design must contain only 1 or 0.\n"
-            push!(ATAmodel.output.infos, message)
+            push!(ata_model.output.infos, message)
         end
     else
-        starting_design = zeros(ATAmodel.settings.n_fs, ATAmodel.settings.T)
+        starting_design = zeros(ata_model.settings.n_fs, ata_model.settings.T)
     end
 
     #decision variables
     JuMP.@variable(
         m,
-        x[i = 1:ATAmodel.settings.n_fs, t = 1:ATAmodel.settings.T] <=
-        Int(ATAmodel.settings.forced0[t][i]),
+        x[i = 1:ata_model.settings.n_fs, t = 1:ata_model.settings.T] <=
+        Int(ata_model.settings.forced0[t][i]),
         Bin,
         start = starting_design[i, t]
     )
@@ -225,23 +226,23 @@ function jumpATA!(
     if size(opMatrix, 1) > 0
         if maximum(opMatrix) > 0
             #Overlap Vars new
-            JuMP.@variable(m, y[i = 1:ATAmodel.settings.n_fs, p = 1:nPairs], Bin)
+            JuMP.@variable(m, y[i = 1:ata_model.settings.n_fs, p = 1:nPairs], Bin)
         end
     end
 
     # Item Use
-    for i = 1:ATAmodel.settings.n_fs
-        if ATAmodel.settings.iu.min[i] .> 0
+    for i = 1:ata_model.settings.n_fs
+        if ata_model.settings.iu.min[i] .> 0
             JuMP.@constraint(
                 m,
-                ATAmodel.settings.iu.min[i] - sum(x[i, t] for t = 1:ATAmodel.settings.T) <=
+                ata_model.settings.iu.min[i] - sum(x[i, t] for t = 1:ata_model.settings.T) <=
                 0
             ) # z[c])
             c += 1
         end
         JuMP.@constraint(
             m,
-            sum(x[i, t] for t = 1:ATAmodel.settings.T) - ATAmodel.settings.iu.max[i] <= 0
+            sum(x[i, t] for t = 1:ata_model.settings.T) - ata_model.settings.iu.max[i] <= 0
         ) # z[c])
         c += 1
     end
@@ -252,57 +253,57 @@ function jumpATA!(
                 JuMP.@constraint(
                     m,
                     sum(
-                        y[i, p] * ATAmodel.settings.fs.counts[i] for
-                        i = 1:ATAmodel.settings.n_fs
+                        y[i, p] * ata_model.settings.fs.counts[i] for
+                        i = 1:ata_model.settings.n_fs
                     ) <= ol_max[p]
                 )
                 JuMP.@constraint(
                     m,
-                    [i = 1:ATAmodel.settings.n_fs],
+                    [i = 1:ata_model.settings.n_fs],
                     2 * y[i, p] <= x[i, fInd[p]] + x[i, fIndFirst[p]]
                 )
                 JuMP.@constraint(
                     m,
-                    [i = 1:ATAmodel.settings.n_fs],
+                    [i = 1:ata_model.settings.n_fs],
                     y[i, p] >= x[i, fInd[p]] + x[i, fIndFirst[p]] - 1
                 )
             end
         else
             #no overlap
             for p = 1:nPairs
-                for i = 1:ATAmodel.settings.n_fs
+                for i = 1:ata_model.settings.n_fs
                     JuMP.@constraint(m, x[i, fInd[p]] + x[i, fIndFirst[p]] <= 1)
                 end
             end
         end
     end
     #expected score
-    for t = 1:ATAmodel.settings.T
+    for t = 1:ata_model.settings.T
         if size(ICF_new[t], 1) > 0
             for k = 1:size(ICF_new[t], 1)
-                if ATAmodel.constraints[t].expected_score.min[k] > 0
+                if ata_model.constraints[t].expected_score.min[k] > 0
                     JuMP.@constraint(
                         m,
                         sum(
                             x[i, t] * round(ICF_new[t][k, i]; digits = 3) for
-                            i = 1:ATAmodel.settings.n_fs
+                            i = 1:ata_model.settings.n_fs
                         ) >= round(
-                            ATAmodel.constraints[t].expected_score.min[k] *
-                            ATAmodel.constraints[t].length_min;
+                            ata_model.constraints[t].expected_score.min[k] *
+                            ata_model.constraints[t].length_min;
                             digits = 3,
                         )
                     )
                     c += 1
                 end
-                if ATAmodel.constraints[t].expected_score.max[k] < 1
+                if ata_model.constraints[t].expected_score.max[k] < 1
                     JuMP.@constraint(
                         m,
                         sum(
                             x[i, t] * round(ICF_new[t][k, i]; digits = 3) for
-                            i = 1:ATAmodel.settings.n_fs
+                            i = 1:ata_model.settings.n_fs
                         ) <= round(
-                            ATAmodel.constraints[t].expected_score.max[k] *
-                            ATAmodel.constraints[t].length_max;
+                            ata_model.constraints[t].expected_score.max[k] *
+                            ata_model.constraints[t].length_max;
                             digits = 3,
                         )
                     )
@@ -313,15 +314,15 @@ function jumpATA!(
     end
 
     #constraints
-    for t = 1:ATAmodel.settings.T
-        if size(ATAmodel.constraints[t].constr_A, 1) > 0
-            for constr = 1:size(ATAmodel.constraints[t].constr_A, 1)
+    for t = 1:ata_model.settings.T
+        if size(ata_model.constraints[t].constr_A, 1) > 0
+            for constr = 1:size(ata_model.constraints[t].constr_A, 1)
                 JuMP.@constraint(
                     m,
                     sum(
-                        x[i, t] * ATAmodel.constraints[t].constr_A[constr, i] for
-                        i = 1:ATAmodel.settings.n_fs
-                    ) <= ATAmodel.constraints[t].constr_b[constr] + 0
+                        x[i, t] * ata_model.constraints[t].constr_A[constr, i] for
+                        i = 1:ata_model.settings.n_fs
+                    ) <= ata_model.constraints[t].constr_b[constr] + 0
                 ) # z[c])
                 c += 1
             end
@@ -331,39 +332,39 @@ function jumpATA!(
 
     ncons = copy(c) - 1
 
-    if ATAmodel.obj.name == "MAXIMIN"
+    if ata_model.obj.name == "MAXIMIN"
         #Objective bound
         JuMP.@variable(m, w >= 0)
-        for t = 1:ATAmodel.settings.T
-            for k = 1:size(ATAmodel.obj.cores[t].points, 1)
+        for t = 1:ata_model.settings.T
+            for k = 1:size(ata_model.obj.cores[t].points, 1)
                 JuMP.@constraint(
                     m,
                     sum(
                         round(IIF_new[t][k, i]; digits = 4) * x[i, t] for
-                        i = 1:ATAmodel.settings.n_fs
+                        i = 1:ata_model.settings.n_fs
                     ) >= w
                 )
             end
         end
         JuMP.@objective(m, Min, (-w))
-    elseif ATAmodel.obj.name == "MINIMAX"
+    elseif ata_model.obj.name == "MINIMAX"
         #Objective bound
         JuMP.@variable(m, epsilon >= 0)
-        for t = 1:ATAmodel.settings.T
-            for k = 1:size(ATAmodel.obj.cores[t].points, 1)
+        for t = 1:ata_model.settings.T
+            for k = 1:size(ata_model.obj.cores[t].points, 1)
                 JuMP.@constraint(
                     m,
                     sum(
                         round(IIF_new[t][k, i]; digits = 4) * x[i, t] for
-                        i = 1:ATAmodel.settings.n_fs
-                    ) - ATAmodel.obj.cores[t].targets[k] <= epsilon
+                        i = 1:ata_model.settings.n_fs
+                    ) - ata_model.obj.cores[t].targets[k] <= epsilon
                 )
                 JuMP.@constraint(
                     m,
                     sum(
                         round(IIF_new[t][k, i]; digits = 4) * x[i, t] for
-                        i = 1:ATAmodel.settings.n_fs
-                    ) - ATAmodel.obj.cores[t].targets[k] >= -epsilon
+                        i = 1:ata_model.settings.n_fs
+                    ) - ata_model.obj.cores[t].targets[k] >= -epsilon
                 )
             end
         end
@@ -374,7 +375,7 @@ function jumpATA!(
     println(string("The model has termination status:", JuMP.termination_status(m)))
     design = abs.(round.(JuMP.value.(x)))
     DelimitedFiles.writedlm(string(results_folder, "/design.csv"), design)
-    ATAmodel.output.design = design
-    JLD2.@save string(results_folder, "/ATAmodel.jld2") ATAmodel
-    push!(ATAmodel.output.infos, ["success", message])
+    ata_model.output.design = design
+    JLD2.@save string(results_folder, "/ata_model.jld2") ata_model
+    push!(ata_model.output.infos, ["success", message])
 end

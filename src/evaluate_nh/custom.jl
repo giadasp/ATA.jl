@@ -2,7 +2,7 @@
 #custom neighborhood
 function analyse_NH(
     NH_start::Neighbourhood,
-    ATAmodel::CustomModel;
+    ata_model::CustomModel;
     fF = true,
     n_fill = 1,
     opt_feas = 0.9,
@@ -16,7 +16,7 @@ function analyse_NH(
     max_time = 1000,
 )
     if fF == true
-        NH_start.obj = zeros(Float64, ATAmodel.settings.T)
+        NH_start.obj = zeros(Float64, ata_model.settings.T)
     end
     NH₁ = Neighbourhood()
     NH₀ = Neighbourhood()
@@ -28,10 +28,10 @@ function analyse_NH(
     f_star = ones(2) .* Inf
     f_evals = 0
     t = copy(start_temp)
-    T = ATAmodel.settings.T
-    n_items = ATAmodel.settings.n_items
-    n_fs = ATAmodel.settings.n_fs
-    fs_counts = ATAmodel.settings.fs.counts * ones(Float64, T)'
+    T = ata_model.settings.T
+    n_items = ata_model.settings.n_items
+    n_fs = ata_model.settings.n_fs
+    fs_counts = ata_model.settings.fs.counts * ones(Float64, T)'
 
     if n_fill > 0
         #Fill up
@@ -42,7 +42,7 @@ function analyse_NH(
             warmup = fill(true, T)
             while any(warmup) #filling forms
                 v = findfirst(warmup .== true)
-                constraints = ATAmodel.constraints[v]
+                constraints = ata_model.constraints[v]
                 #println("ol = ", NH₁.ol)
                 fₜ = (1 - opt_feas) * (NH₁.infeas + NH₁.ol) - (opt_feas * NH₁.obj)
                 mm = fₜ[v]
@@ -53,7 +53,7 @@ function analyse_NH(
                     end
                 end
                 #filling
-                n_t = LinearAlgebra.dot(NH₁.x[:, v], ATAmodel.settings.fs.counts)
+                n_t = LinearAlgebra.dot(NH₁.x[:, v], ata_model.settings.fs.counts)
                 #println("test ", v, " chosen, length was: ", n_t)
                 #try to add other items, the first time it goes over n_max it stops
                 if n_t < constraints.length_max
@@ -61,39 +61,39 @@ function analyse_NH(
                         NH_add = fill_upᵥ(
                             NH₁,
                             v,
-                            ATAmodel.settings.iu,
-                            ATAmodel.settings.fs,
+                            ata_model.settings.iu,
+                            ata_model.settings.fs,
                             constraints,
-                            ATAmodel.settings.forced0[v],
+                            ata_model.settings.forced0[v],
                             n_items,
                             n_fs,
-                            ATAmodel.settings.ol_max[:, v],
+                            ata_model.settings.ol_max[:, v],
                         )
                         NH_add.f = opt_feas * NH_add.f
                     else
                         NH_add = fill_upᵥ(
                             NH₁,
-                            ATAmodel.obj,
+                            ata_model.obj,
                             opt_feas,
                             v,
-                            ATAmodel.settings.iu,
-                            ATAmodel.settings.fs,
+                            ata_model.settings.iu,
+                            ata_model.settings.fs,
                             constraints,
-                            ATAmodel.settings.forced0[v],
+                            ata_model.settings.forced0[v],
                             n_items,
                             n_fs,
-                            ATAmodel.settings.ol_max[:, v],
+                            ata_model.settings.ol_max[:, v],
                         )
                     end
                     NH_add.ol = eval_overlap(
                         NH_add.x,
                         fs_counts,
-                        ATAmodel.settings.ol_max,
+                        ata_model.settings.ol_max,
                         T,
                         NH_add.ol,
                     )
                     Printf.@printf "."
-                    n_t = LinearAlgebra.dot(NH_add.x[:, v], ATAmodel.settings.fs.counts)
+                    n_t = LinearAlgebra.dot(NH_add.x[:, v], ata_model.settings.fs.counts)
                     #println("length for test ", v, ": ", n_t)
                     if n_t <= constraints.length_max
                         NH₁ = _mycopy(NH_add, NH₁)
@@ -152,9 +152,9 @@ function analyse_NH(
             v₂ += 1
             exit = 0
             v = testOrder[v₂]
-            x_forced0ₜ = ATAmodel.settings.forced0[v]
-            Constraintsₜ = ATAmodel.constraints[v]
-            ol_maxₜ = ATAmodel.settings.ol_max[:, v]
+            x_forced0ₜ = ata_model.settings.forced0[v]
+            Constraintsₜ = ata_model.constraints[v]
+            ol_maxₜ = ata_model.settings.ol_max[:, v]
             #it<size(iteratorTestItem, 1) #
             #v = iteratorTestItem[it][2]
             #NH₀.x = copy(xnew)
@@ -192,28 +192,28 @@ function analyse_NH(
                 #else
                 #	taken = 1
                 #end
-                if sum(NH₁.x[:, v] .* ATAmodel.settings.fs.counts) >=
+                if sum(NH₁.x[:, v] .* ata_model.settings.fs.counts) >=
                    Constraintsₜ.length_min
                     NH₁.infeas[v], x_Iₜ = check_feas(
-                        ATAmodel.settings.fs,
+                        ata_model.settings.fs,
                         Constraintsₜ,
                         NH₁.x[:, v],
                         n_fs,
                         n_items,
                     )
-                    iu = sum(NH₁.x, dims = 2)[:, 1] - ATAmodel.settings.iu.max
+                    iu = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
                     NH₁.iu = sum_pos(iu)
                     NH₁.ol =
-                        eval_overlap(NH₁.x, fs_counts, ATAmodel.settings.ol_max, T, NH₁.ol)
-                    #NH₁.ol[v] = eval_overlapᵥ(NH₁.x[:, v], NH₁.x, ATAmodel.settings.fs.counts, ol_maxₜ, v)
+                        eval_overlap(NH₁.x, fs_counts, ata_model.settings.ol_max, T, NH₁.ol)
+                    #NH₁.ol[v] = eval_overlapᵥ(NH₁.x[:, v], NH₁.x, ata_model.settings.fs.counts, ol_maxₜ, v)
                     if fF == false
-                        NH₁.obj = ATAmodel.obj.fun(NH₁.x, ATAmodel.obj.args)
+                        NH₁.obj = ata_model.obj.fun(NH₁.x, ata_model.obj.args)
                     end
                     NH₁.f = _comp_f(NH₁, opt_feas)
                     f_evals += 1
                     if (NH₁.f <= NH₀.f)
                         #switch item
-                        #NH₀.ol = eval_overlap(NH₀.x, fs_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
+                        #NH₀.ol = eval_overlap(NH₀.x, fs_counts, ata_model.settings.ol_max, T, NH₀.ol)
                         #NH₀.f = _comp_f(NH₀, opt_feas)
                         NH₀ = _mycopy(NH₁, NH₀)
                         # println("better to remove, new f₀ = ", NH₀.f)
@@ -237,7 +237,7 @@ function analyse_NH(
                             #remove
                             #exit = 1
                             NH₀ = _mycopy(NH₁, NH₀)
-                            #NH₀.ol = eval_overlap(NH₀.x, fs_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
+                            #NH₀.ol = eval_overlap(NH₀.x, fs_counts, ata_model.settings.ol_max, T, NH₀.ol)
                             #NH₀.f = _comp_f(NH₀, opt_feas)
                             if verbosity == 2
                                 println("SA: f₀ = ", NH₀.f, ", t = ", v)
@@ -264,31 +264,31 @@ function analyse_NH(
                         # iu = copy(iu₀)
                         # iu[i₂]+= 1
                         # iu[h]-= 1
-                        iu = sum(NH₁.x, dims = 2)[:, 1] - ATAmodel.settings.iu.max
+                        iu = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
                         NH₁.iu = sum_pos(iu)
                         NH₁.infeas[v], x_Iₜ = check_feas(
-                            ATAmodel.settings.fs,
+                            ata_model.settings.fs,
                             Constraintsₜ,
                             NH₁.x[:, v],
                             n_fs,
                             n_items,
                         )
                         if fF == false
-                            NH₁.obj = ATAmodel.obj.fun(NH₁.x, ATAmodel.obj.args)
+                            NH₁.obj = ata_model.obj.fun(NH₁.x, ata_model.obj.args)
                         end
                         NH₁.ol = eval_overlap(
                             NH₁.x,
                             fs_counts,
-                            ATAmodel.settings.ol_max,
+                            ata_model.settings.ol_max,
                             T,
                             NH₁.ol,
                         )
-                        #NH₁.ol[v] = eval_overlapᵥ(NH₁.x[:, v], NH₁.x, ATAmodel.settings.fs.counts, ol_maxₜ, v)
+                        #NH₁.ol[v] = eval_overlapᵥ(NH₁.x[:, v], NH₁.x, ata_model.settings.fs.counts, ol_maxₜ, v)
                         NH₁.f = _comp_f(NH₁, opt_feas)
                         if (NH₁.f <= NH₀.f)
                             #switch item
                             #NH₀ = _mycopy(NH₁, NH₀)
-                            # NH₀.ol = eval_overlap(NH₀.x, fs_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
+                            # NH₀.ol = eval_overlap(NH₀.x, fs_counts, ata_model.settings.ol_max, T, NH₀.ol)
                             # NH₀.f = _comp_f(NH₀, opt_feas)
                             NH₀ = _mycopy(NH₁, NH₀)
                             # println("better to switch, new f₀ = ", NH₀.f)
@@ -312,7 +312,7 @@ function analyse_NH(
                             if (rand() < p)
                                 #remove
                                 NH₀ = _mycopy(NH₁, NH₀)
-                                # NH₀.ol = eval_overlap(NH₀.x, fs_counts, ATAmodel.settings.ol_max, T, NH₀.ol)
+                                # NH₀.ol = eval_overlap(NH₀.x, fs_counts, ata_model.settings.ol_max, T, NH₀.ol)
                                 # NH₀.f = _comp_f(NH₀, opt_feas)
                                 if verbosity == 2
                                     println("SA: f₀ = ", NH₀.f, ", t = ", v)
@@ -331,11 +331,11 @@ function analyse_NH(
             for v = 1:T
                 x_Iₜ = fs_to_items(
                     NH₀.x[:, v],
-                    ATAmodel.settings.n_items,
-                    ATAmodel.settings.fs.items,
+                    ata_model.settings.n_items,
+                    ata_model.settings.fs.items,
                 )
             end
-            NH₀.obj = ATAmodel.obj.fun(NH₀.x, ATAmodel.obj.args)
+            NH₀.obj = ata_model.obj.fun(NH₀.x, ata_model.obj.args)
             NH₀.f = _comp_f(NH₀, opt_feas)
             NH⁺ = _mycopy(NH₀, NH⁺)
         end

@@ -1,6 +1,6 @@
 
 """
-add_obj_fun!(ATAmodel::Union{MaximinModel, MinimaxModel})
+add_obj_fun!(ata_model::Union{MaximinModel, MinimaxModel})
 
 # Description
 
@@ -9,35 +9,35 @@ Computes the IIFs at predefined ability points.
 
 # Arguments
 
-- **`ATAmodel::Union{MaximinModel, MinimaxModel}`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
+- **`ata_model::Union{MaximinModel, MinimaxModel}`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
 
 """
-function add_obj_fun!(ATAmodel::Union{MaximinModel,MinimaxModel})
+function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel})
     message = ["", ""]
-    T = ATAmodel.settings.T
-    n_items = ATAmodel.settings.n_items
-    IRT_parameters = ATAmodel.settings.IRT.parameters
-    IRT_model = ATAmodel.settings.IRT.model
-    IRT_D = ATAmodel.settings.IRT.D
-    IRT_parametrization = ATAmodel.settings.IRT.parametrization
+    T = ata_model.settings.T
+    n_items = ata_model.settings.n_items
+    IRT_parameters = ata_model.settings.IRT.parameters
+    IRT_model = ata_model.settings.IRT.model
+    IRT_D = ata_model.settings.IRT.D
+    IRT_parametrization = ata_model.settings.IRT.parametrization
     IIF = Vector{Array{Float64,2}}(undef, T)
     ICF = Vector{Array{Float64,2}}(undef, T)
     K = zeros(Int, T)
     for t = 1:T
-        K[t] = size(ATAmodel.obj.cores[t].points, 1)
+        K[t] = size(ata_model.obj.cores[t].points, 1)
         IIF[t] = zeros(K[t], n_items)
         ICF[t] = zeros(K[t], n_items)
         for k = 1:K[t]
             IIF[t][k, :] = item_info(
                 IRT_parameters,
-                ATAmodel.obj.cores[t].points[k],
+                ata_model.obj.cores[t].points[k],
                 model = IRT_model,
                 parametrization = IRT_parametrization,
                 D = IRT_D,
             )# K[t] x I
             ICF[t][k, :] = item_char(
                 IRT_parameters,
-                ATAmodel.obj.cores[t].points[k],
+                ata_model.obj.cores[t].points[k],
                 model = IRT_model,
                 parametrization = IRT_parametrization,
                 D = IRT_D,
@@ -47,12 +47,12 @@ function add_obj_fun!(ATAmodel::Union{MaximinModel,MinimaxModel})
                 1,
             ] # K[t] x I
         end
-        ATAmodel.obj.cores[t].IIF = IIF[t]
+        ata_model.obj.cores[t].IIF = IIF[t]
     end
     JLD2.@save "OPT/IIF.jld2" IIF
     if !isfile("OPT/ICF.jld2")
         JLD2.@save "OPT/ICF.jld2" ICF
     end
-    push!(ATAmodel.output.infos, message)
+    push!(ata_model.output.infos, message)
     return nothing
 end

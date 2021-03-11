@@ -1,7 +1,7 @@
 
 
 """
-add_overlap!(ATAmodel::AbstractModel; overlap_file = "OverlapMatrix.csv", overlap_delim=";")
+add_overlap!(ata_model::AbstractModel; overlap_file = "OverlapMatrix.csv", overlap_delim=";")
 
 # Description
 
@@ -10,20 +10,20 @@ It requires the [`start_ATA`](#ATA.start_ATA) step.
 
 # Arguments
 
-- **`ATAmodel::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
 - **`overlap_file`** : Optional. Default: "OverlapMatrix.csv". The path of the file containing the maximum overlap between each pair of tests in the form of a matrix with custom-separated values.
 - **`overlap_delim`** : Optional. Default: ";". The custom-separator for the `overlap_file`.
 
 """
 function add_overlap!(
-    ATAmodel::AbstractModel;
+    ata_model::AbstractModel;
     overlap_file = "OverlapMatrix.csv",
     overlap_delim = ";",
 )
-    T = ATAmodel.settings.T
-    n_items = ATAmodel.settings.n_items
+    T = ata_model.settings.T
+    n_items = ata_model.settings.n_items
     if !isfile(overlap_file)
-        push!(ATAmodel.output.infos, ["danger", string(overlap_file, " not found.\n")])
+        push!(ata_model.output.infos, ["danger", string(overlap_file, " not found.\n")])
         return nothing
     else
         opMatrix = Matrix{Int64}(
@@ -41,27 +41,27 @@ function add_overlap!(
             # end
             opMatrix = opMatrix[1:T, 1:T]
             DelimitedFiles.writedlm("OPT/overlap.txt", opMatrix)
-            ATAmodel.settings.ol_max = opMatrix
+            ata_model.settings.ol_max = opMatrix
         else
-            ATAmodel.settings.ol_max =
-                ones(ATAmodel.settings.n_items, ATAmodel.settings.n_items) .*
-                ATAmodel.settings.n_items
+            ata_model.settings.ol_max =
+                ones(ata_model.settings.n_items, ata_model.settings.n_items) .*
+                ata_model.settings.n_items
             push!(
-                ATAmodel.output.infos,
+                ata_model.output.infos,
                 [
                     "success",
                     string(
                         "- No lines in ",
                         overlap_file,
                         ", Maximum overlap set at ",
-                        ATAmodel.settings.n_items,
+                        ata_model.settings.n_items,
                         ".\n",
                     ),
                 ],
             )
         end
-        JLD2.@save "OPT/ATAmodel.jld2" ATAmodel
-        push!(ATAmodel.output.infos, ["success", "- Maximum overlap constrained.\n"])
+        JLD2.@save "OPT/ata_model.jld2" ata_model
+        push!(ata_model.output.infos, ["success", "- Maximum overlap constrained.\n"])
     end
     return nothing
 end
