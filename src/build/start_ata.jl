@@ -396,6 +396,9 @@ function start_ATA(;
                 write(f, "categories = $val\n\n")
                 message[2] = message[2] * "- Categories for output loaded.\n"
             end
+
+            #overlap matrix
+            ata_model.settings.ol_max = zeros(Float64, ata_model.settings.T, ata_model.settings.T)
         end
         message[2] =
             message[2] * string(

@@ -80,7 +80,7 @@ function siman!(
         x₀ = zeros(Float64, n_fs, ata_model.settings.T)
     end
 
-    NH⁺ = Neighbourhood(x₀, Inf, zeros(T), 1e6 * ones(T), 1e6 * ones(T), zero(Float64))
+    NH⁺ = Neighbourhood(x₀, Inf, zeros(T), 1e6 * ones(T), zeros(T), zero(Float64))
     bestNH = 1
     if size(x₀, 1) == 0
         NH⁺.x = zeros(Float64, n_fs, T)

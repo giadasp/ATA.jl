@@ -2,14 +2,8 @@
 ###                    Parallel siman algorithm                           ######
 ################################################################################
 
-#1. First, save the package folder in your pc.
-#2. Then, modify all the input files (included this) in the test folder as required.
-#3. When the ATA model is ready, run Julia.exe and write:
-# cd("where your input files are")
-# include("LocalTest.jl")
-
 #Beta: for running ATA with multiple cores do:
-#add julia.exe to the windows path and run Julia with the command prompt:
+#add julia.exe to the windows path and run Julia with the command prompt cmd:
 #julia -p <numberOfCores>
 
 using Distributed  #this is not needed if Julia has been run with <numberOfCores> >1
