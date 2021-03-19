@@ -20,7 +20,6 @@ function add_constraints!(
     constraints_file = "Constraints.csv",
     constraints_delim = ";",
 )
-    message = ["", ""]
     n_items = ata_model.settings.n_items
     bank = ata_model.settings.bank
     A = Vector{Matrix{Float64}}(undef, ata_model.settings.T)
@@ -44,6 +43,7 @@ function add_constraints!(
         )
         return nothing
     else
+        message = ["", ""]
         x_forced0 = ata_model.settings.forced0
         Categoricalconsts =
             CSV.read(constraints_file, DataFrames.DataFrame, delim = constraints_delim)
@@ -151,7 +151,7 @@ function add_constraints!(
         JLD2.@save "OPT/ata_model.jld2" AbstractModel
         message[1] = "success"
         message[2] = message[2] * string("- Constraints in file ", constraints_file ," added. \n")
+        push!(ata_model.output.infos, message)
     end
-    push!(ata_model.output.infos, message)
     return nothing
 end
