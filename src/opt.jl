@@ -50,7 +50,7 @@ function assemble!(
     n_test_sample = 1,
     opt_feas = 0.0,
     n_fill = 1,
-    max_time = 1000.00,
+    max_time = 1000.0,
     max_conv = 2,
     feas_nh = 0,
     opt_nh = 5,
@@ -86,5 +86,8 @@ function assemble!(
             optimizer_attributes = optimizer_attributes,
             kwargs...
         )
+    else
+      push!(ata_model.output.infos, ["danger", "only \"siman\" and \"jumpATA\" are supported.\n"])
     end
+    return nothing
 end
