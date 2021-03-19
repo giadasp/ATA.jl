@@ -45,7 +45,8 @@ function siman!(
     end
     n_items = ata_model.settings.n_items
     fs_counts = ata_model.settings.fs.counts * ones(Float64, T)'
-    iu⁺ = 0
+        iu_max⁺ = 0
+    iu_min⁺ = 0
     start_time = copy(time())
     nacc = 0 # total accepted trials
     t = copy(start_temp) # temperature - will initially rise or fall to cover parameter space. Then it will fall
@@ -96,7 +97,9 @@ function siman!(
             n_fs,
             n_items,
         )
-        NH⁺.ol = eval_overlap(NH⁺.x, fs_counts, ata_model.settings.ol_max, T, NH⁺.ol)
+        if ata_model.settings.to_apply[3]
+            NH⁺.ol = eval_overlap(NH⁺.x, fs_counts, ata_model.settings.ol_max, T, NH⁺.ol)
+        end
         if fF == false
             if ata_model.obj.name in ["MAXIMIN", "MINIMAX", "CCMAXIMIN"]
                 NH⁺.obj[v2] = eval_TIFₜ(x_Iₜ, ata_model.obj.cores[v2])

@@ -79,25 +79,32 @@ function group_by_friends!(ata_model::AbstractModel) #last
         ata_model.settings.forced0 = x_forced0_new
         DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0_new)
         #item use
-        item_use_min = ata_model.settings.iu.min
-        item_use_max = ata_model.settings.iu.max
-        item_use_min_new = zeros(Int, n_fs)
-        item_use_max_new = zeros(Int, n_fs)
-        for fs = 1:n_fs
-            item_use_min_new[fs] =
-                Int(maximum(ata_model.settings.iu.min[ata_model.settings.fs.items[fs]]))
-            item_use_max_new[fs] =
-                Int(minimum(ata_model.settings.iu.max[ata_model.settings.fs.items[fs]]))
+        if size(ata_model.settings.iu.min,1) > 0
+            item_use_min = ata_model.settings.iu.min
+            item_use_min_new = zeros(Int, n_fs)
+            for fs = 1:n_fs
+                item_use_min_new[fs] =
+                    Int(maximum(ata_model.settings.iu.min[ata_model.settings.fs.items[fs]]))
+            end
+            ata_model.settings.iu.min = item_use_min_new
+            open("OPT/Settings.jl", "a") do f
+                write(f, "item_use_min = $item_use_min_new\n\n")
+            end
+        end
+        if size(ata_model.settings.iu.max,1) > 0
+            item_use_max = ata_model.settings.iu.max
+            item_use_max_new = zeros(Int, n_fs)
+            for fs = 1:n_fs
+                item_use_max_new[fs] =
+                    Int(minimum(ata_model.settings.iu.max[ata_model.settings.fs.items[fs]]))
+            end
+            ata_model.settings.iu.max = item_use_max_new
+            open("OPT/Settings.jl", "a") do f
+                write(f, "item_use_max = $item_use_max_new\n\n")
+            end
         end
         #enemy sets
 
-        #update model
-        ata_model.settings.iu.max = item_use_max_new
-        ata_model.settings.iu.min = item_use_min_new
-        open("OPT/Settings.jl", "a") do f
-            write(f, "item_use_min = $item_use_min_new\n\n")
-            write(f, "item_use_max = $item_use_max_new\n\n")
-        end
         push!(
             ata_model.output.infos,
             ["success", string("- Grouped in ", n_fs, " Friend sets.\n")],

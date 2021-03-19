@@ -150,7 +150,7 @@ function add_constraints!(
         end
         JLD2.@save "OPT/ata_model.jld2" AbstractModel
         message[1] = "success"
-        message[2] = message[2] * "- constraints added. \n"
+        message[2] = message[2] * string("- Constraints in file ", constraints_file ," added. \n")
     end
     push!(ata_model.output.infos, message)
     return nothing

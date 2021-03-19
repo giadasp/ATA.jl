@@ -17,6 +17,7 @@ mutable struct Settings
     es::EnemySets # enemy Sets
     iu::ItemUse
     ol_max::Matrix{Float64}
+    to_apply::Vector{Bool} #[iu_max?, iu_min?, ol?]
     Settings(
         n_items,
         n_fs,
@@ -31,6 +32,7 @@ mutable struct Settings
         es,
         iu,
         ol_max,
+        to_apply,
     ) = new(
         n_items,
         n_fs,
@@ -45,6 +47,7 @@ mutable struct Settings
         es,
         iu,
         ol_max,
+        to_apply,
     ) # no pattern mode
     Settings() = new(
         0,
@@ -60,5 +63,6 @@ mutable struct Settings
         EnemySets(),
         ItemUse(),
         zeros(Int64, 0, 0),
+        [false, false, false]
     )
 end

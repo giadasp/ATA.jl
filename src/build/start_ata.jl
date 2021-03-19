@@ -191,28 +191,31 @@ function start_ATA(;
             end
             message[2] =
                 message[2] * "- Expected score variable and expected_score_pts loaded.\n"
-
             if size(Inputs.expected_score_min, 1) > 0
-                t1 = 1
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        ata_model.constraints[t1].expected_score.min =
-                            Inputs.expected_score_min[g]
-                        t1 += 1
+                if any(vcat(Inputs.expected_score_min...) .> 0)
+                    t1 = 1
+                    for g = 1:ata_model.settings.n_groups
+                        for t = 1:ata_model.settings.Tg[g]
+                            ata_model.constraints[t1].expected_score.min =
+                                Inputs.expected_score_min[g]
+                            t1 += 1
+                        end
                     end
+                    message[2] = message[2] * "- Lower bounds for expected score loaded.\n"
                 end
-                message[2] = message[2] * "- Minimum expected score constrained.\n"
             end
             if size(Inputs.expected_score_max, 1) > 0
-                t1 = 1
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        ata_model.constraints[t1].expected_score.max =
-                            Inputs.expected_score_max[g]
-                        t1 += 1
+                if any(vcat(Inputs.expected_score_max...) .< 1.00)
+                    t1 = 1
+                    for g = 1:ata_model.settings.n_groups
+                        for t = 1:ata_model.settings.Tg[g]
+                            ata_model.constraints[t1].expected_score.max =
+                                Inputs.expected_score_max[g]
+                            t1 += 1
+                        end
                     end
+                    message[2] = message[2] * "- Upper bounds for expected score loaded.\n"
                 end
-                message[2] = message[2] * "- Maximum expected score constrained.\n"
             end
             if Inputs.sum_vars != Vector{Vector{String}}(undef, 0)
                 t1 = 1
@@ -261,15 +264,21 @@ function start_ATA(;
                     string("- Sum of variables", Inputs.sum_vars, " constrained.\n")
             end
             if size(Inputs.item_use_min, 1) > 0
-                ata_model.settings.iu.min = Inputs.item_use_min
-                message[2] = message[2] * "- Minimum item use constrained.\n"
+                if any(Inputs.item_use_min .> 0)
+                    ata_model.settings.iu.min = Inputs.item_use_min
+                    ata_model.settings.to_apply[2] = true
+                    message[2] = message[2] * "- Minimum item use constrained.\n"
+                end
             end
             if size(Inputs.item_use_max, 1) > 0
-                ata_model.settings.iu.max = Inputs.item_use_max
-                for v = 1:ata_model.settings.T
-                    x_forced0[v][findall(ata_model.settings.iu.max .< 1)] .= false
+                if any(Inputs.item_use_max .< ata_model.settings.T)
+                    ata_model.settings.iu.max = Inputs.item_use_max
+                    for v = 1:ata_model.settings.T
+                        x_forced0[v][findall(ata_model.settings.iu.max .< 1)] .= false
+                    end
+                    ata_model.settings.to_apply[1] = true
+                    message[2] = message[2] * "- Maximum item use constrained.\n"
                 end
-                message[2] = message[2] * "- Maximum item use constrained.\n"
             end
             if Inputs.obj_type == "MAXIMIN"
                 ata_model.obj.cores =

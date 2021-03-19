@@ -51,16 +51,18 @@ function jumpATA!(
     ################################################################################	
     opMatrix = ata_model.settings.ol_max
     nPairs = 0
-    if size(opMatrix, 1) > 0
-        Pairs_t = _combinations(ata_model.settings.T)
-        nPairs_t = size(Pairs_t, 1)
-        Pairs = _combinations(ata_model.settings.T)
-        nPairs = size(Pairs, 1)
-        ol_max = Array{Int64,1}(undef, nPairs)
-        fInd = [Pairs[pair][1] for pair = 1:nPairs]
-        fIndFirst = [Pairs[pair][2] for pair = 1:nPairs]
-        for pair = 1:nPairs
-            ol_max[pair] = opMatrix[fInd[pair], fIndFirst[pair]]
+    if ata_model.settings.to_apply[3]
+        if size(opMatrix, 1) > 0
+            Pairs_t = _combinations(ata_model.settings.T)
+            nPairs_t = size(Pairs_t, 1)
+            Pairs = _combinations(ata_model.settings.T)
+            nPairs = size(Pairs, 1)
+            ol_max = Array{Int64,1}(undef, nPairs)
+            fInd = [Pairs[pair][1] for pair = 1:nPairs]
+            fIndFirst = [Pairs[pair][2] for pair = 1:nPairs]
+            for pair = 1:nPairs
+                ol_max[pair] = opMatrix[fInd[pair], fIndFirst[pair]]
+            end
         end
     end
     #Group IIFs by friend set
@@ -130,12 +132,16 @@ function jumpATA!(
     end
 
     # item use
-    c += size(ata_model.settings.iu.max, 1)
-    c += sum(ata_model.settings.iu.min .> 0)
-
+    if ata_model.settings.to_apply[1]
+        c += size(ata_model.settings.iu.max, 1)
+    end
+    if ata_model.settings.to_apply[2]
+        c += sum(ata_model.settings.iu.min .> 0)
+    end
     #overlap old
-    c += nPairs
-
+    if ata_model.settings.to_apply[3]
+        c += nPairs
+    end
     #expected score
     for t = 1:ata_model.settings.T
         if size(ICF_new[t], 1) > 0
@@ -223,60 +229,68 @@ function jumpATA!(
         start = starting_design[i, t]
     )
 
-    if size(opMatrix, 1) > 0
-        if maximum(opMatrix) > 0
-            #Overlap Vars new
-            JuMP.@variable(m, y[i = 1:ata_model.settings.n_fs, p = 1:nPairs], Bin)
+    if ata_model.settings.to_apply[3]
+        if size(opMatrix, 1) > 0
+            if maximum(opMatrix) > 0
+                #Overlap Vars new
+                JuMP.@variable(m, y[i = 1:ata_model.settings.n_fs, p = 1:nPairs], Bin)
+            end
         end
     end
 
     # Item Use
     for i = 1:ata_model.settings.n_fs
-        if ata_model.settings.iu.min[i] .> 0
+        if ata_model.settings.to_apply[2]
+            if ata_model.settings.iu.min[i] .> 0
+                JuMP.@constraint(
+                    m,
+                    ata_model.settings.iu.min[i] - sum(x[i, t] for t = 1:ata_model.settings.T) <=
+                    0
+                ) # z[c])
+                c += 1
+            end
+        end
+        if ata_model.settings.to_apply[1]
             JuMP.@constraint(
                 m,
-                ata_model.settings.iu.min[i] - sum(x[i, t] for t = 1:ata_model.settings.T) <=
-                0
+                sum(x[i, t] for t = 1:ata_model.settings.T) - ata_model.settings.iu.max[i] <= 0
             ) # z[c])
             c += 1
         end
-        JuMP.@constraint(
-            m,
-            sum(x[i, t] for t = 1:ata_model.settings.T) - ata_model.settings.iu.max[i] <= 0
-        ) # z[c])
-        c += 1
     end
-    if size(opMatrix, 1) > 0
-        if maximum(opMatrix) > 0
-            #overlap classic
-            for p = 1:nPairs
-                JuMP.@constraint(
-                    m,
-                    sum(
-                        y[i, p] * ata_model.settings.fs.counts[i] for
-                        i = 1:ata_model.settings.n_fs
-                    ) <= ol_max[p]
-                )
-                JuMP.@constraint(
-                    m,
-                    [i = 1:ata_model.settings.n_fs],
-                    2 * y[i, p] <= x[i, fInd[p]] + x[i, fIndFirst[p]]
-                )
-                JuMP.@constraint(
-                    m,
-                    [i = 1:ata_model.settings.n_fs],
-                    y[i, p] >= x[i, fInd[p]] + x[i, fIndFirst[p]] - 1
-                )
-            end
-        else
-            #no overlap
-            for p = 1:nPairs
-                for i = 1:ata_model.settings.n_fs
-                    JuMP.@constraint(m, x[i, fInd[p]] + x[i, fIndFirst[p]] <= 1)
+    if ata_model.settings.to_apply[3]
+        if size(opMatrix, 1) > 0
+            if maximum(opMatrix) > 0
+                #overlap classic
+                for p = 1:nPairs
+                    JuMP.@constraint(
+                        m,
+                        sum(
+                            y[i, p] * ata_model.settings.fs.counts[i] for
+                            i = 1:ata_model.settings.n_fs
+                        ) <= ol_max[p]
+                    )
+                    JuMP.@constraint(
+                        m,
+                        [i = 1:ata_model.settings.n_fs],
+                        2 * y[i, p] <= x[i, fInd[p]] + x[i, fIndFirst[p]]
+                    )
+                    JuMP.@constraint(
+                        m,
+                        [i = 1:ata_model.settings.n_fs],
+                        y[i, p] >= x[i, fInd[p]] + x[i, fIndFirst[p]] - 1
+                    )
+                end
+            else
+                #no overlap
+                for p = 1:nPairs
+                    for i = 1:ata_model.settings.n_fs
+                        JuMP.@constraint(m, x[i, fInd[p]] + x[i, fIndFirst[p]] <= 1)
+                    end
                 end
             end
         end
-    end
+    end 
     #expected score
     for t = 1:ata_model.settings.T
         if size(ICF_new[t], 1) > 0

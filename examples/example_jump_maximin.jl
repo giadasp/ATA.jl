@@ -3,7 +3,7 @@ using JuMP
 # add Cbc by running import Pkg; Pkg.add("Cbc")
 using Cbc
 # cd("where your input files are")
-
+cd("examples")
 # 1. Start ATA and add file with custom settings (Needed)
 ata_model = start_ATA(;
     settings_file = "settingsATA maximin.jl",

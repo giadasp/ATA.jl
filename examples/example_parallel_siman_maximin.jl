@@ -14,7 +14,7 @@
 
 using Distributed  #this is not needed if Julia has been run with <numberOfCores> >1
 @everywhere using ATA
-@everywhere cd("where your input files are")
+@everywhere cd("examples")
 
 #Input files needed: settingsATA.jl, Bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
 #settingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...

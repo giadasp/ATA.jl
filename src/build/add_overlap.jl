@@ -42,10 +42,12 @@ function add_overlap!(
             opMatrix = opMatrix[1:T, 1:T]
             DelimitedFiles.writedlm("OPT/overlap.txt", opMatrix)
             ata_model.settings.ol_max = opMatrix
+            ata_model.settings.to_apply[3] = true
         else
             ata_model.settings.ol_max =
                 ones(ata_model.settings.n_items, ata_model.settings.n_items) .*
                 ata_model.settings.n_items
+            ata_model.settings.to_apply[3] = false
             push!(
                 ata_model.output.infos,
                 [
@@ -53,9 +55,7 @@ function add_overlap!(
                     string(
                         "- No lines in ",
                         overlap_file,
-                        ", Maximum overlap set at ",
-                        ata_model.settings.n_items,
-                        ".\n",
+                        ", overlap constraints are not applied.\n",
                     ),
                 ],
             )

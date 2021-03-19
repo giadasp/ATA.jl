@@ -53,7 +53,7 @@ function analyse_NH(
                 #println("test ", v, " chosen, length was: ", n_t)
                 #try to add other items, the first time it goes over n_max it stops
                 if n_t < constraints.length_max
-                    NH_add = fill_upᵥ(
+                    NH_add = find_best_itemᵥ(
                         NH₁,
                         v,
                         ata_model.settings.iu,
@@ -63,15 +63,17 @@ function analyse_NH(
                         n_items,
                         n_fs,
                         ata_model.settings.ol_max[:, v],
+                        ata_model.settings.to_apply,
                     )
-
-                    NH_add.ol = eval_overlap(
-                        NH_add.x,
-                        fs_counts,
-                        ata_model.settings.ol_max,
-                        T,
-                        NH_add.ol,
-                    )
+                    if ata_model.settings.to_apply[3]
+                        NH_add.ol = eval_overlap(
+                            NH_add.x,
+                            fs_counts,
+                            ata_model.settings.ol_max,
+                            T,
+                            NH_add.ol,
+                        )
+                    end
                     Printf.@printf "."
                     n_t = LinearAlgebra.dot(NH_add.x[:, v], ata_model.settings.fs.counts)
                     #println("length for test ", v, ": ", n_t)
@@ -178,10 +180,23 @@ function analyse_NH(
                         n_fs,
                         n_items,
                     )
-                    iu = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
-                    NH₁.iu = sum_pos(iu)
-                    NH₁.ol =
-                        eval_overlap(NH₁.x, fs_counts, ata_model.settings.ol_max, T, NH₁.ol)
+                    if ata_model.settings.to_apply[1]
+                        iu_max = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
+                        iu_max = sum_pos(iu_max)
+                    else
+                        iu_max = 0
+                    end
+                    if ata_model.settings.to_apply[2]
+                        iu_min = -sum(NH₁.x, dims = 2)[:, 1] + ata_model.settings.iu.min
+                        iu_min = sum_pos(iu_min)
+                    else
+                        iu_min = 0
+                    end
+                    NH₁.iu = iu_max + iu_min
+                    if ata_model.settings.to_apply[3]
+                        NH₁.ol =
+                            eval_overlap(NH₁.x, fs_counts, ata_model.settings.ol_max, T, NH₁.ol)
+                    end
                     #NH₁.ol[v] = eval_overlapᵥ(NH₁.x[:, v], NH₁.x, ata_model.settings.fs.counts, ol_maxₜ, v)
                     NH₁.f = _comp_f(NH₁, 0.0)
                     f_evals += 1
@@ -238,22 +253,36 @@ function analyse_NH(
                         # iu = copy(iu₀)
                         # iu[i₂]+= 1
                         # iu[h]-= 1
-                        iu = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
-                        NH₁.iu = sum_pos(iu)
-                        NH₁.infeas[v], x_Iₜ = check_feas(
+                        if ata_model.settings.to_apply[1]
+                            iu_max = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
+                            iu_max = sum_pos(iu_max)
+                       else
+                            iu_max = 0
+                        end
+                        if ata_model.settings.to_apply[2]
+                                                        iu_min = -sum(NH₁.x, dims = 2)[:, 1] + ata_model.settings.iu.min
+                            iu_min = sum_pos(iu_min)
+                        else
+                            iu_min = 0
+                        end
+                        NH₁.iu = iu_max + iu_min
+                        NH₁.infeas[v], x_Iₜ = ch
+                        eck_feas(
                             ata_model.settings.fs,
                             Constraintsₜ,
                             NH₁.x[:, v],
                             n_fs,
                             n_items,
                         )
-                        NH₁.ol = eval_overlap(
-                            NH₁.x,
-                            fs_counts,
-                            ata_model.settings.ol_max,
-                            T,
-                            NH₁.ol,
-                        )
+                        if ata_model.settings.to_apply[3]
+                            NH₁.ol = eval_overlap(
+                                NH₁.x,
+                                fs_counts,
+                                ata_model.settings.ol_max,
+                                T,
+                                NH₁.ol,
+                            )
+                        end
                         #NH₁.ol[v] = eval_overlapᵥ(NH₁.x[:, v], NH₁.x, ata_model.settings.fs.counts, ol_maxₜ, v)
                         NH₁.f = _comp_f(NH₁, 0.0)
                         if (NH₁.f <= NH₀.f)
