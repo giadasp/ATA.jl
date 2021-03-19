@@ -1,4 +1,4 @@
-
+@require Psychometrics = "ce8202d9-98c3-4990-890a-8616ce2c06f9" include("add_obj_fun_cc_maximin_psychometrics.jl")
 """
 add_obj_fun!(ata_model::CcMaximinModel)
 
@@ -108,7 +108,7 @@ function add_obj_fun!(
     else
         load_item_parameters_chain!(ata_model; kwargs...)
     end
-    message = ["success", "- IIFs for MAXIMIN CC objective function computed.\n"]
+    message = ["success", "- Objective function loaded.\n- IIFs and ICFs computed.\n- IIFs and ICFs for all item parameters samples computed.\n"]
     open("OPT/Settings.jl", "a") do f
         write(f, "K = $K\n\n")
     end

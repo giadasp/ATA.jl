@@ -14,7 +14,7 @@ function load_design!(design::Matrix{Any}, ata_model::AbstractModel)
     ata_model.output.design = Float64.(design)
     push!(
             ata_model.output.infos,
-            ["success", string("- Design loaded.\n")],
+            ["success", string("- Starting design loaded.\n")],
         )
     return nothing
 end

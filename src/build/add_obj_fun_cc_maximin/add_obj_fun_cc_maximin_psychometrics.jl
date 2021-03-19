@@ -1,5 +1,3 @@
-@require Psychometrics = "ce8202d9-98c3-4990-890a-8616ce2c06f9" include("add_obj_fun_cc_maximin_psychometrics.jl")
-
 function load_item_parameters_chain(
         ata_model::AbstractModel;
         items_file = "items.jld2",

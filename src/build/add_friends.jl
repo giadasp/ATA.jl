@@ -12,11 +12,11 @@ It requires the [`start_ATA`](#ATA.startATA) step.
 - **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` function.
 """
 function add_friends!(ata_model::AbstractModel)
-    message = ["", ""]
     if !isfile("OPT/Settings.jl")
         push!(ata_model.output.infos, ["danger", "Run start_ATA before!\n"])
         return nothing
     else
+        message = ["", ""]
         n_items = ata_model.settings.n_items
         FriendSets =
             string.(

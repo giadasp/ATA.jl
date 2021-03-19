@@ -13,7 +13,6 @@ Computes the IIFs at predefined ability points.
 
 """
 function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel})
-    message = ["", ""]
     T = ata_model.settings.T
     n_items = ata_model.settings.n_items
     IRT_parameters = ata_model.settings.IRT.parameters
@@ -49,6 +48,7 @@ function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel})
         end
         ata_model.obj.cores[t].IIF = IIF[t]
     end
+    message = ["success", "- Objective function loaded.\n- IIFs and ICFs computed.\n"]
     JLD2.@save "OPT/IIF.jld2" IIF
     if !isfile("OPT/ICF.jld2")
         JLD2.@save "OPT/ICF.jld2" ICF
