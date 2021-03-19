@@ -7,7 +7,7 @@ function siman!(
     results_folder = "RESULTS",
     start_temp = 0.1,
     geom_temp = 0.1,
-    max_time = 1000.00,
+    max_time = 1000.0,
     max_conv = 2,
     feas_nh = 0,
     opt_nh = 5,
@@ -86,8 +86,19 @@ function siman!(
         NH⁺.x = zeros(Float64, n_fs, T)
     end
     # compute f
-    iu = sum(NH⁺.x; dims = 2)[:, 1] - ata_model.settings.iu.max
-    NH⁺.iu = sum_pos(iu)
+    if ata_model.settings.to_apply[1]
+        iu_max = sum(NH⁺.x, dims = 2)[:, 1] - ata_model.settings.iu.max
+        iu_max = sum_pos(iu_max)
+    else
+        iu_max = 0
+    end
+    if ata_model.settings.to_apply[2]
+        iu_min = -sum(NH⁺.x, dims = 2)[:, 1] + ata_model.settings.iu.min
+        iu_min = sum_pos(iu_min)
+    else
+        iu_min = 0
+    end
+    NH⁺.iu = iu_max + iu_min
     t = copy(start_temp)
     for v2 = 1:T
         NH⁺.infeas[v2], x_Iₜ = check_feas(
