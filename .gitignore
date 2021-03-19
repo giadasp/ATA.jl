@@ -5,3 +5,4 @@ examples/PLOTS/
 *.csv
 *.txt
 *.pdf
+*.jld2
