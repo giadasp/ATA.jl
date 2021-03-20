@@ -42,8 +42,8 @@ add_overlap!(ata_model; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
 print_last_info(ata_model)
 
 # 6. Add expected score constraints (Optional)
-# add_exp_score!(ata_model);
-# print_last_info(ata_model)
+add_exp_score!(ata_model);
+print_last_info(ata_model)
 
 # 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
 group_by_friends!(ata_model);
@@ -68,7 +68,7 @@ geom_temp = 0.1;
 # Default: `0.1`. Values:  `[0, Inf)`.
 # Decreasing geometric factor.
 
-n_item_sample = 1;
+n_item_sample = Inf;
 # Default: 1. Values: `[1, Inf]`. 
 # Number of items to alter. Set to minimum for a shallow analysis, 
 # set to maximum for a deep analysis of the neighbourhoods.

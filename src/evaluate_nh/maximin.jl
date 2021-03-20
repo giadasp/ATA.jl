@@ -87,13 +87,15 @@ function analyse_NH(
                             ata_model.settings.to_apply,
                         )
                     end
-                    NH_add.ol = eval_overlap(
-                        NH_add.x,
-                        fs_counts,
-                        ata_model.settings.ol_max,
-                        T,
-                        NH_add.ol,
-                    )
+                    if ata_model.settings.to_apply[3]
+                        NH_add.ol = eval_overlap(
+                            NH_add.x,
+                            fs_counts,
+                            ata_model.settings.ol_max,
+                            T,
+                            NH_add.ol,
+                        )
+                    end
                     Printf.@printf "."
                     n_t = LinearAlgebra.dot(NH_add.x[:, v], ata_model.settings.fs.counts)
                     #println("length for test ", v, ": ", n_t)
