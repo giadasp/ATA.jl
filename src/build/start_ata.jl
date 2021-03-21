@@ -1,20 +1,24 @@
 """
-    start_ATA(;
-        settings_file = "SettingsATA.jl",
-        bank_file = "Bank.csv",
+    start_ata(;
+        settings::InputSettings = InputSettings(),
+        bank::DataFrames.DataFrame = DataFrames.DataFrame(),
+        settings_file = "settings_ata.jl",
+        bank_file = "bank.csv",
         bank_delim = ";",
     )
 
 # Description
 
-Initialize an empty ATA model and load the test assembly settings contained in the `settings_file`.
-It requires the [`start_ATA`](#ATA.start_ATA) step.
+Initialize an empty ATA model and load the test assembly settings contained in the `settings_file`
+using item data in file `bank_file` which values are separated by `bank_delim`.
+Alternatively, settings object and bank dataframe can be passed using the arguments `settings` and `bank`.
 
 # Arguments
 
-- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` function.
-- **`settings_file`** : Optional. Default: "SettingsATA.jl". The path of the file containing the ATA settings in the form of an `InputSettings` struct.
-- **`bank_file`** : Optional. Default: "Bank.csv". The path of the file containing the item pool/bank in the form of custom-separated values.
+- **`settings::InputSettings`** : Optional. Default:  `InputSettings()` object with custom ATA settings.
+- **`bank::DataFrames.DataFrame`** : Optional. Default: `DataFrame()`. A dataframe containing data about the items.
+- **`settings_file`** : Optional. Default: "settings_ata.jl". The path of the file containing the ATA settings in the form of an `InputSettings` struct.
+- **`bank_file`** : Optional. Default: "bank.csv". The path of the file containing the item pool/bank in the form of custom-separated values.
 - **`bank_delim`** : Optional. Default: ";". The custom-separator for the bank_file.
 
 # Output
@@ -22,11 +26,11 @@ It requires the [`start_ATA`](#ATA.start_ATA) step.
 - An ATA model.
 
 """
-function start_ATA(;
+function start_ata(;
     settings::InputSettings = InputSettings(),
     bank::DataFrames.DataFrame = DataFrames.DataFrame(),
-    settings_file = "SettingsATA.jl",
-    bank_file = "Bank.csv",
+    settings_file = "settings_ata.jl",
+    bank_file = "bank.csv",
     bank_delim = ";",
 )
     message = ["", ""]

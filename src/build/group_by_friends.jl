@@ -9,7 +9,7 @@ Group the items by friend sets once the friend sets have been added to the `ATA.
 
 # Arguments
 
-- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()`, settings loaded by [`start_ATA`](#ATA.start_ATA) function and friend sets added by [`add_friends!`](#ATA.add_friends!-Tuple{ATA.AbstractModel}) function.
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ata()`, settings loaded by [`start_ata`](#ATA.start_ata) function and friend sets added by [`add_friends!`](#ATA.add_friends!-Tuple{ATA.AbstractModel}) function.
 """
 function group_by_friends!(ata_model::AbstractModel) #last
     message = ["", ""]

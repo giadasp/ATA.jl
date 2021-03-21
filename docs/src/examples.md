@@ -19,7 +19,7 @@ using Cbc
 1\. Resetting the ATA process and load settings (Needed)
 
 ```julia
-ata_model = start_ATA(settings_file="examples/settings_ata_maximin.jl", bank_file="examples/data/Bank.csv", bank_delim=";")
+ata_model = start_ata(settings_file="examples/settings_ata_maximin.jl", bank_file="examples/data/bank.csv", bank_delim=";")
 print_last_info(ata_model)
 ```
 

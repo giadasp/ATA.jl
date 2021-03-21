@@ -6,11 +6,13 @@ add_constraints!(ata_model::AbstractModel; constraints_file = "constraints.csv",
 # Description
 
 Add categorical and sum constraints to the `ATA.AbstractModel` as specified in the `constraints_file`.
-It requires the [`start_ATA`](#ATA.start_ATA) step.
+Alternatively, the constraint dataframe can be passed using the argument `constraints`.
+It requires the [`start_ata`](#ATA.start_ata) step.
 
 # Arguments
 
-- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
+- **`constraints::DataFrames.DataFrame = DataFrames.DataFrame()**`. Optional. Default: DataFrames.DataFrame(). The dataframe containing the categorical and quantitative constraints.
 - **`constraints_file`** : Optional. Default: "constraints.csv". The path of the file containing the categorical and sum constraints in the form of custom-separated values.
 - **`constraints_delim`** : Optional. Default: ";". The custom-separator for the `constraints_file`.
 

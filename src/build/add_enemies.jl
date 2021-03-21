@@ -4,12 +4,12 @@ add_enemies!(ata_model::AbstractModel)
 
 # Description
 
-Add enemy sets to the `ATA.AbstractModel` as specified in the `settings_file` loaded by [`start_ATA`](#ATA.start_ATA) function.
-It requires the [`start_ATA`](#ATA.start_ATA) step.
+Add enemy sets to the `ATA.AbstractModel` as specified in the `settings_file` loaded by [`start_ata`](#ATA.start_ata) function.
+It requires the [`start_ata`](#ATA.start_ata) step.
 
 # Arguments
 
-- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 """
 function add_enemies!(ata_model::AbstractModel)
     message = ["", ""]

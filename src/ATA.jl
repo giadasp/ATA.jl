@@ -74,7 +74,7 @@ function __init__()
 end
 
 export mean,
-    start_ATA,
+    start_ata,
     add_friends!,
     add_enemies!,
     add_constraints!,

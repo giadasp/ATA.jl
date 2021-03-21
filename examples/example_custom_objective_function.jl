@@ -6,7 +6,7 @@ using LinearAlgebra
 cd("where your input files are")
 
 # 1. Start ATA and add file with custom settings (Needed)
-ata_model = start_ATA(;
+ata_model = start_ata(;
     settings_file = "settings_ata_custom.jl",
     bank_file = "data/bank.csv",
     bank_delim = ";",

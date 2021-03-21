@@ -4,12 +4,12 @@ add_obj_fun!(ata_model::Union{MaximinModel, MinimaxModel})
 
 # Description
 
-Add the objective function as specified in the `settings_file`. It requires the [`start_ATA`](#ATA.start_ATA) build step.  
+Add the objective function as specified in the `settings_file`. It requires the [`start_ata`](#ATA.start_ata) build step.  
 Computes the IIFs at predefined ability points.
 
 # Arguments
 
-- **`ata_model::Union{MaximinModel, MinimaxModel}`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
+- **`ata_model::Union{MaximinModel, MinimaxModel}`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 
 """
 function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel})

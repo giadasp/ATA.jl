@@ -17,7 +17,7 @@ using Distributed  #this is not needed if Julia has been run with <numberOfCores
 #BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
 # 1. Start ATA and add file with custom settings (Needed)
-ata_model = start_ATA(;
+ata_model = start_ata(;
     settings_file = "settings_ata_maximin.jl",
     bank_file = "data/bank.csv",
     bank_delim = ";",

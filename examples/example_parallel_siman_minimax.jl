@@ -10,16 +10,16 @@ using Distributed  #this is not needed if Julia has been run with <numberOfCores
 @everywhere using ATA
 @everywhere cd("where your input files are")
 
-#Input files needed: settingsATA.jl, Bank.csv, Categoricalconstraints.csv, overlap_matrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
-#settingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...
+#Input files needed: settings_ata.jl, bank.csv, Categoricalconstraints.csv, overlap_matrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
+#settings_ata.jl : overall features of the tests, such as length, expected score, item use, ecc...
 #Categoricalconstraints.csv : categorical constraints
 #overlap_matrix.csv : maximum overlap allowed between test forms, it is a TxT matrix. If the assembly is non parallel (i.e. there is more than one group of parallel tests, n_groups>1)
 #it is a n_groups x n_groups matrix.
 #BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
 # 1. Start ATA and add file with custom settings (Needed)
-ata_model = start_ATA(;
-    settings_file = "SettingsATA minimax.jl",
+ata_model = start_ata(;
+    settings_file = "settings_ata minimax.jl",
     bank_file = "data/bank.csv",
     bank_delim = ";",
 );

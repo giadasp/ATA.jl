@@ -8,7 +8,7 @@ Useful for loading a custom starting design before the `assemble!` step or to pr
 
 # Arguments
 
-- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()`, settings loaded by [`start_ATA`](#ATA.start_ATA).
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ata()`, settings loaded by [`start_ata`](#ATA.start_ata).
 """
 function load_design!(design::Matrix{Any}, ata_model::AbstractModel)
     message = ["", ""]

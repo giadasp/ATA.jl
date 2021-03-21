@@ -5,8 +5,8 @@ using Cbc
 # cd("where your input files are")
 
 # 1. Start ATA and add file with custom settings (Needed)
-ata_model = start_ATA(
-    settings_file = "SettingsATA minimax.jl",
+ata_model = start_ata(
+    settings_file = "settings_ata minimax.jl",
     bank_file = "data/bank.csv",
     bank_delim = ";",
 )

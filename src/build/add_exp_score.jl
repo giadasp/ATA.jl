@@ -6,11 +6,11 @@ add_exp_score!(ata_model::AbstractModel)
 
 Add the expected score constraints as specified in the `settings_file`.
 If the names of the expected score columns of the item bank are not provided in the `settings_file` they are computed as the item characteristic functions following the IRT model always specified in the `settings_file`.
-It requires the [`start_ATA`](#ATA.start_ATA) step.
+It requires the [`start_ata`](#ATA.start_ata) step.
 
 # Arguments
 
-- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 
 """
 function add_exp_score!(ata_model::AbstractModel)

@@ -6,11 +6,13 @@ add_overlap!(ata_model::AbstractModel; overlap_file = "overlap_matrix.csv", over
 # Description
 
 Add maximum overlap constraints to the `ATA.AbstractModel` as specified by the `overlap_file` which contains a `TxT` matrix defining the maximum number of shared items between each pair of tests.
-It requires the [`start_ATA`](#ATA.start_ATA) step.
+Alternatively, the overlap matrix can be passed using the argument `overlap`.
+It requires the [`start_ata`](#ATA.start_ata) step.
 
 # Arguments
 
-- **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
+- **`ata_model::AbstractModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
+- **`overlap::Matrix{Float64} = Matrix{Float64}(undef, 0, 0)`**: Optional. 
 - **`overlap_file`** : Optional. Default: "overlap_matrix.csv". The path of the file containing the maximum overlap between each pair of tests in the form of a matrix with custom-separated values.
 - **`overlap_delim`** : Optional. Default: ";". The custom-separator for the `overlap_file`.
 

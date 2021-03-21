@@ -24,7 +24,7 @@ function compact_ata(;
     plot_folder = "PLOTS",
     kwargs...,
 )
-    ata_model = start_ATA(;
+    ata_model = start_ata(;
         settings = settings,
         bank = bank,
         settings_file = settings_file,
