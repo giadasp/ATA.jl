@@ -795,3 +795,9 @@ function print_neighbourhood(x::Neighbourhood)
     map(x -> Printf.@printf("  %5.1f", x), x.iu)
     Printf.@printf("    ]\n")
 end
+
+
+function read_settings_file(settings_file::String)
+    include(settings_file)
+    return Inputs::InputSettings
+end
