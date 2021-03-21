@@ -16,7 +16,6 @@ function jumpATA!(
             " will be overwritten.\n",
         )
     end
-
     n_items = ata_model.settings.n_items
     if ata_model.obj.name == "MAXIMIN"
         if isfile("OPT/IIF.jld2")

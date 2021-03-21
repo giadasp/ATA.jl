@@ -21,11 +21,11 @@ add_enemies!(ata_model)
 print_last_info(ata_model)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(ata_model; constraints_file = "Constraints.csv", constraints_delim = ";")
+add_constraints!(ata_model; constraints_file = "constraints.csv", constraints_delim = ";")
 print_last_info(ata_model)
 
 # 5. Add overlap maxima (Optional)
-#add_overlap!(ata_model; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
+#add_overlap!(ata_model; overlap_file = "overlap_matrix.csv", overlap_delim = ";")
 #print_last_info(ata_model)
 
 # 6. Add expected score constraints (Optional)

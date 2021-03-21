@@ -1,7 +1,7 @@
 
 
 """
-add_overlap!(ata_model::AbstractModel; overlap_file = "OverlapMatrix.csv", overlap_delim=";")
+add_overlap!(ata_model::AbstractModel; overlap_file = "overlap_matrix.csv", overlap_delim=";")
 
 # Description
 
@@ -11,13 +11,13 @@ It requires the [`start_ATA`](#ATA.start_ATA) step.
 # Arguments
 
 - **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
-- **`overlap_file`** : Optional. Default: "OverlapMatrix.csv". The path of the file containing the maximum overlap between each pair of tests in the form of a matrix with custom-separated values.
+- **`overlap_file`** : Optional. Default: "overlap_matrix.csv". The path of the file containing the maximum overlap between each pair of tests in the form of a matrix with custom-separated values.
 - **`overlap_delim`** : Optional. Default: ";". The custom-separator for the `overlap_file`.
 
 """
 function add_overlap!(
     ata_model::AbstractModel;
-    overlap_file = "OverlapMatrix.csv",
+    overlap_file = "overlap_matrix.csv",
     overlap_delim = ";",
 )
     T = ata_model.settings.T

@@ -2,7 +2,6 @@ docs/build/
 examples/OPT/
 examples/RESULTS/
 examples/PLOTS/
-*.csv
 *.txt
 *.pdf
 *.jld2

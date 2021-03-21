@@ -1,7 +1,7 @@
 
 
 """
-add_constraints!(ata_model::AbstractModel; constraints_file = "Constraints.csv", constraints_delim = ";")
+add_constraints!(ata_model::AbstractModel; constraints_file = "constraints.csv", constraints_delim = ";")
 
 # Description
 
@@ -11,13 +11,13 @@ It requires the [`start_ATA`](#ATA.start_ATA) step.
 # Arguments
 
 - **`ata_model::AbstractModel`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
-- **`constraints_file`** : Optional. Default: "Constraints.csv". The path of the file containing the categorical and sum constraints in the form of custom-separated values.
+- **`constraints_file`** : Optional. Default: "constraints.csv". The path of the file containing the categorical and sum constraints in the form of custom-separated values.
 - **`constraints_delim`** : Optional. Default: ";". The custom-separator for the `constraints_file`.
 
 """
 function add_constraints!(
     ata_model::AbstractModel;
-    constraints_file = "Constraints.csv",
+    constraints_file = "constraints.csv",
     constraints_delim = ";",
 )
     n_items = ata_model.settings.n_items

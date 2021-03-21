@@ -7,7 +7,7 @@ cd("where your input files are")
 
 # 1. Start ATA and add file with custom settings (Needed)
 ata_model = start_ATA(;
-    settings_file = "settingsATA custom.jl",
+    settings_file = "settings_ata_custom.jl",
     bank_file = "data/bank.csv",
     bank_delim = ";",
 )
@@ -22,11 +22,11 @@ add_enemies!(ata_model)
 print_last_info(ata_model)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(ata_model; constraints_file = "Constraints.csv", constraints_delim = ";")
+add_constraints!(ata_model; constraints_file = "constraints.csv", constraints_delim = ";")
 print_last_info(ata_model)
 
 # 5. Add overlap maxima (Optional)
-add_overlap!(ata_model; overlap_file = "OverlapMatrix.csv", overlap_delim = ";")
+add_overlap!(ata_model; overlap_file = "overlap_matrix.csv", overlap_delim = ";")
 print_last_info(ata_model)
 
 # 6. Add expected score constraints (Optional)

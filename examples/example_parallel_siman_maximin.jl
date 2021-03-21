@@ -10,16 +10,15 @@ using Distributed  #this is not needed if Julia has been run with <numberOfCores
 @everywhere using ATA
 @everywhere cd("examples")
 
-#Input files needed: settingsATA.jl, Bank.csv, CategoricalConstraints.csv, OverlapMatrix.csv, BSpar.jld2 (only for Chance-Contrained (CC))
-#settingsATA.jl : overall features of the tests, such as length, expected score, item use, ecc...
-#CategoricalConstraints.csv : categorical constraints
-#OverlapMatrix.csv : maximum overlap allowed between test forms, it is a TxT matrix. If the assembly is non parallel (i.e. there is more than one group of parallel tests, n_groups>1)
+#settings_ata_maximin.jl : overall features of the tests, such as length, expected score, item use, ecc...
+#constraints.csv : categorical constraints
+#overlap_matrix.csv : maximum overlap allowed between test forms, it is a TxT matrix. If the assembly is non parallel (i.e. there is more than one group of parallel tests, n_groups>1)
 #it is a n_groups x n_groups matrix.
 #BSpar.jld2 : it is a nPar way array (Array{Float64,nPar}) where nPar is the number of IRT parameters. Each sub array is a n_items x R matrix (Matrix{Float64}(.,n_items,R)).
 
 # 1. Start ATA and add file with custom settings (Needed)
 ata_model = start_ATA(;
-    settings_file = "SettingsATA maximin.jl",
+    settings_file = "settings_ata_maximin.jl",
     bank_file = "data/bank.csv",
     bank_delim = ";",
 );
@@ -34,11 +33,11 @@ add_enemies!(ata_model);
 print_last_info(ata_model)
 
 # 4. Add categorical constraints (Optional)
-add_constraints!(ata_model; constraints_file = "Constraints.csv", constraints_delim = ";");
+add_constraints!(ata_model; constraints_file = "constraints.csv", constraints_delim = ";");
 print_last_info(ata_model)
 
 # 5. Add overlap maxima (Optional)
-add_overlap!(ata_model; overlap_file = "OverlapMatrix.csv", overlap_delim = ";");
+add_overlap!(ata_model; overlap_file = "overlap_matrix.csv", overlap_delim = ";");
 print_last_info(ata_model)
 
 # 6. Add expected score constraints (Optional)

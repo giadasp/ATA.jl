@@ -19,7 +19,7 @@ using Cbc
 1\. Resetting the ATA process and load settings (Needed)
 
 ```julia
-ata_model = start_ATA(settings_file="examples/settingsATA maximin.jl", bank_file="examples/data/Bank.csv", bank_delim=";")
+ata_model = start_ATA(settings_file="examples/settings_ata_maximin.jl", bank_file="examples/data/Bank.csv", bank_delim=";")
 print_last_info(ata_model)
 ```
 
@@ -42,7 +42,7 @@ print_last_info(ata_model)
 ```julia
 add_constraints!(
     ata_model;
-    constraints_file = "examples/Constraints.csv",
+    constraints_file = "examples/constraints.csv",
     constraints_delim = ";",
 )
 print_last_info(ata_model)
@@ -51,7 +51,7 @@ print_last_info(ata_model)
 5\. Add overlap maxima (Optional)
 
 ```julia
-add_overlap!(ata_model; overlap_file = "examples/OverlapMatrix.csv", overlap_delim = ";")
+add_overlap!(ata_model; overlap_file = "examples/overlap_matrix.csv", overlap_delim = ";")
 print_last_info(ata_model)
 ```
 
