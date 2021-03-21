@@ -85,11 +85,11 @@ function start_ata(;
         ata_model.output.infos = infos
         #load bank
         if size(bank, 1) > 0
+            ata_model.settings.bank = bank
             message[2] = message[2] * "- Item bank dataframe loaded.\n"
         elseif isfile(bank_file)
             try
-                bank = CSV.read(bank_file, DataFrames.DataFrame, delim = bank_delim)
-                ata_model.settings.bank = bank
+                ata_model.settings.bank = CSV.read(bank_file, DataFrames.DataFrame, delim = bank_delim)
             catch e
                 message[1] = "danger"
                 message[2] = message[2] * "- Error in reading the item bank file.\n"
