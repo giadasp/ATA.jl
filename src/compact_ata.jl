@@ -70,10 +70,8 @@ function compact_ata(;
         add_obj_fun!(ata_model)
         print_last_info(ata_model)
     end
-
     # 9. assemble
     assemble!(ata_model; solver = solver, kwargs...)
-
     if print_it
         print_results(
             ata_model;
