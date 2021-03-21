@@ -57,7 +57,7 @@ function assemble!(
     verbosity = 2,
     optimizer_constructor = "GLPK",
     optimizer_attributes = [("tm_lim", 1000)],
-    kwargs...
+    kwargs...,
 )
     if solver == "siman"
         siman!(
@@ -75,7 +75,7 @@ function assemble!(
             n_fill = n_fill,
             feas_nh = feas_nh,
             opt_nh = opt_nh,
-            kwargs...
+            kwargs...,
         )
     elseif solver == "jumpATA"
         jumpATA!(
@@ -84,10 +84,13 @@ function assemble!(
             starting_design = starting_design,
             optimizer_constructor = optimizer_constructor,
             optimizer_attributes = optimizer_attributes,
-            kwargs...
+            kwargs...,
         )
     else
-      push!(ata_model.output.infos, ["danger", "only \"siman\" and \"jumpATA\" are supported.\n"])
+        push!(
+            ata_model.output.infos,
+            ["danger", "only \"siman\" and \"jumpATA\" are supported.\n"],
+        )
     end
     return nothing
 end

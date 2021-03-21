@@ -4,7 +4,7 @@ function jumpATA!(
     results_folder = "RESULTS",
     optimizer_constructor = "GLPK",
     optimizer_attributes = [("tm_lim", 500000), ("msg_lev", 3)],
-    kwargs...
+    kwargs...,
 )
     message = ""
     if !(results_folder in readdir())
@@ -48,10 +48,10 @@ function jumpATA!(
     ################################################################################
     #                                overlap
     ################################################################################	
-    opMatrix = ata_model.settings.ol_max
+    overlap_matrix = ata_model.settings.ol_max
     nPairs = 0
     if ata_model.settings.to_apply[3]
-        if size(opMatrix, 1) > 0
+        if size(overlap_matrix, 1) > 0
             Pairs_t = _combinations(ata_model.settings.T)
             nPairs_t = size(Pairs_t, 1)
             Pairs = _combinations(ata_model.settings.T)
@@ -60,7 +60,7 @@ function jumpATA!(
             fInd = [Pairs[pair][1] for pair = 1:nPairs]
             fIndFirst = [Pairs[pair][2] for pair = 1:nPairs]
             for pair = 1:nPairs
-                ol_max[pair] = opMatrix[fInd[pair], fIndFirst[pair]]
+                ol_max[pair] = overlap_matrix[fInd[pair], fIndFirst[pair]]
             end
         end
     end
@@ -118,7 +118,8 @@ function jumpATA!(
             end
         end
     else
-        ICF_new = [ata_model.constraints[t].expected_score.val for t = 1:ata_model.settings.T]
+        ICF_new =
+            [ata_model.constraints[t].expected_score.val for t = 1:ata_model.settings.T]
     end
     ################################################################################
     #                                count constraints
@@ -229,8 +230,8 @@ function jumpATA!(
     )
 
     if ata_model.settings.to_apply[3]
-        if size(opMatrix, 1) > 0
-            if maximum(opMatrix) > 0
+        if size(overlap_matrix, 1) > 0
+            if maximum(overlap_matrix) > 0
                 #Overlap Vars new
                 JuMP.@variable(m, y[i = 1:ata_model.settings.n_fs, p = 1:nPairs], Bin)
             end
@@ -243,8 +244,8 @@ function jumpATA!(
             if ata_model.settings.iu.min[i] .> 0
                 JuMP.@constraint(
                     m,
-                    ata_model.settings.iu.min[i] - sum(x[i, t] for t = 1:ata_model.settings.T) <=
-                    0
+                    ata_model.settings.iu.min[i] -
+                    sum(x[i, t] for t = 1:ata_model.settings.T) <= 0
                 ) # z[c])
                 c += 1
             end
@@ -252,14 +253,15 @@ function jumpATA!(
         if ata_model.settings.to_apply[1]
             JuMP.@constraint(
                 m,
-                sum(x[i, t] for t = 1:ata_model.settings.T) - ata_model.settings.iu.max[i] <= 0
+                sum(x[i, t] for t = 1:ata_model.settings.T) -
+                ata_model.settings.iu.max[i] <= 0
             ) # z[c])
             c += 1
         end
     end
     if ata_model.settings.to_apply[3]
-        if size(opMatrix, 1) > 0
-            if maximum(opMatrix) > 0
+        if size(overlap_matrix, 1) > 0
+            if maximum(overlap_matrix) > 0
                 #overlap classic
                 for p = 1:nPairs
                     JuMP.@constraint(
@@ -289,7 +291,7 @@ function jumpATA!(
                 end
             end
         end
-    end 
+    end
     #expected score
     for t = 1:ata_model.settings.T
         if size(ICF_new[t], 1) > 0

@@ -95,7 +95,7 @@ export mean,
     fs_to_items,#_mycopy,  fast_sort!, _myqle#, optimize
     run_app,
     compact_ata
-    
+
 ATA
 
 end

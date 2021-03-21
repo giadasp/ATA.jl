@@ -12,9 +12,6 @@ Useful for loading a custom starting design before the `assemble!` step or to pr
 """
 function load_design!(design::Matrix{Any}, ata_model::AbstractModel)
     ata_model.output.design = Float64.(design)
-    push!(
-            ata_model.output.infos,
-            ["success", string("- Starting design loaded.\n")],
-        )
+    push!(ata_model.output.infos, ["success", string("- Starting design loaded.\n")])
     return nothing
 end

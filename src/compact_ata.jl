@@ -18,12 +18,12 @@ function compact_ata(;
     print_folder = "RESULTS",
     plot_it = true,
     plot_folder = "PLOTS",
-    kwargs...
+    kwargs...,
 )
     ata_model = start_ATA(;
-    settings_file = settings_file,
-    bank_file = bank_file,
-    bank_delim = bank_delim
+        settings_file = settings_file,
+        bank_file = bank_file,
+        bank_delim = bank_delim,
     )
     print_last_info(ata_model)
     if add_friends
@@ -38,16 +38,12 @@ function compact_ata(;
         add_constraints!(
             ata_model;
             constraints_file = constraints_file,
-            constraints_delim = constraints_delim
-            )
+            constraints_delim = constraints_delim,
+        )
         print_last_info(ata_model)
     end
     if add_overlap
-        add_overlap!(
-            ata_model;
-            overlap_file = overlap_file,
-            overlap_delim = overlap_delim
-            )
+        add_overlap!(ata_model; overlap_file = overlap_file, overlap_delim = overlap_delim)
         print_last_info(ata_model)
     end
     if add_exp_score
@@ -64,17 +60,21 @@ function compact_ata(;
     end
 
     # 9. assemble
-    assemble!(
-        ata_model;
-        solver = solver,
-        kwargs...
-        ) 
+    assemble!(ata_model; solver = solver, kwargs...)
 
     if print_it
-        print_results(ata_model; group_by_fs = group_by_friends, results_folder = print_folder)
-    end    
+        print_results(
+            ata_model;
+            group_by_fs = group_by_friends,
+            results_folder = print_folder,
+        )
+    end
     if plot_it
-        plot_results(ata_model; group_by_fs = group_by_friends, results_folder = plot_folder)
+        plot_results(
+            ata_model;
+            group_by_fs = group_by_friends,
+            results_folder = plot_folder,
+        )
     end
     return ata_model::AbstractModel
 end

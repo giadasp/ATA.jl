@@ -1,4 +1,6 @@
-@require Psychometrics = "ce8202d9-98c3-4990-890a-8616ce2c06f9" include("add_obj_fun_cc_maximin_psychometrics.jl")
+@require Psychometrics = "ce8202d9-98c3-4990-890a-8616ce2c06f9" include(
+    "add_obj_fun_cc_maximin_psychometrics.jl",
+)
 """
 add_obj_fun!(ata_model::CcMaximinModel)
 
@@ -12,11 +14,7 @@ Computes the IIFs at predefined ability points using `R` sampled item parameters
 - **`ata_model::Union{CcMaximinModel}`** : Required. The model built with `start_ATA()` and with settings loaded by [`start_ATA`](#ATA.start_ATA) function.
 
 """
-function add_obj_fun!(
-    ata_model::CcMaximinModel;
-    psychometrics = false,
-    kwargs...
-    )
+function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs...)
     message = ["", ""]
     T = ata_model.settings.T
     n_items = ata_model.settings.n_items
@@ -108,7 +106,10 @@ function add_obj_fun!(
     else
         load_item_parameters_chain!(ata_model; kwargs...)
     end
-    message = ["success", "- Objective function loaded.\n- IIFs and ICFs computed.\n- IIFs and ICFs for all item parameters samples computed.\n"]
+    message = [
+        "success",
+        "- Objective function loaded.\n- IIFs and ICFs computed.\n- IIFs and ICFs for all item parameters samples computed.\n",
+    ]
     open("OPT/Settings.jl", "a") do f
         write(f, "K = $K\n\n")
     end

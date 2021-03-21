@@ -17,51 +17,71 @@ It requires the [`start_ATA`](#ATA.start_ATA) step.
 """
 function add_overlap!(
     ata_model::AbstractModel;
+    overlap::Matrix{Float64} = Matrix{Float64}(undef, 0, 0),
     overlap_file = "overlap_matrix.csv",
     overlap_delim = ";",
 )
+    #load bank
+    if size(overlap, 1) > 0
+        overlap_matrix = overlap
+        message[2] = message[2] * "- Overlap matrix loaded.\n"
+    elseif isfile(bank_file)
+        try
+            overlap_matrix =
+                CSV.read(
+                    overlap_file,
+                    DataFrames.DataFrame,
+                    delim = overlap_delim,
+                    header = false,
+                )
+        catch e
+            message[1] = "danger"
+            message[2] = message[2] * "- Error in reading the overlap file.\n"
+            return nothing
+        end
+        message[2] = message[2] * "- Overlap file loaded.\n"
+    else
+        push!(
+            ata_model.output.infos,
+            [
+                "danger",
+                "Overlap file with name ",
+                overlap_file,
+                " does not exist. Provide a valid overlap matrix or a name of an existing file.",
+            ],
+        )
+        return nothing
+    end
     T = ata_model.settings.T
     n_items = ata_model.settings.n_items
-    if !isfile(overlap_file)
-        push!(ata_model.output.infos, ["danger", string(overlap_file, " not found.\n")])
-        return nothing
+
+    if size(overlap_matrix, 1) > 0
+        #ol_max = Vector{Vector{Int64}}(undef, T)
+        # for t = 1:T
+        # 	ol_max[t] = overlap_matrix[t, setdiff(collect(1:T), t)]
+        # end
+        overlap_matrix = overlap_matrix[1:T, 1:T]
+        DelimitedFiles.writedlm("OPT/overlap.txt", overlap_matrix)
+        ata_model.settings.ol_max = overlap_matrix
+        ata_model.settings.to_apply[3] = true
     else
-        opMatrix = Matrix{Int64}(
-            CSV.read(
-                overlap_file,
-                DataFrames.DataFrame,
-                delim = overlap_delim,
-                header = false,
-            ),
+        ata_model.settings.ol_max =
+            ones(ata_model.settings.n_items, ata_model.settings.n_items) .*
+            ata_model.settings.n_items
+        ata_model.settings.to_apply[3] = false
+        push!(
+            ata_model.output.infos,
+            [
+                "success",
+                string(
+                    "- No lines in ",
+                    overlap_file,
+                    ", overlap constraints are not applied.\n",
+                ),
+            ],
         )
-        if size(opMatrix, 1) > 0
-            #ol_max = Vector{Vector{Int64}}(undef, T)
-            # for t = 1:T
-            # 	ol_max[t] = opMatrix[t, setdiff(collect(1:T), t)]
-            # end
-            opMatrix = opMatrix[1:T, 1:T]
-            DelimitedFiles.writedlm("OPT/overlap.txt", opMatrix)
-            ata_model.settings.ol_max = opMatrix
-            ata_model.settings.to_apply[3] = true
-        else
-            ata_model.settings.ol_max =
-                ones(ata_model.settings.n_items, ata_model.settings.n_items) .*
-                ata_model.settings.n_items
-            ata_model.settings.to_apply[3] = false
-            push!(
-                ata_model.output.infos,
-                [
-                    "success",
-                    string(
-                        "- No lines in ",
-                        overlap_file,
-                        ", overlap constraints are not applied.\n",
-                    ),
-                ],
-            )
-        end
-        JLD2.@save "OPT/ata_model.jld2" ata_model
-        push!(ata_model.output.infos, ["success", "- Maximum overlap constrained.\n"])
     end
+    JLD2.@save "OPT/ata_model.jld2" ata_model
+    push!(ata_model.output.infos, ["success", "- Maximum overlap constrained.\n"])
     return nothing
 end

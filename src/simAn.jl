@@ -45,7 +45,7 @@ function siman!(
     end
     n_items = ata_model.settings.n_items
     fs_counts = ata_model.settings.fs.counts * ones(Float64, T)'
-        iu_max⁺ = 0
+    iu_max⁺ = 0
     iu_min⁺ = 0
     start_time = copy(time())
     nacc = 0 # total accepted trials
