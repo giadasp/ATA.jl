@@ -67,8 +67,6 @@ function add_constraints!(
 
         end
         x_forced0 = ata_model.settings.forced0
-        categorical_constraints =
-            CSV.read(constraints_file, DataFrames.DataFrame, delim = constraints_delim)
         if size(categorical_constraints, 1) == 0
             message[2] =
                 message[2] *
