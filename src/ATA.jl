@@ -1,16 +1,16 @@
 __precompile__()
 module ATA
 
-import Printf
-import CSV
-import DelimitedFiles
-import DataFrames
-import Distributions
-import Distributed
-import Random
-import LinearAlgebra
-import JLD2
-import StatsBase
+using Printf
+using CSV
+using DelimitedFiles
+using DataFrames
+using Distributions
+using Distributed
+using Random
+using LinearAlgebra
+using JLD2
+using StatsBase
 using Requires
 
 include("structs/ata_model.jl")

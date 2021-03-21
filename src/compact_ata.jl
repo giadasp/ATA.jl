@@ -1,13 +1,17 @@
 function compact_ata(;
+    settings::InputSettings = InputSettings(),
+    bank::DataFrames.DataFrame = DataFrames.DataFrame(),
     settings_file = "",
     bank_file = "",
     bank_delim = ";",
     add_friends = true,
     add_enemies = true,
     add_constraints = true,
+    constraints::DataFrames.DataFrame = DataFrames.DataFrame(),
     constraints_file = "",
     constraints_delim = ";",
     add_overlap = true,
+    overlap::Matrix{Float64} = Matrix{Float64}(undef, 0, 0),
     overlap_file = "",
     overlap_delim = ";",
     add_exp_score = true,
@@ -21,6 +25,8 @@ function compact_ata(;
     kwargs...,
 )
     ata_model = start_ATA(;
+        settings = settings,
+        bank = bank,
         settings_file = settings_file,
         bank_file = bank_file,
         bank_delim = bank_delim,
@@ -37,13 +43,19 @@ function compact_ata(;
     if add_constraints
         add_constraints!(
             ata_model;
+            constraints = constraints,
             constraints_file = constraints_file,
             constraints_delim = constraints_delim,
         )
         print_last_info(ata_model)
     end
     if add_overlap
-        add_overlap!(ata_model; overlap_file = overlap_file, overlap_delim = overlap_delim)
+        add_overlap!(
+            ata_model;
+            overlap = overlap,
+            overlap_file = overlap_file,
+            overlap_delim = overlap_delim
+        )
         print_last_info(ata_model)
     end
     if add_exp_score
