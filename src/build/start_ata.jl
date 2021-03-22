@@ -108,12 +108,13 @@ function start_ata(;
             )
             return nothing
         end
+        ata.model.settings.n_groups = Inputs.n_groups
         ata_model.settings.n_items = Inputs.n_items
         ata_model.settings.T = Int(sum(Inputs.T))
         ata_model.settings.Tg = Inputs.T
         #initialize constraints
         ata_model.constraints = [Constraint() for t = 1:ata_model.settings.T]
-        ata_model.settings.n_groups = size(Inputs.groups, 1)
+        ata_model.settings.n_groups = size(Inputs.T, 1)
         x_forced0 = Vector{Vector{Bool}}(undef, ata_model.settings.T)
         for t = 1:ata_model.settings.T
             x_forced0[t] = fill(true, ata_model.settings.n_items)
