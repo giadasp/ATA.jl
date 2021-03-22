@@ -96,7 +96,7 @@ mutable struct InputSettings
         categories,
     )
     
-    InputSettings(;
+    function InputSettings(;
         T = Int64[],
         n_items = zero(Int64),
         n_groups = zero(Int64),
@@ -128,7 +128,8 @@ mutable struct InputSettings
         obj_aux_int = zero(Int64),
         obj_aux_float = zero(Float64),
         categories = String[],
-    ) = new(
+    ) 
+    InputSettings(
         T,
         n_items,
         n_groups,
@@ -161,4 +162,5 @@ mutable struct InputSettings
         obj_aux_float,
         categories,
     )
+    end
 end
