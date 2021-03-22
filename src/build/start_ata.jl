@@ -108,7 +108,7 @@ function start_ata(;
             )
             return nothing
         end
-        ata.model.settings.n_groups = Inputs.n_groups
+        ata_model.settings.n_groups = Inputs.n_groups
         ata_model.settings.n_items = Inputs.n_items
         ata_model.settings.T = Int(sum(Inputs.T))
         ata_model.settings.Tg = Inputs.T
