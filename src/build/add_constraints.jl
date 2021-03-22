@@ -143,25 +143,25 @@ function add_constraints!(
             message[2] = message[2] * "- Linear constraints (categorical and quantitative) added.\n"   
         end
         #add sum vars constraints
-        if size(ata_model.constraints[t].sum_vars, 1) > 1
-            for t = 1:ata_model.settings.T
-                for var = 1:size(ata_model.constraints[t].sum_vars, 1)
-                    vals = copy(
-                        ata_model.settings.bank[!, ata_model.constraints[t].sum_vars[var]],
-                    )
-                    vals[findall(ismissing.(vals))] .= 0.0
-                    if !ismissing(ata_model.constraints[t].sum_vars_min[var])
-                        A[t] = vcat(A[t], .-vals')
-                        push!(b[t], -ata_model.constraints[t].sum_vars_min[var])
-                    end
-                    if !ismissing(ata_model.constraints[t].sum_vars_max[var])
-                        A[t] = vcat(A[t], vals')
-                        push!(b[t], ata_model.constraints[t].sum_vars_max[var])
-                    end
-                end
-            end
-            message[2] = message[2] * "- Constraints on sum of quantitative variables added.\n"
-        end
+        # if size(ata_model.constraints[t].sum_vars, 1) > 1
+        #     for t = 1:ata_model.settings.T
+        #         for var = 1:size(ata_model.constraints[t].sum_vars, 1)
+        #             vals = copy(
+        #                 ata_model.settings.bank[!, ata_model.constraints[t].sum_vars[var]],
+        #             )
+        #             vals[findall(ismissing.(vals))] .= 0.0
+        #             if !ismissing(ata_model.constraints[t].sum_vars_min[var])
+        #                 A[t] = vcat(A[t], .-vals')
+        #                 push!(b[t], -ata_model.constraints[t].sum_vars_min[var])
+        #             end
+        #             if !ismissing(ata_model.constraints[t].sum_vars_max[var])
+        #                 A[t] = vcat(A[t], vals')
+        #                 push!(b[t], ata_model.constraints[t].sum_vars_max[var])
+        #             end
+        #         end
+        #     end
+        #     message[2] = message[2] * "- Constraints on sum of quantitative variables added.\n"
+        # end
         for t = 1:ata_model.settings.T
             DelimitedFiles.writedlm("OPT/A_$t.csv", A[t])
             DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
