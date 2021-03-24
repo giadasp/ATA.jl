@@ -13,6 +13,7 @@ using JLD2
 using StatsBase
 using Requires
 using Psychometrics
+using FileIO
 
 include("structs/ata_model.jl")
 include("utils.jl")

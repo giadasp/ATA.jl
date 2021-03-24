@@ -1,5 +1,5 @@
 function load_item_parameters_chain!(
-    ata_model::AbstractModel;
+    ata_model::CcMaximinModel;
     items_file = "items.jld2",
     kwargs...,
 )
@@ -16,7 +16,9 @@ function load_item_parameters_chain!(
         if !isfile(items_file)
             error(string("- ", items_file, " does not exist.\n"))
         end
-        JLD2.@load items_file items
+        items[collect(keys(items))[1]]
+        items = FileIO.load(items_file)
+        items = items[collect(keys(items))[1]]
         K = zeros(Int, T)
         for t = 1:T
             K[t] = size(ata_model.obj.cores[t].points, 1)
