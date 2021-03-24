@@ -19,10 +19,10 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, items_fi
     try
         T = ata_model.settings.T
         n_items = ata_model.settings.n_items
-        IRT_parameters = ata_model.settings.IRT.parameters
-        IRT_model = ata_model.settings.IRT.model
-        IRT_D = ata_model.settings.IRT.D
-        IRT_parametrization = ata_model.settings.IRT.parametrization
+        irt_parameters = ata_model.settings.irt.parameters
+        irt_model = ata_model.settings.irt.model
+        irt_D = ata_model.settings.irt.D
+        irt_parametrization = ata_model.settings.irt.parametrization
         IIF = Vector{Array{Float64,2}}(undef, T)
         ICF = Vector{Array{Float64,2}}(undef, T)
         K = zeros(Int, T)
@@ -32,18 +32,18 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, items_fi
             ICF[t] = zeros(K[t], n_items)
             for k = 1:K[t]
                 IIF[t][k, :] = item_info(
-                    IRT_parameters,
+                    irt_parameters,
                     ata_model.obj.cores[t].points[k],
-                    model = IRT_model,
-                    parametrization = IRT_parametrization,
-                    D = IRT_D,
+                    model = irt_model,
+                    parametrization = irt_parametrization,
+                    D = irt_D,
                 )# K[t] x I
                 ICF[t][k, :] = item_char(
-                    IRT_parameters,
+                    irt_parameters,
                     ata_model.obj.cores[t].points[k],
-                    model = IRT_model,
-                    parametrization = IRT_parametrization,
-                    D = IRT_D,
+                    model = irt_model,
+                    parametrization = irt_parametrization,
+                    D = irt_D,
                 )[1][
                     :,
                     :,
@@ -76,11 +76,11 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, items_fi
                 IIF[t] = zeros(K[t], n_items, R)
                 ICF[t] = zeros(K[t], n_items, R)
                 for r = 1:R
-                    if IRT_model == "1PL"
+                    if irt_model == "1PL"
                         df = DataFrames.DataFrame(b = BSb[:, r]) #nqp values in interval\r\n",
-                    elseif IRT_model == "2PL"
+                    elseif irt_model == "2PL"
                         df = DataFrames.DataFrame(a = BSa[:, r], b = BSb[:, r]) #nqp values in interval\r\n",
-                    elseif IRT_model == "3PL"
+                    elseif irt_model == "3PL"
                         df = DataFrames.DataFrame(
                             a = BSa[:, r],
                             b = BSb[:, r],
@@ -91,16 +91,16 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, items_fi
                         IIF[t][k, :, r] = item_info(
                             df,
                             ata_model.obj.cores[t].points[k];
-                            model = IRT_model,
-                            parametrization = IRT_parametrization,
-                            D = IRT_D,
+                            model = irt_model,
+                            parametrization = irt_parametrization,
+                            D = irt_D,
                         ) # K[t] x I x R
                         ICF[t][k, :, r] = item_char(
                             df,
                             ata_model.obj.cores[t].points[k];
-                            model = IRT_model,
-                            parametrization = IRT_parametrization,
-                            D = IRT_D,
+                            model = irt_model,
+                            parametrization = irt_parametrization,
+                            D = irt_D,
                         )[1] # K[t] x I x R
                     end
                     ata_model.obj.cores[t].IIF = IIF[t]

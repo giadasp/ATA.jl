@@ -25,11 +25,11 @@ function add_exp_score!(ata_model::AbstractModel)
         for t = 1:T
             if expected_score_var[t] == Symbol("")
                 ICF[t] = item_char(
-                    ata_model.settings.IRT.parameters,
+                    ata_model.settings.irt.parameters,
                     ata_model.constraints[t].expected_score.pts,
-                    model = ata_model.settings.IRT.model,
-                    parametrization = ata_model.settings.IRT.parametrization,
-                    D = ata_model.settings.IRT.D,
+                    model = ata_model.settings.irt.model,
+                    parametrization = ata_model.settings.irt.parametrization,
+                    D = ata_model.settings.irt.D,
                 )[1][
                     :,
                     :,

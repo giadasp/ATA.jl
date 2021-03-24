@@ -86,18 +86,18 @@ function plot_results(
 
             ThetasPlot = collect(range(-4, stop = 4, length = 101)) #nqp values in interval/r/n",
             IIFplot = item_info(
-                ata_model.settings.IRT.parameters,
+                ata_model.settings.irt.parameters,
                 ThetasPlot,
-                model = ata_model.settings.IRT.model,
-                parametrization = ata_model.settings.IRT.parametrization,
-                D = ata_model.settings.IRT.D,
+                model = ata_model.settings.irt.model,
+                parametrization = ata_model.settings.irt.parametrization,
+                D = ata_model.settings.irt.D,
             )
             ICFplot = item_char(
-                ata_model.settings.IRT.parameters,
+                ata_model.settings.irt.parameters,
                 ThetasPlot,
-                model = ata_model.settings.IRT.model,
-                parametrization = ata_model.settings.IRT.parametrization,
-                D = ata_model.settings.IRT.D,
+                model = ata_model.settings.irt.model,
+                parametrization = ata_model.settings.irt.parametrization,
+                D = ata_model.settings.irt.D,
             )[1][
                 :,
                 :,

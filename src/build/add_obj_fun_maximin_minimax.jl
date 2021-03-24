@@ -17,10 +17,10 @@ function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel}; kwargs...)
     try
         T = ata_model.settings.T
         n_items = ata_model.settings.n_items
-        IRT_parameters = ata_model.settings.IRT.parameters
-        IRT_model = ata_model.settings.IRT.model
-        IRT_D = ata_model.settings.IRT.D
-        IRT_parametrization = ata_model.settings.IRT.parametrization
+        irt_parameters = ata_model.settings.irt.parameters
+        irt_model = ata_model.settings.irt.model
+        irt_D = ata_model.settings.irt.D
+        irt_parametrization = ata_model.settings.irt.parametrization
         IIF = Vector{Array{Float64,2}}(undef, T)
         ICF = Vector{Array{Float64,2}}(undef, T)
         K = zeros(Int, T)
@@ -30,18 +30,18 @@ function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel}; kwargs...)
             ICF[t] = zeros(K[t], n_items)
             for k = 1:K[t]
                 IIF[t][k, :] = item_info(
-                    IRT_parameters,
+                    irt_parameters,
                     ata_model.obj.cores[t].points[k],
-                    model = IRT_model,
-                    parametrization = IRT_parametrization,
-                    D = IRT_D,
+                    model = irt_model,
+                    parametrization = irt_parametrization,
+                    D = irt_D,
                 )# K[t] x I
                 ICF[t][k, :] = item_char(
-                    IRT_parameters,
+                    irt_parameters,
                     ata_model.obj.cores[t].points[k],
-                    model = IRT_model,
-                    parametrization = IRT_parametrization,
-                    D = IRT_D,
+                    model = irt_model,
+                    parametrization = irt_parametrization,
+                    D = irt_D,
                 )[1][
                     :,
                     :,

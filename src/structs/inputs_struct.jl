@@ -3,10 +3,10 @@ mutable struct InputSettings
     n_items::Int64
     n_groups::Int64
     groups::Vector{String}
-    IRT_model::String
-    IRT_parameters::Vector{String}
-    IRT_parametrization::String
-    IRT_D::Float64
+    irt_model::String
+    irt_parameters::Vector{String}
+    irt_parametrization::String
+    irt_D::Float64
     enemy_sets_var::Vector{String}
     friend_sets_var::Vector{String}
     item_use_min::Vector{Int64}
@@ -35,10 +35,10 @@ mutable struct InputSettings
         n_items,
         n_groups,
         groups,
-        IRT_model,
-        IRT_parameters,
-        IRT_parametrization,
-        IRT_D,
+        irt_model,
+        irt_parameters,
+        irt_parametrization,
+        irt_D,
         enemy_sets_var,
         friend_sets_var,
         item_use_min,
@@ -67,10 +67,10 @@ mutable struct InputSettings
         n_items,
         n_groups,
         groups,
-        IRT_model,
-        IRT_parameters,
-        IRT_parametrization,
-        IRT_D,
+        irt_model,
+        irt_parameters,
+        irt_parametrization,
+        irt_D,
         enemy_sets_var,
         friend_sets_var,
         item_use_min,
@@ -101,10 +101,10 @@ mutable struct InputSettings
         n_items = zero(Int64),
         n_groups = zero(Int64),
         groups = String[],
-        IRT_model = "",
-        IRT_parameters = String[],
-        IRT_parametrization = "at-b",
-        IRT_D = 1.0,
+        irt_model = "",
+        irt_parameters = String[],
+        irt_parametrization = "at-b",
+        irt_D = 1.0,
         enemy_sets_var = String[],
         friend_sets_var = String[],
         item_use_min = Int64[],
@@ -134,10 +134,10 @@ mutable struct InputSettings
             n_items,
             n_groups,
             groups,
-            IRT_model,
-            IRT_parameters,
-            IRT_parametrization,
-            IRT_D,
+            irt_model,
+            irt_parameters,
+            irt_parametrization,
+            irt_D,
             enemy_sets_var,
             friend_sets_var,
             item_use_min,

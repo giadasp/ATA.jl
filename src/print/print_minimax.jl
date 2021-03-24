@@ -81,9 +81,9 @@ function print_results(
                     item_char(
                         ata_model.irt.parameters,
                         ata_model.obj.cores[t].points[k],
-                        model = ata_model.settings.IRT.model,
-                        parametrization = ata_model.settings.IRT.parametrization,
-                        D = ata_model.settings.IRT.D,
+                        model = ata_model.settings.irt.model,
+                        parametrization = ata_model.settings.irt.parametrization,
+                        D = ata_model.settings.irt.D,
                     )' * design[:, t]
             end
         end
@@ -104,9 +104,9 @@ function print_results(
                         item_info(
                             sim_pool,
                             ata_model.obj.cores[t].points[k],
-                            model = ata_model.settings.IRT.model,
-                            parametrization = ata_model.settings.IRT.parametrization,
-                            D = ata_model.settings.IRT.D,
+                            model = ata_model.settings.irt.model,
+                            parametrization = ata_model.settings.irt.parametrization,
+                            D = ata_model.settings.irt.D,
                         )' * design[:, t],
                     )
                 end
