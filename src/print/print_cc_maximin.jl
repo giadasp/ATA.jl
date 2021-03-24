@@ -124,7 +124,7 @@ function print_results(
             DataFrames.DataFrame(hcat(zero_qle, first_qle, second_qle, third_qle, fourth_qle, alpha, estimated))
 
         if size(sim_pool, 1) > 0
-            tif_at_theta_pts[:true] = True
+            tif_at_theta_pts[!,:True] = True
             DataFrames.DataFrames.names!(
                 tif_at_theta_pts,
                 Symbol.([

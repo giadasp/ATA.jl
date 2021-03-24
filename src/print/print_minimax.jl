@@ -114,7 +114,7 @@ function print_results(
         end
         tif_at_theta_pts = DataFrames.DataFrame(estimated = estimated, target = target)
         if size(sim_pool, 1) > 0
-            tif_at_theta_pts[:true] = True
+            tif_at_theta_pts[!,:True] = True
             DataFrames.DataFrames.names!(tif_at_theta_pts, Symbol.(["estimated", "target", "true"]))
         end
         CSV.write(string(results_folder, "/tif_at_theta_pts.csv"), tif_at_theta_pts)
