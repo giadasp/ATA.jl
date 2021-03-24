@@ -158,13 +158,13 @@ function print_results(
         for t = 1:T
             if size(ICF, 1) == 0
                 ICF[t] =
-                    item_char(
+                    (item_char(
                         ata_model.settings.irt.parameters,
                         ata_model.obj.cores[t].points[k],
                         model = ata_model.settings.irt.model,
                         parametrization = ata_model.settings.irt.parametrization,
                         D = ata_model.settings.irt.D,
-                    )' * design[:, t]
+                    )[1][:,:,1])' * design[:, t]
             end
         end
 

@@ -68,7 +68,7 @@ function load_item_parameters_chain!(
                         model = irt_model,
                         parametrization = irt_parametrization,
                         D = irt_D,
-                    )[1] # K[t] x I x R
+                    )[1][:,:,1] # K[t] x I x R
                 end
                 ata_model.obj.cores[t].IIF = IIF[t]
             end
