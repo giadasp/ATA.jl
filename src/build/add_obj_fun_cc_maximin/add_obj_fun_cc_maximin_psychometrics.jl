@@ -16,7 +16,6 @@ function load_item_parameters_chain!(
         if !isfile(items_file)
             error(string("- ", items_file, " does not exist.\n"))
         end
-        items[collect(keys(items))[1]]
         items = FileIO.load(items_file)
         items = items[collect(keys(items))[1]]
         K = zeros(Int, T)

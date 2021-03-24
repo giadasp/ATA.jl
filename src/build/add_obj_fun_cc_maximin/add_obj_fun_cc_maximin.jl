@@ -11,10 +11,10 @@ Computes the IIFs at predefined ability points using `R` sampled item parameters
 
 # Arguments
 
-- **`ata_model::Union{CcMaximinModel}`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
+- **`ata_model::CcMaximinModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 
 """
-function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs...)
+function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, items_file = "", kwargs...)
     message = ["", ""]
     try
         T = ata_model.settings.T
@@ -109,7 +109,7 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs..
             JLD2.@save "OPT/IIF_CC.jld2" IIF
             JLD2.@save "OPT/ICF_CC.jld2" ICF
         else
-            load_item_parameters_chain!(ata_model; kwargs...)
+            load_item_parameters_chain!(ata_model; items_file = items_file, kwargs...)
         end
         message = [
             "success",
