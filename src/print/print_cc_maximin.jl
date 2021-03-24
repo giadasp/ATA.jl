@@ -156,7 +156,7 @@ function print_results(
 
         ICF = map(c -> c.expected_score.val, ata_model.constraints)
         for t = 1:T
-            if size(ICF, 1) == 0
+            if size(ICF[t], 1) == 0
                 ICF[t] =
                     (item_char(
                         ata_model.settings.irt.parameters,
