@@ -127,7 +127,7 @@ function print_results(
             tif_at_theta_pts[!,:True] = True
             DataFrames.rename(
                 tif_at_theta_pts,
-                Symbol.([
+                [
                     "min",
                     "0.25-qle",
                     "median",
@@ -136,12 +136,12 @@ function print_results(
                     string(ata_model.obj.cores[1].alpha, "-qle"),
                     "estimated",
                     "true",
-                ]),
+                ],
             )
         else
             DataFrames.rename(
                 tif_at_theta_pts,
-                Symbol.([
+                [
                     "min",
                     "0.25-qle",
                     "median",
@@ -149,7 +149,7 @@ function print_results(
                     "max",
                     string(ata_model.obj.cores[1].alpha, "-qle"),
                     "estimated",
-                ]),
+                ],
             )
         end
         CSV.write(string(results_folder, "/tif_at_theta_pts.csv"), tif_at_theta_pts)
