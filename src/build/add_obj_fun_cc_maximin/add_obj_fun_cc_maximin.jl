@@ -2,7 +2,7 @@ include(
     "add_obj_fun_cc_maximin_psychometrics.jl"
 )
 """
-add_obj_fun!(ata_model::CcMaximinModel)
+    add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs...)
 
 # Description
 

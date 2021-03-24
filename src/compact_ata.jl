@@ -23,6 +23,7 @@ function compact_ata(;
     plot_it = true,
     plot_folder = "PLOTS",
     sim_pool = DataFrames.DataFrame(),
+    psychometrics = false,
     kwargs...,
 )
     ata_model = start_ata(;
@@ -68,7 +69,7 @@ function compact_ata(;
         print_last_info(ata_model)
     end
     if add_obj_fun
-        add_obj_fun!(ata_model)
+        add_obj_fun!(ata_model; psychometrics = psychometrics)
         print_last_info(ata_model)
     end
     # 9. assemble

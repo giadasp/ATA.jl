@@ -1,6 +1,6 @@
 
 """
-add_obj_fun!(ata_model::Union{MaximinModel, MinimaxModel})
+    add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel}; kwargs...)
 
 # Description
 
@@ -12,7 +12,7 @@ Computes the IIFs at predefined ability points.
 - **`ata_model::Union{MaximinModel, MinimaxModel}`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 
 """
-function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel})
+function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel}; kwargs...)
     message = ["", ""]
     try
         T = ata_model.settings.T
