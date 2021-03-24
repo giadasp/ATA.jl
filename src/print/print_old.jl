@@ -134,7 +134,7 @@
 
 #             if isfile("sim_pool.csv")
 #                 tif_at_theta_pts[:true] = true
-#                 DataFrames.DataFrames.names!(
+#                 DataFrames.rename(
 #                     tif_at_theta_pts,
 #                     Symbol.([
 #                         "min",
@@ -148,7 +148,7 @@
 #                     ]),
 #                 )
 #             else
-#                 DataFrames.DataFrames.names!(
+#                 DataFrames.rename(
 #                     tif_at_theta_pts,
 #                     Symbol.([
 #                         "min",
@@ -189,7 +189,7 @@
 #             tif_at_theta_pts = DataFrames.DataFrame(estimated = estimated)
 #             if isfile("sim_pool.csv")
 #                 tif_at_theta_pts[:true] = true
-#                 DataFrames.DataFrames.names!(tif_at_theta_pts, Symbol.(["estimated", "true"]))
+#                 DataFrames.rename(tif_at_theta_pts, Symbol.(["estimated", "true"]))
 #             end
 #             CSV.write(string(results_folder, "/tif_at_theta_pts.csv"), tif_at_theta_pts)
 #         end

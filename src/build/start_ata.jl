@@ -137,11 +137,11 @@ function start_ata(;
             ata_model.settings.irt.D = Inputs.irt_D
 
             if ata_model.settings.irt.model == "1PL"
-                DataFrames.DataFrames.rename!(ata_model.settings.irt.parameters, [:b])#nqp values in interval\r\n",
+                DataFrames.rename!(ata_model.settings.irt.parameters, [:b])#nqp values in interval\r\n",
             elseif ata_model.settings.irt.model == "2PL"
-                DataFrames.DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b]) #nqp values in interval\r\n",
+                DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b]) #nqp values in interval\r\n",
             elseif ata_model.settings.irt.model == "3PL"
-                DataFrames.DataFrames.rename!(
+                DataFrames.rename!(
                     ata_model.settings.irt.parameters,
                     [:a, :b, :c],
                 ) #nqp values in interval\r\n",

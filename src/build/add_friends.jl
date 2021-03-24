@@ -60,7 +60,7 @@ function add_friends!(ata_model::AbstractModel)
             end
         end
         push!(ata_model.settings.fs.var, :SINGLE_fs)
-        DataFrames.DataFrames.insertcols!(
+        DataFrames.insertcols!(
             ata_model.settings.bank,
             size(ata_model.settings.bank, 2),
             :SINGLE_fs => single_items,

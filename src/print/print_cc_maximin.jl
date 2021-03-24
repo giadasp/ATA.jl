@@ -125,7 +125,7 @@ function print_results(
 
         if size(sim_pool, 1) > 0
             tif_at_theta_pts[!,:True] = True
-            DataFrames.DataFrames.names!(
+            DataFrames.rename(
                 tif_at_theta_pts,
                 Symbol.([
                     "min",
@@ -139,7 +139,7 @@ function print_results(
                 ]),
             )
         else
-            DataFrames.DataFrames.names!(
+            DataFrames.rename(
                 tif_at_theta_pts,
                 Symbol.([
                     "min",
