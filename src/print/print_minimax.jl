@@ -77,17 +77,17 @@ function print_results(
         ICF = map(c -> c.expected_score.val, ata_model.constraints)
         for t = 1:T
             if size(ICF[t], 1) == 0
-                ICF[t] = (item_char(
-                    irt_parameters,
-                    ata_model.obj.cores[t].points[k],
-                    model = irt_model,
-                    parametrization = irt_parametrization,
-                    D = irt_D,
-                )[1][
-                    :,
-                    :,
-                    1,
-                ])' * design[:, t]
+                ICF[t] = zeros(size(ata_model.obj.cores[t].points, 1), n_items)
+                for k = 1 : size(ata_model.obj.cores[t].points, 1)
+                    ICF[t][k, :] =
+                        (item_char(
+                            ata_model.settings.irt.parameters,
+                            ata_model.obj.cores[t].points[k],
+                            model = ata_model.settings.irt.model,
+                            parametrization = ata_model.settings.irt.parametrization,
+                            D = ata_model.settings.irt.D,
+                        )[1][:,:,1])
+                end
             end
         end
         #save values
