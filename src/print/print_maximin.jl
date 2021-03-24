@@ -73,18 +73,21 @@ function print_results(
         end
         #DelimitedFiles.writedlm(string(results_folder,"/olMatrixOUT.csv"),olMatrixOUT)
         #TIF e ICF          
-        IIF = map(c -> c.IIF, ata_model.cores)
+        IIF = map(c -> c.IIF, ata_model.obj.cores)
         ICF = map(c -> c.expected_score.val, ata_model.constraints)
         for t = 1:T
             if size(ICF, 1) == 0
-                ICF[t] =
-                    item_char(
-                        ata_model.settings.irt.parameters,
-                        ata_model.obj.cores[t].points[k],
-                        model = ata_model.settings.irt.model,
-                        parametrization = ata_model.settings.irt.parametrization,
-                        D = ata_model.settings.irt.D,
-                    )' * design[:, t]
+                ICF[t] = (item_char(
+                    irt_parameters,
+                    ata_model.obj.cores[t].points[k],
+                    model = irt_model,
+                    parametrization = irt_parametrization,
+                    D = irt_D,
+                )[1][
+                    :,
+                    :,
+                    1,
+                ])' * design[:, t]
             end
         end
         #save values
