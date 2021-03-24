@@ -99,7 +99,7 @@ function print_results(
                 estimated = vcat(
                     estimated,
                     item_info(
-                        ata_model.irt.parameters,
+                        ata_model.settings.irt.parameters,
                         ata_model.obj.cores[t].points[k],
                         model = ata_model.settings.irt.model,
                         parametrization = ata_model.settings.irt.parametrization,
@@ -159,7 +159,7 @@ function print_results(
             if size(ICF, 1) == 0
                 ICF[t] =
                     item_char(
-                        ata_model.irt.parameters,
+                        ata_model.settings.irt.parameters,
                         ata_model.obj.cores[t].points[k],
                         model = ata_model.settings.irt.model,
                         parametrization = ata_model.settings.irt.parametrization,
