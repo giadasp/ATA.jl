@@ -73,7 +73,6 @@ function print_results(
         #DelimitedFiles.writedlm(string(results_folder,"/olMatrixOUT.csv"),olMatrixOUT)
         #TIF e ICF          
         if size(ata_model.settings.irt_parameters, 1) > 0
-
             points = [-1.5, -1.0, -0.5, 0, 0.5, 1.0, 1.5]
             ICF = Vector{Matrix{Float64}}(undef, T)
             for t = 1:T
