@@ -3,7 +3,6 @@ mutable struct CcMaximinObjectiveCore
     alpha::Float64
     points::Vector{Float64}
     IIF::Array{Float64,3}
-    irt_parameters::Array{Float64,3}
     CcMaximinObjectiveCore() =
         new(1, 0.05, Vector{Float64}(), Array{Float64,3}(undef, 0, 0, 0))
 end
