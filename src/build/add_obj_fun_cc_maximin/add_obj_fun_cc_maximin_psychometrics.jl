@@ -6,18 +6,21 @@ function load_item_parameters_chain!(
     message = ["", ""]
 
     try
+        T = ata_model.settings.T
+        n_items = ata_model.settings.n_items
         IRT_parameters = ata_model.settings.IRT.parameters
         IRT_model = ata_model.settings.IRT.model
         IRT_D = ata_model.settings.IRT.D
         IRT_parametrization = ata_model.settings.IRT.parametrization
         R = ata_model.obj.cores[1].R
-        T = ata_model.settings.T
         n_items = ata_model.settings.n_items
         if !isfile(items_file)
             error(string("- ", items_file, " does not exist.\n"))
         end
         items = FileIO.load(items_file)
         items = items[collect(keys(items))[1]]
+        IIF = Vector{Array{Float64,3}}(undef, T)
+        ICF = Vector{Array{Float64,3}}(undef, T)
         K = zeros(Int, T)
         for t = 1:T
             K[t] = size(ata_model.obj.cores[t].points, 1)
