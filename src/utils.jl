@@ -433,7 +433,7 @@ function item_char(
         parametrization = parametrization, #"at-b, at-ab, at+b, at+ab"
         D = D,#any number (1, 1.6)
         derivatives = derivatives,
-    )
+    )[:, 1, :]
 end
 
 """
@@ -477,10 +477,11 @@ function item_info(
         #i = (a.^2 ) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2 
         i = pder .^ 2 ./ (p .* (1 .- p))
     else
-        i = pder .^ 2 ./ p
-        i = sum(i, dims = 3)[:, :, 1]
+        error("GRM still not supported.\n")
+        #i = pder .^ 2 ./ p
     end
-    return i
+    i = sum(i, dims = 3)[:, :, 1]
+    return i::Matrix{Float64}
 end
 
 """
@@ -509,7 +510,7 @@ function item_info(
     parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
     D = 1,
 ) #true, false
-    return item_info(pars, [theta], model = model, parametrization = parametrization, D = D)
+    return item_info(pars, [theta], model = model, parametrization = parametrization, D = D)[:, 1, :]
 end
 
 function student_likelihood(
