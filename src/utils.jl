@@ -433,7 +433,7 @@ function item_char(
         parametrization = parametrization, #"at-b, at-ab, at+b, at+ab"
         D = D,#any number (1, 1.6)
         derivatives = derivatives,
-    )[:, 1, :]
+    )
 end
 
 """
