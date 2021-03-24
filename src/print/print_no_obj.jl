@@ -72,7 +72,7 @@ function print_results(
         end
         #DelimitedFiles.writedlm(string(results_folder,"/olMatrixOUT.csv"),olMatrixOUT)
         #TIF e ICF          
-        if size(ata_model.settings.irt_parameters, 1) > 0
+        if size(ata_model.settings.irt.parameters, 1) > 0
             points = [-1.5, -1.0, -0.5, 0, 0.5, 1.0, 1.5]
             ICF = Vector{Matrix{Float64}}(undef, T)
             for t = 1:T
@@ -161,7 +161,7 @@ function print_results(
             write(io, "\r\n")
             DelimitedFiles.writedlm(io, design_items, "\t")
             write(io, "\r\n")
-            if size(ata_model.settings.irt_parameters, 1) > 0
+            if size(ata_model.settings.irt.parameters, 1) > 0
                 write(io, "Expected score")
                 write(io, "\r\n")
                 for t = 1:T
