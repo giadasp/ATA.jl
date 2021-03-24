@@ -123,7 +123,7 @@ function start_ata(;
                 zeros(Float64, 0, ata_model.settings.n_items)
         end
 
-        if !("opt" in readdir())
+        if !isdir("opt")
             mkdir("opt")
         end
         open("OPT/Settings.jl", "w") do f

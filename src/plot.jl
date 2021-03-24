@@ -1,5 +1,5 @@
 """
-	plot_results(ata_model; group_by_fs = false, results_folder = "PLOTS")
+	plot_results(ata_model; group_by_fs = false, results_folder = "plots")
 
 # Description
 
@@ -9,14 +9,14 @@ Plot the ICFs and TIFs of the assembled tests.
 
 - **`ata_model::AbstractModel`** : Required. The model built with `ATA` fuctions, `ata_model.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
 - **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.AbstractModel}).
-- **`results_folder`** : Optional. Default: "PLOTS". The folder in which the output is stored.
+- **`results_folder`** : Optional. Default: "plots". The folder in which the output is stored.
 """
 function plot_results(
     ata_model::AbstractModel;
     group_by_fs = false,
-    results_folder = "PLOTS",
+    results_folder = "plots",
 )
-    if !(results_folder in readdir())
+    if !isdir(results_folder)
         mkdir(results_folder)
     else
         println(

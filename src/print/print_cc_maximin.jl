@@ -24,7 +24,7 @@ function print_results(
     results_folder = "results",
     sim_pool::DataFrames.DataFrame = DataFrame(),
 )
-    if !(results_folder in readdir())
+    if !isdir(results_folder)
         mkdir(results_folder)
     else
         println(

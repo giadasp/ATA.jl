@@ -7,7 +7,7 @@ function jumpATA!(
     kwargs...,
 )
     message = ""
-    if !(results_folder in readdir())
+    if !isdir(results_folder)
         mkdir(results_folder)
     else
         message *= string(

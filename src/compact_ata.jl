@@ -21,7 +21,7 @@ function compact_ata(;
     print_it = true,
     print_folder = "results",
     plot_it = true,
-    plot_folder = "PLOTS",
+    plot_folder = "plots",
     sim_pool = DataFrames.DataFrame(),
     psychometrics = false,
     kwargs...,

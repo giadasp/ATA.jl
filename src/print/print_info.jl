@@ -1,4 +1,3 @@
-
 """
 print_infos(ata_model)
 

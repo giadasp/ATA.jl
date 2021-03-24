@@ -18,7 +18,7 @@
 #     group_by_fs = false,
 #     results_folder = "results",
 # )
-#     if !(results_folder in readdir())
+#     if !isdir(results_folder)
 #         mkdir(results_folder)
 #     else
 #         println(

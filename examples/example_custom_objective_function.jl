@@ -160,4 +160,4 @@ print_results(ata_model; group_by_fs = true, results_folder = "results")
 
 #]add https://github.com/giadasp/ATAPlot.jl
 using ATAPlot
-plot_results(ata_model; group_by_fs = true, results_folder = "PLOTS")
+plot_results(ata_model; group_by_fs = true, results_folder = "plots")
