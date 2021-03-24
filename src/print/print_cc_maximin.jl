@@ -87,14 +87,15 @@ function print_results(
         end
         for t = 1:T
             K = size(ata_model.obj.cores[t].points, 1)
+            IIF_t = ata_model.obj.cores[t].IIF
             for k = 1:K
-                IIF_t = (IIF_CC[t][k, :, :]' * design[:, t])
-                zero_qle = vcat(zero_qle, minimum(IIF_t))
-                first_qle = vcat(first_qle, StatsBase.quantile(IIF_t, [0.25]))
-                second_qle = vcat(second_qle, StatsBase.quantile(IIF_t, [0.5]))
-                third_qle = vcat(third_qle, StatsBase.quantile(IIF_t, [0.75]))
-                fourth_qle = vcat(fourth_qle, maximum(IIF_t))
-                alpha = vcat(alpha, StatsBase.quantile(IIF_t, ata_model.obj.cores[t].alpha))
+                IIF_t_k = (IIF_t[k, :, :]' * design[:, t])
+                zero_qle = vcat(zero_qle, minimum(IIF_t_k))
+                first_qle = vcat(first_qle, StatsBase.quantile(IIF_t_k, [0.25]))
+                second_qle = vcat(second_qle, StatsBase.quantile(IIF_t_k, [0.5]))
+                third_qle = vcat(third_qle, StatsBase.quantile(IIF_t_k, [0.75]))
+                fourth_qle = vcat(fourth_qle, maximum(IIF_t_k))
+                alpha = vcat(alpha, StatsBase.quantile(IIF_t_k, ata_model.obj.cores[t].alpha))
                 estimated = vcat(
                     estimated,
                     item_info(
