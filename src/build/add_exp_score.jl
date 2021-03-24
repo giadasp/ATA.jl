@@ -14,7 +14,7 @@ It requires the [`start_ata`](#ATA.start_ata) step.
 
 """
 function add_exp_score!(ata_model::AbstractModel)
-    message=["", ""]
+    message = ["", ""]
     try
         T = ata_model.settings.T
         n_items = ata_model.settings.n_items
@@ -51,7 +51,7 @@ function add_exp_score!(ata_model::AbstractModel)
         push!(ata_model.output.infos, ["success", "- Expected Score constrained.\n"])
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return nothing

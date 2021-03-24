@@ -218,12 +218,12 @@ function analyse_NH(
                             n_fs,
                             n_items,
                         )
-                       if ata_model.settings.to_apply[1]
+                        if ata_model.settings.to_apply[1]
                             iu_max = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
                             iu_max = sum_pos(iu_max)
-                       else
+                        else
                             iu_max = 0
-                       end
+                        end
                         if ata_model.settings.to_apply[2]
                             iu_min = -sum(NH₁.x, dims = 2)[:, 1] + ata_model.settings.iu.min
                             iu_min = sum_pos(iu_min)
@@ -300,13 +300,15 @@ function analyse_NH(
                             # iu[i₂]+= 1
                             # iu[h]-= 1
                             if ata_model.settings.to_apply[1]
-                                iu_max = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
+                                iu_max =
+                                    sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
                                 iu_max = sum_pos(iu_max)
-                           else
+                            else
                                 iu_max = 0
-                           end
+                            end
                             if ata_model.settings.to_apply[2]
-                                iu_min = -sum(NH₁.x, dims = 2)[:, 1] + ata_model.settings.iu.min
+                                iu_min =
+                                    -sum(NH₁.x, dims = 2)[:, 1] + ata_model.settings.iu.min
                                 iu_min = sum_pos(iu_min)
                             else
                                 iu_min = 0

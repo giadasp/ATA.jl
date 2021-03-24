@@ -95,7 +95,7 @@ mutable struct InputSettings
         obj_aux_float,
         categories,
     )
-    
+
     function InputSettings(;
         T = Int64[],
         n_items = zero(Int64),

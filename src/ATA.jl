@@ -12,14 +12,14 @@ using LinearAlgebra
 using JLD2
 using StatsBase
 using Requires
+using Psychometrics
 
 include("structs/ata_model.jl")
 include("utils.jl")
 include("build/build.jl")
 include("opt.jl")
-include("print.jl")
+include("print/print.jl")
 include("compact_ata.jl")
-
 
 function __init__()
     @require Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76" begin

@@ -63,6 +63,6 @@ mutable struct Settings
         EnemySets(),
         ItemUse(),
         zeros(Int64, 0, 0),
-        [false, false, false]
+        [false, false, false],
     )
 end

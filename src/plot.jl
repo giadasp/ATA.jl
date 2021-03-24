@@ -78,10 +78,10 @@ function plot_results(
         if ata_model.obj.name == "MAXIMIN" ||
            ata_model.obj.name == "CCMAXIMIN" ||
            ata_model.obj.name == "MINIMAX"
-            if isfile("simPool.csv")
-                simPool = CSV.read("simPool.csv", DataFrames.DataFrame)
+            if isfile("sim_pool.csv")
+                sim_pool = CSV.read("sim_pool.csv", DataFrames.DataFrame)
             else
-                simPool = Float64[]
+                sim_pool = Float64[]
             end
 
             ThetasPlot = collect(range(-4, stop = 4, length = 101)) #nqp values in interval/r/n",
@@ -116,7 +116,7 @@ function plot_results(
                 IIFf,
                 ICFf,
                 design;
-                simPool = simPool,
+                sim_pool = sim_pool,
                 results_folder = results_folder,
             )
 
@@ -126,7 +126,7 @@ function plot_results(
                     IIFf,
                     ICFf,
                     design;
-                    simPool = simPool,
+                    sim_pool = sim_pool,
                     results_folder = results_folder,
                 )
             end

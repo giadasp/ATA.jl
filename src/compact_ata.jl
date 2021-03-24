@@ -19,9 +19,10 @@ function compact_ata(;
     add_obj_fun = true,
     solver = "siman", #"jumpATA",
     print_it = true,
-    print_folder = "RESULTS",
+    print_folder = "results",
     plot_it = true,
     plot_folder = "PLOTS",
+    sim_pool = DataFrames.DataFrame(),
     kwargs...,
 )
     ata_model = start_ata(;
@@ -54,7 +55,7 @@ function compact_ata(;
             ata_model;
             overlap = overlap,
             overlap_file = overlap_file,
-            overlap_delim = overlap_delim
+            overlap_delim = overlap_delim,
         )
         print_last_info(ata_model)
     end
@@ -77,6 +78,7 @@ function compact_ata(;
             ata_model;
             group_by_fs = group_by_friends,
             results_folder = print_folder,
+            sim_pool = sim_pool,
         )
     end
     if plot_it

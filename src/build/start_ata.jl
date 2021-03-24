@@ -64,7 +64,7 @@ function start_ata(;
         infos = ata_model.output.infos
         if Inputs.obj_type != ""
             if Inputs.obj_type == "MAXIMIN"
-                ata_model = MaximinModel()            
+                ata_model = MaximinModel()
             elseif Inputs.obj_type == "MINIMAX"
                 ata_model = MinimaxModel()
             elseif Inputs.obj_type == "CCMAXIMIN"
@@ -89,7 +89,8 @@ function start_ata(;
             message[2] = message[2] * "- Item bank dataframe loaded.\n"
         elseif isfile(bank_file)
             try
-                ata_model.settings.bank = CSV.read(bank_file, DataFrames.DataFrame, delim = bank_delim)
+                ata_model.settings.bank =
+                    CSV.read(bank_file, DataFrames.DataFrame, delim = bank_delim)
             catch e
                 message[1] = "danger"
                 message[2] = message[2] * "- Error in reading the item bank file.\n"
@@ -122,8 +123,8 @@ function start_ata(;
                 zeros(Float64, 0, ata_model.settings.n_items)
         end
 
-        if !("OPT" in readdir())
-            mkdir("OPT")
+        if !("opt" in readdir())
+            mkdir("opt")
         end
         open("OPT/Settings.jl", "w") do f
             write(f, "#Settings \n\n")
@@ -464,7 +465,7 @@ function start_ata(;
         push!(ata_model.output.infos, message)
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return ata_model

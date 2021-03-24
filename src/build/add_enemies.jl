@@ -96,7 +96,7 @@ function add_enemies!(ata_model::AbstractModel)
         end
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return nothing

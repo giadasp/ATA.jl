@@ -1,4 +1,4 @@
-function load_item_parameters_chain(
+function load_item_parameters_chain!(
     ata_model::AbstractModel;
     items_file = "items.jld2",
     kwargs...,
@@ -73,7 +73,7 @@ function load_item_parameters_chain(
         end
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return nothing

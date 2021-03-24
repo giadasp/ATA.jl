@@ -140,7 +140,8 @@ function add_constraints!(
                     end
                 end
             end
-            message[2] = message[2] * "- Linear constraints (categorical and quantitative) added.\n"   
+            message[2] =
+                message[2] * "- Linear constraints (categorical and quantitative) added.\n"
         end
         #add sum vars constraints
         # if size(ata_model.constraints[t].sum_vars, 1) > 1
@@ -178,7 +179,7 @@ function add_constraints!(
         push!(ata_model.output.infos, message)
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return nothing

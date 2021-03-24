@@ -1,5 +1,5 @@
-@require Psychometrics = "ce8202d9-98c3-4990-890a-8616ce2c06f9" include(
-    "add_obj_fun_cc_maximin_psychometrics.jl",
+include(
+    "add_obj_fun_cc_maximin_psychometrics.jl"
 )
 """
 add_obj_fun!(ata_model::CcMaximinModel)
@@ -122,7 +122,7 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs..
         push!(ata_model.output.infos, message)
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return nothing
