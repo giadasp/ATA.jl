@@ -7,7 +7,7 @@ mutable struct Settings
     n_items::Int64
     n_fs::Int64
     bank::DataFrames.DataFrame
-    IRT::IRT
+    irt::IRT
     theta_bounds::Vector{Vector{Float64}}
     forced0::Vector{Vector{Bool}}
     n_groups::Int64
@@ -22,7 +22,7 @@ mutable struct Settings
         n_items,
         n_fs,
         bank,
-        IRT,
+        irt,
         theta_bounds,
         forced0,
         n_groups,
@@ -37,7 +37,7 @@ mutable struct Settings
         n_items,
         n_fs,
         bank,
-        IRT,
+        irt,
         theta_bounds,
         forced0,
         n_groups,
@@ -63,6 +63,6 @@ mutable struct Settings
         EnemySets(),
         ItemUse(),
         zeros(Int64, 0, 0),
-        [false, false, false]
+        [false, false, false],
     )
 end

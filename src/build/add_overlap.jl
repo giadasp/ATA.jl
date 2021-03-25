@@ -89,7 +89,7 @@ function add_overlap!(
         push!(ata_model.output.infos, ["success", "- Maximum overlap constrained.\n"])
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return nothing

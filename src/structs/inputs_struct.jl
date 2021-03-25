@@ -3,10 +3,10 @@ mutable struct InputSettings
     n_items::Int64
     n_groups::Int64
     groups::Vector{String}
-    IRT_model::String
-    IRT_parameters::Vector{String}
-    IRT_parametrization::String
-    IRT_D::Float64
+    irt_model::String
+    irt_parameters::Vector{String}
+    irt_parametrization::String
+    irt_D::Float64
     enemy_sets_var::Vector{String}
     friend_sets_var::Vector{String}
     item_use_min::Vector{Int64}
@@ -35,10 +35,10 @@ mutable struct InputSettings
         n_items,
         n_groups,
         groups,
-        IRT_model,
-        IRT_parameters,
-        IRT_parametrization,
-        IRT_D,
+        irt_model,
+        irt_parameters,
+        irt_parametrization,
+        irt_D,
         enemy_sets_var,
         friend_sets_var,
         item_use_min,
@@ -67,10 +67,10 @@ mutable struct InputSettings
         n_items,
         n_groups,
         groups,
-        IRT_model,
-        IRT_parameters,
-        IRT_parametrization,
-        IRT_D,
+        irt_model,
+        irt_parameters,
+        irt_parametrization,
+        irt_D,
         enemy_sets_var,
         friend_sets_var,
         item_use_min,
@@ -95,16 +95,15 @@ mutable struct InputSettings
         obj_aux_float,
         categories,
     )
-    
     function InputSettings(;
         T = Int64[],
         n_items = zero(Int64),
         n_groups = zero(Int64),
         groups = String[],
-        IRT_model = "",
-        IRT_parameters = String[],
-        IRT_parametrization = "at-b",
-        IRT_D = 1.0,
+        irt_model = "",
+        irt_parameters = String[],
+        irt_parametrization = "at-b",
+        irt_D = 1.0,
         enemy_sets_var = String[],
         friend_sets_var = String[],
         item_use_min = Int64[],
@@ -128,39 +127,39 @@ mutable struct InputSettings
         obj_aux_int = zero(Int64),
         obj_aux_float = zero(Float64),
         categories = String[],
-    ) 
-    InputSettings(
-        T,
-        n_items,
-        n_groups,
-        groups,
-        IRT_model,
-        IRT_parameters,
-        IRT_parametrization,
-        IRT_D,
-        enemy_sets_var,
-        friend_sets_var,
-        item_use_min,
-        item_use_max,
-        length_min,
-        length_max,
-        length_weight,
-        expected_score_var,
-        expected_score_pts,
-        expected_score_min,
-        expected_score_max,
-        mean_vars,
-        mean_vars_min,
-        mean_vars_max,
-        sum_vars,
-        sum_vars_min,
-        sum_vars_max,
-        obj_type,
-        obj_points,
-        obj_targets,
-        obj_aux_int,
-        obj_aux_float,
-        categories,
     )
+        InputSettings(
+            T,
+            n_items,
+            n_groups,
+            groups,
+            irt_model,
+            irt_parameters,
+            irt_parametrization,
+            irt_D,
+            enemy_sets_var,
+            friend_sets_var,
+            item_use_min,
+            item_use_max,
+            length_min,
+            length_max,
+            length_weight,
+            expected_score_var,
+            expected_score_pts,
+            expected_score_min,
+            expected_score_max,
+            mean_vars,
+            mean_vars_min,
+            mean_vars_max,
+            sum_vars,
+            sum_vars_min,
+            sum_vars_max,
+            obj_type,
+            obj_points,
+            obj_targets,
+            obj_aux_int,
+            obj_aux_float,
+            categories,
+        )
     end
 end

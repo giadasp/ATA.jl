@@ -1,8 +1,8 @@
-@require Psychometrics = "ce8202d9-98c3-4990-890a-8616ce2c06f9" include(
-    "add_obj_fun_cc_maximin_psychometrics.jl",
+include(
+    "add_obj_fun_cc_maximin_psychometrics.jl"
 )
 """
-add_obj_fun!(ata_model::CcMaximinModel)
+    add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs...)
 
 # Description
 
@@ -11,18 +11,18 @@ Computes the IIFs at predefined ability points using `R` sampled item parameters
 
 # Arguments
 
-- **`ata_model::Union{CcMaximinModel}`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
+- **`ata_model::CcMaximinModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 
 """
-function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs...)
+function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, items_file = "", kwargs...)
     message = ["", ""]
     try
         T = ata_model.settings.T
         n_items = ata_model.settings.n_items
-        IRT_parameters = ata_model.settings.IRT.parameters
-        IRT_model = ata_model.settings.IRT.model
-        IRT_D = ata_model.settings.IRT.D
-        IRT_parametrization = ata_model.settings.IRT.parametrization
+        irt_parameters = ata_model.settings.irt.parameters
+        irt_model = ata_model.settings.irt.model
+        irt_D = ata_model.settings.irt.D
+        irt_parametrization = ata_model.settings.irt.parametrization
         IIF = Vector{Array{Float64,2}}(undef, T)
         ICF = Vector{Array{Float64,2}}(undef, T)
         K = zeros(Int, T)
@@ -32,18 +32,18 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs..
             ICF[t] = zeros(K[t], n_items)
             for k = 1:K[t]
                 IIF[t][k, :] = item_info(
-                    IRT_parameters,
+                    irt_parameters,
                     ata_model.obj.cores[t].points[k],
-                    model = IRT_model,
-                    parametrization = IRT_parametrization,
-                    D = IRT_D,
+                    model = irt_model,
+                    parametrization = irt_parametrization,
+                    D = irt_D,
                 )# K[t] x I
                 ICF[t][k, :] = item_char(
-                    IRT_parameters,
+                    irt_parameters,
                     ata_model.obj.cores[t].points[k],
-                    model = IRT_model,
-                    parametrization = IRT_parametrization,
-                    D = IRT_D,
+                    model = irt_model,
+                    parametrization = irt_parametrization,
+                    D = irt_D,
                 )[1][
                     :,
                     :,
@@ -76,11 +76,11 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs..
                 IIF[t] = zeros(K[t], n_items, R)
                 ICF[t] = zeros(K[t], n_items, R)
                 for r = 1:R
-                    if IRT_model == "1PL"
+                    if irt_model == "1PL"
                         df = DataFrames.DataFrame(b = BSb[:, r]) #nqp values in interval\r\n",
-                    elseif IRT_model == "2PL"
+                    elseif irt_model == "2PL"
                         df = DataFrames.DataFrame(a = BSa[:, r], b = BSb[:, r]) #nqp values in interval\r\n",
-                    elseif IRT_model == "3PL"
+                    elseif irt_model == "3PL"
                         df = DataFrames.DataFrame(
                             a = BSa[:, r],
                             b = BSb[:, r],
@@ -91,17 +91,17 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs..
                         IIF[t][k, :, r] = item_info(
                             df,
                             ata_model.obj.cores[t].points[k];
-                            model = IRT_model,
-                            parametrization = IRT_parametrization,
-                            D = IRT_D,
+                            model = irt_model,
+                            parametrization = irt_parametrization,
+                            D = irt_D,
                         ) # K[t] x I x R
                         ICF[t][k, :, r] = item_char(
                             df,
                             ata_model.obj.cores[t].points[k];
-                            model = IRT_model,
-                            parametrization = IRT_parametrization,
-                            D = IRT_D,
-                        )[1] # K[t] x I x R
+                            model = irt_model,
+                            parametrization = irt_parametrization,
+                            D = irt_D,
+                        )[1][:,:,1] # K[t] x I x R
                     end
                     ata_model.obj.cores[t].IIF = IIF[t]
                 end
@@ -109,7 +109,7 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs..
             JLD2.@save "OPT/IIF_CC.jld2" IIF
             JLD2.@save "OPT/ICF_CC.jld2" ICF
         else
-            load_item_parameters_chain!(ata_model; kwargs...)
+            load_item_parameters_chain!(ata_model; items_file = items_file, kwargs...)
         end
         message = [
             "success",
@@ -122,7 +122,7 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs..
         push!(ata_model.output.infos, message)
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return nothing

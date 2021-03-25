@@ -1,13 +1,13 @@
 function jumpATA!(
     ata_model::AbstractModel;
     starting_design = Matrix{Float64}(undef, 0, 0),
-    results_folder = "RESULTS",
+    results_folder = "results",
     optimizer_constructor = "GLPK",
     optimizer_attributes = [("tm_lim", 500000), ("msg_lev", 3)],
     kwargs...,
 )
     message = ""
-    if !(results_folder in readdir())
+    if !isdir(results_folder)
         mkdir(results_folder)
     else
         message *= string(

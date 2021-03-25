@@ -23,8 +23,8 @@ function find_best_itemᵥ(
     else
         iu_max₀ = 0
     end
-    if to_apply[2] 
-        iu_min₀ = - sum(NH.x, dims = 2)[:, 1] + iu.min
+    if to_apply[2]
+        iu_min₀ = -sum(NH.x, dims = 2)[:, 1] + iu.min
     else
         iu_min₀ = 0
     end
@@ -33,16 +33,17 @@ function find_best_itemᵥ(
     ol₀ₜ = 0
     for i₂ in idxₜ₂
         if x_forced0ₜ[i₂]
-            x₁, infeas₁, iu_max, iu_min = copy(x₀), copy(infeas₀), copy(iu_max₀), copy(iu_min₀)
+            x₁, infeas₁, iu_max, iu_min =
+                copy(x₀), copy(infeas₀), copy(iu_max₀), copy(iu_min₀)
             x₁[i₂, v] = one(Float64)
             if to_apply[1]
-                iu_max[i₂] = iu_max[i₂] + 1    
+                iu_max[i₂] = iu_max[i₂] + 1
                 iu_max = sum_pos(iu_max)
-            end        
+            end
             if to_apply[2]
                 iu_min[i₂] = iu_min[i₂] - 1
                 iu_min = sum_pos(iu_min)
-            end 
+            end
             xₜ = copy(x₁[:, v])
             infeas₁, x_Iₜ = check_feas(fs, constraints, xₜ, n_fs, n_items)
             if to_apply[3]

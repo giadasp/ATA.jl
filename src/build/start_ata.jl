@@ -64,7 +64,7 @@ function start_ata(;
         infos = ata_model.output.infos
         if Inputs.obj_type != ""
             if Inputs.obj_type == "MAXIMIN"
-                ata_model = MaximinModel()            
+                ata_model = MaximinModel()
             elseif Inputs.obj_type == "MINIMAX"
                 ata_model = MinimaxModel()
             elseif Inputs.obj_type == "CCMAXIMIN"
@@ -89,7 +89,8 @@ function start_ata(;
             message[2] = message[2] * "- Item bank dataframe loaded.\n"
         elseif isfile(bank_file)
             try
-                ata_model.settings.bank = CSV.read(bank_file, DataFrames.DataFrame, delim = bank_delim)
+                ata_model.settings.bank =
+                    CSV.read(bank_file, DataFrames.DataFrame, delim = bank_delim)
             catch e
                 message[1] = "danger"
                 message[2] = message[2] * "- Error in reading the item bank file.\n"
@@ -108,12 +109,13 @@ function start_ata(;
             )
             return nothing
         end
+        ata_model.settings.n_groups = Inputs.n_groups
         ata_model.settings.n_items = Inputs.n_items
         ata_model.settings.T = Int(sum(Inputs.T))
         ata_model.settings.Tg = Inputs.T
         #initialize constraints
         ata_model.constraints = [Constraint() for t = 1:ata_model.settings.T]
-        ata_model.settings.n_groups = size(Inputs.groups, 1)
+        ata_model.settings.n_groups = size(Inputs.T, 1)
         x_forced0 = Vector{Vector{Bool}}(undef, ata_model.settings.T)
         for t = 1:ata_model.settings.T
             x_forced0[t] = fill(true, ata_model.settings.n_items)
@@ -121,26 +123,26 @@ function start_ata(;
                 zeros(Float64, 0, ata_model.settings.n_items)
         end
 
-        if !("OPT" in readdir())
-            mkdir("OPT")
+        if !isdir("opt")
+            mkdir("opt")
         end
         open("OPT/Settings.jl", "w") do f
             write(f, "#Settings \n\n")
 
-            ata_model.settings.IRT.model = Inputs.IRT_model
-            ata_model.settings.IRT.parameters = DataFrames.DataFrame(
-                ata_model.settings.bank[!, Symbol.(Inputs.IRT_parameters)],
+            ata_model.settings.irt.model = Inputs.irt_model
+            ata_model.settings.irt.parameters = DataFrames.DataFrame(
+                ata_model.settings.bank[!, Symbol.(Inputs.irt_parameters)],
             )
-            ata_model.settings.IRT.parametrization = Inputs.IRT_parametrization
-            ata_model.settings.IRT.D = Inputs.IRT_D
+            ata_model.settings.irt.parametrization = Inputs.irt_parametrization
+            ata_model.settings.irt.D = Inputs.irt_D
 
-            if ata_model.settings.IRT.model == "1PL"
-                DataFrames.DataFrames.rename!(ata_model.settings.IRT.parameters, [:b])#nqp values in interval\r\n",
-            elseif ata_model.settings.IRT.model == "2PL"
-                DataFrames.DataFrames.rename!(ata_model.settings.IRT.parameters, [:a, :b]) #nqp values in interval\r\n",
-            elseif ata_model.settings.IRT.model == "3PL"
-                DataFrames.DataFrames.rename!(
-                    ata_model.settings.IRT.parameters,
+            if ata_model.settings.irt.model == "1PL"
+                DataFrames.rename!(ata_model.settings.irt.parameters, [:b])#nqp values in interval\r\n",
+            elseif ata_model.settings.irt.model == "2PL"
+                DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b]) #nqp values in interval\r\n",
+            elseif ata_model.settings.irt.model == "3PL"
+                DataFrames.rename!(
+                    ata_model.settings.irt.parameters,
                     [:a, :b, :c],
                 ) #nqp values in interval\r\n",
             else
@@ -150,7 +152,7 @@ function start_ata(;
                 )
                 return nothing
             end
-            CSV.write("OPT/IRT_parameters.csv", ata_model.settings.IRT.parameters)
+            CSV.write("OPT/irt_parameters.csv", ata_model.settings.irt.parameters)
             message[2] = message[2] * "- IRT item parameters loaded.\n"
             if Inputs.enemy_sets_var != String[]
                 ata_model.settings.es.var = Symbol.(Inputs.enemy_sets_var)
@@ -359,6 +361,7 @@ function start_ata(;
                         for t = 1:ata_model.settings.Tg[g]
                             ata_model.obj.cores[t1].points = Inputs.obj_points[g]
                             ata_model.obj.cores[t1].alpha = Inputs.obj_aux_float
+                            ata_model.obj.cores[t1].R = Inputs.obj_aux_int
                             t1 += 1
                         end
                     end
@@ -463,7 +466,7 @@ function start_ata(;
         push!(ata_model.output.infos, message)
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return ata_model

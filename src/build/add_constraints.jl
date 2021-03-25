@@ -64,7 +64,6 @@ function add_constraints!(
                 A[t] = zeros(Float64, 0, ata_model.settings.n_items)
                 b[t] = Vector{Float64}(undef, 0)
             end
-
         end
         x_forced0 = ata_model.settings.forced0
         if size(categorical_constraints, 1) == 0
@@ -141,44 +140,46 @@ function add_constraints!(
                     end
                 end
             end
-            #add quantitative constraints
-            for t = 1:ata_model.settings.T
-                for var = 1:size(ata_model.constraints[t].sum_vars, 1)
-                    vals = copy(
-                        ata_model.settings.bank[!, ata_model.constraints[t].sum_vars[var]],
-                    )
-                    vals[findall(ismissing.(vals))] .= 0.0
-                    if !ismissing(ata_model.constraints[t].sum_vars_min[var])
-                        A[t] = vcat(A[t], .-vals')
-                        push!(b[t], -ata_model.constraints[t].sum_vars_min[var])
-                    end
-                    if !ismissing(ata_model.constraints[t].sum_vars_max[var])
-                        A[t] = vcat(A[t], vals')
-                        push!(b[t], ata_model.constraints[t].sum_vars_max[var])
-                    end
-                end
-            end
-            message[2] = message[2] * "- Sum variables constraints added. \n"
-            for t = 1:ata_model.settings.T
-                DelimitedFiles.writedlm("OPT/A_$t.csv", A[t])
-                DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
-            end
-            DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0)
+            message[2] =
+                message[2] * "- Linear constraints (categorical and quantitative) added.\n"
         end
+        #add sum vars constraints
+        # if size(ata_model.constraints[t].sum_vars, 1) > 1
+        #     for t = 1:ata_model.settings.T
+        #         for var = 1:size(ata_model.constraints[t].sum_vars, 1)
+        #             vals = copy(
+        #                 ata_model.settings.bank[!, ata_model.constraints[t].sum_vars[var]],
+        #             )
+        #             vals[findall(ismissing.(vals))] .= 0.0
+        #             if !ismissing(ata_model.constraints[t].sum_vars_min[var])
+        #                 A[t] = vcat(A[t], .-vals')
+        #                 push!(b[t], -ata_model.constraints[t].sum_vars_min[var])
+        #             end
+        #             if !ismissing(ata_model.constraints[t].sum_vars_max[var])
+        #                 A[t] = vcat(A[t], vals')
+        #                 push!(b[t], ata_model.constraints[t].sum_vars_max[var])
+        #             end
+        #         end
+        #     end
+        #     message[2] = message[2] * "- Constraints on sum of quantitative variables added.\n"
+        # end
+        for t = 1:ata_model.settings.T
+            DelimitedFiles.writedlm("OPT/A_$t.csv", A[t])
+            DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
+        end
+        DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0)
         #update model
         ata_model.settings.forced0 = x_forced0
         for t = 1:ata_model.settings.T
             ata_model.constraints[t].constr_b = b[t]
             ata_model.constraints[t].constr_A = A[t]
         end
-        JLD2.@save "OPT/ata_model.jld2" AbstractModel
+        JLD2.@save "OPT/ata_model.jld2" ata_model
         message[1] = "success"
-        message[2] =
-            message[2] * string("- Constraints in file ", constraints_file, " added. \n")
         push!(ata_model.output.infos, message)
     catch e
         message[1] = "danger"
-        message[2] = message[2] * string("- ",sprint(showerror, e),"\n")
+        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
         push!(ata_model.output.infos, message)
     end
     return nothing

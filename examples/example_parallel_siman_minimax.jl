@@ -129,15 +129,15 @@ assemble!(
 
 # All the settings and outputs from optimization are in ata_model object.
 # See the struct in ATA.jl to understand how to retrieve all the information.
-# A summary of the resulting tests is available in results_folder/Results.txt
+# A summary of the resulting tests is available in results_folder/results.txt
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
-# is reported in "RESULTS/ResultsATA.jl"
-print_results(ata_model; group_by_fs = true, results_folder = "RESULTS")
+# is reported in "results/results_ata.jl"
+print_results(ata_model; group_by_fs = true, results_folder = "results")
 
 
 #]add https://github.com/giadasp/ATAPlot.jl
 using ATAPlot
-plot_results(ata_model; group_by_fs = true, results_folder = "PLOTS")
+plot_results(ata_model; group_by_fs = true, results_folder = "plots")
 
 #to stop all the processes do:
 #ctrl+C

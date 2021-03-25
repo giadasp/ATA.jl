@@ -4,7 +4,7 @@ include("evaluate_nh/eval.jl")
 function siman!(
     ata_model::AbstractModel;
     starting_design = Matrix{Float64}(undef, 0, 0),
-    results_folder = "RESULTS",
+    results_folder = "results",
     start_temp = 0.1,
     geom_temp = 0.1,
     max_time = 1000.0,
@@ -19,7 +19,7 @@ function siman!(
     kwargs...,
 )
     message = ""
-    if !(results_folder in readdir())
+    if !isdir(results_folder)
         mkdir(results_folder)
     else
         message *= string(
@@ -253,7 +253,7 @@ function siman!(
         # end
         if verbosity >= 1
             println(hline)
-            println("Results")
+            println("results")
             if (finish == 1)
                 println(" == > Maximum number of neighbourhoods explored <== ")
                 # elseif (finish == 2) #time max reached
@@ -303,7 +303,7 @@ function siman!(
         string(results_folder, "/design.csv"),
         reshape(ata_model.output.design, n_fs, T),
     )
-    open(string(results_folder, "/ResultsATA.txt"), "w") do io
+    open(string(results_folder, "/results_ata.txt"), "w") do io
         write(io, "tests")
         write(io, "\r\n")
         DelimitedFiles.writedlm(io, collect(1:T)', ", ")

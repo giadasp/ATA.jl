@@ -2,5 +2,5 @@
 
 ```@autodocs
 Modules = [ATA]
-Pages   = ["build.jl"]
+Pages   = ["build/build.jl"]
 ```

@@ -24,8 +24,8 @@ function find_best_itemᵥ(
     else
         iu_max₀ = 0
     end
-    if to_apply[2] 
-        iu_min₀ = - sum(NH.x, dims = 2)[:, 1] + iu.min
+    if to_apply[2]
+        iu_min₀ = -sum(NH.x, dims = 2)[:, 1] + iu.min
     else
         iu_min₀ = 0
     end
@@ -34,17 +34,18 @@ function find_best_itemᵥ(
     ol₀ₜ = 0
     for i₂ in idxₜ₂
         if x_forced0ₜ[i₂]
-            x₁, TIF₁, infeas₁, iu_min, iu_max = copy(x₀), copy(TIF₀), copy(infeas₀), copy(iu_min₀), copy(iu_max₀)
+            x₁, TIF₁, infeas₁, iu_min, iu_max =
+                copy(x₀), copy(TIF₀), copy(infeas₀), copy(iu_min₀), copy(iu_max₀)
             x₁[i₂, v] = one(Float64)
             xₜ = copy(x₁[:, v])
             if to_apply[1]
-                iu_max[i₂] = iu_max[i₂] + 1    
+                iu_max[i₂] = iu_max[i₂] + 1
                 iu_max = sum_pos(iu_max)
-            end        
+            end
             if to_apply[2]
                 iu_min[i₂] = iu_min[i₂] - 1
                 iu_min = sum_pos(iu_min)
-            end 
+            end
             infeas₁, x_Iₜ = check_feas(fs, constraints, xₜ, n_fs, n_items)
             TIF₁[v] = eval_TIFₜ(x_Iₜ, coreₜ)
             if to_apply[3]
@@ -52,7 +53,8 @@ function find_best_itemᵥ(
             else
                 ol = 0
             end
-            f₁ = (1 - opt_feas) * (infeas₁ + iu_min + iu_max + ol) - opt_feas * minimum(TIF₁)
+            f₁ =
+                (1 - opt_feas) * (infeas₁ + iu_min + iu_max + ol) - opt_feas * minimum(TIF₁)
             if (f₁ < f₀)
                 i⁺ = copy(i₂)
                 f₀, TIF₀, infeas₀ = copy(f₁), copy(TIF₁), copy(infeas₁)

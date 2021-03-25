@@ -1,5 +1,5 @@
 """
-	plot_results(ata_model; group_by_fs = false, results_folder = "PLOTS")
+	plot_results(ata_model; group_by_fs = false, results_folder = "plots")
 
 # Description
 
@@ -9,14 +9,14 @@ Plot the ICFs and TIFs of the assembled tests.
 
 - **`ata_model::AbstractModel`** : Required. The model built with `ATA` fuctions, `ata_model.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
 - **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.AbstractModel}).
-- **`results_folder`** : Optional. Default: "PLOTS". The folder in which the output is stored.
+- **`results_folder`** : Optional. Default: "plots". The folder in which the output is stored.
 """
 function plot_results(
     ata_model::AbstractModel;
     group_by_fs = false,
-    results_folder = "PLOTS",
+    results_folder = "plots",
 )
-    if !(results_folder in readdir())
+    if !isdir(results_folder)
         mkdir(results_folder)
     else
         println(
@@ -78,26 +78,26 @@ function plot_results(
         if ata_model.obj.name == "MAXIMIN" ||
            ata_model.obj.name == "CCMAXIMIN" ||
            ata_model.obj.name == "MINIMAX"
-            if isfile("simPool.csv")
-                simPool = CSV.read("simPool.csv", DataFrames.DataFrame)
+            if isfile("sim_pool.csv")
+                sim_pool = CSV.read("sim_pool.csv", DataFrames.DataFrame)
             else
-                simPool = Float64[]
+                sim_pool = Float64[]
             end
 
             ThetasPlot = collect(range(-4, stop = 4, length = 101)) #nqp values in interval/r/n",
             IIFplot = item_info(
-                ata_model.settings.IRT.parameters,
+                ata_model.settings.irt.parameters,
                 ThetasPlot,
-                model = ata_model.settings.IRT.model,
-                parametrization = ata_model.settings.IRT.parametrization,
-                D = ata_model.settings.IRT.D,
+                model = ata_model.settings.irt.model,
+                parametrization = ata_model.settings.irt.parametrization,
+                D = ata_model.settings.irt.D,
             )
             ICFplot = item_char(
-                ata_model.settings.IRT.parameters,
+                ata_model.settings.irt.parameters,
                 ThetasPlot,
-                model = ata_model.settings.IRT.model,
-                parametrization = ata_model.settings.IRT.parametrization,
-                D = ata_model.settings.IRT.D,
+                model = ata_model.settings.irt.model,
+                parametrization = ata_model.settings.irt.parametrization,
+                D = ata_model.settings.irt.D,
             )[1][
                 :,
                 :,
@@ -116,7 +116,7 @@ function plot_results(
                 IIFf,
                 ICFf,
                 design;
-                simPool = simPool,
+                sim_pool = sim_pool,
                 results_folder = results_folder,
             )
 
@@ -126,7 +126,7 @@ function plot_results(
                     IIFf,
                     ICFf,
                     design;
-                    simPool = simPool,
+                    sim_pool = sim_pool,
                     results_folder = results_folder,
                 )
             end

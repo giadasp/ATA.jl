@@ -208,9 +208,9 @@ function analyse_NH(
                     if ata_model.settings.to_apply[1]
                         iu_max = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
                         iu_max = sum_pos(iu_max)
-                   else
+                    else
                         iu_max = 0
-                   end
+                    end
                     if ata_model.settings.to_apply[2]
                         iu_min = -sum(NH₁.x, dims = 2)[:, 1] + ata_model.settings.iu.min
                         iu_min = sum_pos(iu_min)
@@ -219,8 +219,13 @@ function analyse_NH(
                     end
                     NH₁.iu = iu_max + iu_min
                     if ata_model.settings.to_apply[3]
-                        NH₁.ol =
-                            eval_overlap(NH₁.x, fs_counts, ata_model.settings.ol_max, T, NH₁.ol)
+                        NH₁.ol = eval_overlap(
+                            NH₁.x,
+                            fs_counts,
+                            ata_model.settings.ol_max,
+                            T,
+                            NH₁.ol,
+                        )
                     end
                     #NH₁.ol[v] = eval_overlapᵥ(NH₁.x[:, v], NH₁.x, ata_model.settings.fs.counts, ol_maxₜ, v)
                     if fF == false
@@ -281,14 +286,14 @@ function analyse_NH(
                         # iu = copy(iu₀)
                         # iu[i₂]+= 1
                         # iu[h]-= 1
-                       if ata_model.settings.to_apply[1]
+                        if ata_model.settings.to_apply[1]
                             iu_max = sum(NH₁.x, dims = 2)[:, 1] - ata_model.settings.iu.max
                             iu_max = sum_pos(iu_max)
-                       else
+                        else
                             iu_max = 0
                         end
                         if ata_model.settings.to_apply[2]
-                                                        iu_min = -sum(NH₁.x, dims = 2)[:, 1] + ata_model.settings.iu.min
+                            iu_min = -sum(NH₁.x, dims = 2)[:, 1] + ata_model.settings.iu.min
                             iu_min = sum_pos(iu_min)
                         else
                             iu_min = 0
