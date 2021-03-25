@@ -1,5 +1,5 @@
 """
-print_infos(ata_model)
+    print_infos(ata_model)
 
 # Description
 
@@ -20,7 +20,7 @@ function print_infos(ata_model::AbstractModel)
 end
 
 """
-print_last_info(ata_model)
+    print_last_info(ata_model)
 
 # Description
 

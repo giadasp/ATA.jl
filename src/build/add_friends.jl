@@ -1,6 +1,6 @@
 
 """
-add_friends!(ata_model::AbstractModel)
+    add_friends!(ata_model::AbstractModel)
 
 # Description
 

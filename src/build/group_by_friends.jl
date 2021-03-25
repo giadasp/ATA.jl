@@ -1,7 +1,7 @@
 
 
 """
-group_by_friends!(ata_model::AbstractModel)
+    group_by_friends!(ata_model::AbstractModel)
 
 # Description
 

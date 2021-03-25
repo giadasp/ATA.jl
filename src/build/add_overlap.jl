@@ -1,7 +1,7 @@
 
 
 """
-add_overlap!(ata_model::AbstractModel; overlap_file = "overlap_matrix.csv", overlap_delim=";")
+    add_overlap!(ata_model::AbstractModel; overlap_file = "overlap_matrix.csv", overlap_delim=";")
 
 # Description
 

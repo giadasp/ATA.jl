@@ -1,5 +1,3 @@
-
-
 # """
 # 	print_results(ata_model; group_by_fs = false, results_folder = "results")
 

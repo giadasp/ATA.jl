@@ -1,14 +1,14 @@
 
 """
-resp_gen(
-    pars::DataFrames.DataFrame,
-    theta::Vector{Float64},
-    design::Matrix{Float64};
-    model = "2PL", #1PL, 2PL, 3PL
-    parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
-    D = 1,#any number 
-    method = "classic uniform",
-)
+    resp_gen(
+        pars::DataFrames.DataFrame,
+        theta::Vector{Float64},
+        design::Matrix{Float64};
+        model = "2PL", #1PL, 2PL, 3PL
+        parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
+        D = 1,#any number 
+        method = "classic uniform",
+    )
 
 # Description
 

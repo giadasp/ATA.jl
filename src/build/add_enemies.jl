@@ -1,6 +1,6 @@
 
 """
-add_enemies!(ata_model::AbstractModel)
+    add_enemies!(ata_model::AbstractModel)
 
 # Description
 

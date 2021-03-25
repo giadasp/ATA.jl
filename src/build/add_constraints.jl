@@ -1,7 +1,7 @@
 
 
 """
-add_constraints!(ata_model::AbstractModel; constraints_file = "constraints.csv", constraints_delim = ";")
+    add_constraints!(ata_model::AbstractModel; constraints_file = "constraints.csv", constraints_delim = ";")
 
 # Description
 
