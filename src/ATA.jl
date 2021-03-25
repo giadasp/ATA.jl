@@ -15,7 +15,7 @@ using Requires
 using Psychometrics
 using FileIO
 
-include("structs/ata_model.jl")
+include("structs/structs.jl")
 include("utils.jl")
 include("build/build.jl")
 include("opt.jl")
