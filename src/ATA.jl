@@ -76,11 +76,8 @@ end
 
 export mean,
     start_ata,
-    add_friends!,
-    add_enemies!,
     add_constraints!,
     add_overlap!,
-    add_exp_score!,
     group_by_friends!,
     add_obj_fun!,
     assemble!,

@@ -12,31 +12,15 @@ ata_model = start_ata(
 )
 print_last_info(ata_model)
 
-# 2. Add friend set variables (Optional)
-add_friends!(ata_model)
-print_last_info(ata_model)
-
-# 3. Add enemy set variables (Optional)
-add_enemies!(ata_model)
-print_last_info(ata_model)
-
-# 4. Add categorical constraints (Optional)
+# 2. Add categorical constraints (Optional)
 add_constraints!(ata_model; constraints_file = "constraints.csv", constraints_delim = ";")
 print_last_info(ata_model)
 
-# 5. Add overlap maxima (Optional)
-#add_overlap!(ata_model; overlap_file = "overlap_matrix.csv", overlap_delim = ";")
-#print_last_info(ata_model)
-
-# 6. Add expected score constraints (Optional)
-add_exp_score!(ata_model)
-print_last_info(ata_model)
-
-# 7. Add overlap maxima (Optional, Needed if add_friends!(model) hase been run)
+# 3. Add overlap maxima (Optional, Needed if friend sets needs to be taken into account.)
 group_by_friends!(ata_model)
 print_last_info(ata_model)
 
-# 8. Add objective function (Optional)
+# 4. Add objective function (Optional)
 add_obj_fun!(ata_model)
 print_last_info(ata_model)
 
@@ -51,7 +35,7 @@ optimizer_constructor = "Cbc"
 # #Optimizer attributes
 optimizer_attributes = [("seconds", 500), ("logLevel", 1)]
 
-# 9. assemble
+# 5. assemble
 assemble!(
     ata_model;
     solver = solver,

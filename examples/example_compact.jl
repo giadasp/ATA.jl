@@ -7,7 +7,6 @@ ata_model = compact_ata(;
     bank_file = "data/bank.csv",
     constraints_file = "constraints.csv",
     overlap_file = "overlap_matrix.csv",
-    add_exp_score = false,
     solver = "siman",
     max_time = 200,
 )

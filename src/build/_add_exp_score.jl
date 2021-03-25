@@ -1,5 +1,5 @@
 """
-    add_exp_score!(ata_model::AbstractModel)
+    _add_exp_score!(ata_model::AbstractModel)
 
 # Description
 
@@ -12,9 +12,8 @@ It requires the [`start_ata`](#ATA.start_ata) step.
 - **`ata_model::AbstractModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 
 """
-function add_exp_score!(ata_model::AbstractModel)
+function _add_exp_score!(ata_model::AbstractModel)
     message = ["", ""]
-    try
         T = ata_model.settings.T
         n_items = ata_model.settings.n_items
         n_groups = ata_model.settings.n_groups
@@ -48,10 +47,5 @@ function add_exp_score!(ata_model::AbstractModel)
         # end
         JLD2.@save "OPT/ICF.jld2" ICF
         push!(ata_model.output.infos, ["success", "- Expected Score constrained.\n"])
-    catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
-    end
     return nothing
 end

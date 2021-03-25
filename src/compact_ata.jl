@@ -4,8 +4,6 @@ function compact_ata(;
     settings_file = "",
     bank_file = "",
     bank_delim = ";",
-    add_friends = true,
-    add_enemies = true,
     add_constraints = true,
     constraints::DataFrames.DataFrame = DataFrames.DataFrame(),
     constraints_file = "",
@@ -14,7 +12,6 @@ function compact_ata(;
     overlap::Matrix{Float64} = Matrix{Float64}(undef, 0, 0),
     overlap_file = "",
     overlap_delim = ";",
-    add_exp_score = true,
     group_by_friends = true,
     add_obj_fun = true,
     solver = "siman", #"jumpATA",
@@ -34,14 +31,6 @@ function compact_ata(;
         bank_delim = bank_delim,
     )
     print_last_info(ata_model)
-    if add_friends
-        add_friends!(ata_model)
-        print_last_info(ata_model)
-    end
-    if add_enemies
-        add_enemies!(ata_model)
-        print_last_info(ata_model)
-    end
     if add_constraints
         add_constraints!(
             ata_model;
@@ -58,10 +47,6 @@ function compact_ata(;
             overlap_file = overlap_file,
             overlap_delim = overlap_delim,
         )
-        print_last_info(ata_model)
-    end
-    if add_exp_score
-        add_exp_score!(ata_model)
         print_last_info(ata_model)
     end
     if group_by_friends

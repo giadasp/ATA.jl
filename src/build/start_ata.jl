@@ -154,71 +154,81 @@ function start_ata(;
             end
             CSV.write("OPT/irt_parameters.csv", ata_model.settings.irt.parameters)
             message[2] = message[2] * "- IRT item parameters loaded.\n"
-            if Inputs.enemy_sets_var != String[]
-                ata_model.settings.es.var = Symbol.(Inputs.enemy_sets_var)
-                val = Symbol.(Inputs.enemy_sets_var)
-                write(f, "enemy_sets_var = $val\n\n")
-                message[2] = message[2] * "- Variable for Enemy sets loaded.\n"
-            end
+                        #test length
+                        if Inputs.length_min != Int64[]
+                            lengthmin = zeros(Int64, ata_model.settings.T)
+                            lengthweight = ones(Int64, ata_model.settings.T)
+                            t1 = 1
+                            for g = 1:ata_model.settings.n_groups
+                                for t = 1:ata_model.settings.Tg[g]
+                                    lengthmin[t1] = Int(Inputs.length_min[g])
+                                    lengthweight[t1] = Inputs.length_weight[g]
+                                    t1 += 1
+                                end
+                            end
+                            for t = 1:ata_model.settings.T
+                                ata_model.constraints[t].constr_A = vcat(
+                                    ata_model.constraints[t].constr_A,
+                                    (-lengthweight[t]) .* ones(Float64, ata_model.settings.n_items)',
+                                )
+                                ata_model.constraints[t].constr_b = vcat(
+                                    ata_model.constraints[t].constr_b,
+                                    -lengthmin[t] * lengthweight[t],
+                                )
+                                ata_model.constraints[t].length_min = lengthmin[t]
+                            end
+                            write(f, "length_min = $lengthmin\n")
+                            message[2] = message[2] * "- Minimum length of tests constrained.\n"
+                        end
+            
+                        if Inputs.length_max != Int64[]
+                            lengthmax = zeros(Int64, ata_model.settings.T)
+                            lengthweight = ones(Int64, ata_model.settings.T)
+                            t1 = 1
+                            for g = 1:ata_model.settings.n_groups
+                                for t = 1:ata_model.settings.Tg[g]
+                                    lengthmax[t1] = Int(Inputs.length_max[g])
+                                    lengthweight[t1] = Inputs.length_weight[g]
+                                    t1 += 1
+                                end
+                            end
+                            for t = 1:ata_model.settings.T
+                                ata_model.constraints[t].constr_A = vcat(
+                                    ata_model.constraints[t].constr_A,
+                                    (lengthweight[t]) .* ones(ata_model.settings.n_items)',
+                                )
+                                ata_model.constraints[t].constr_b = vcat(
+                                    ata_model.constraints[t].constr_b,
+                                    lengthmax[t] * lengthweight[t],
+                                )
+                                ata_model.constraints[t].length_max = lengthmax[t]
+                            end
+                            write(f, "length_max = $lengthmax\n")
+                            message[2] = message[2] * "- Maximum length of tests constrained.\n"
+                        end
+            #friend sets
+            #fictiuos friendSets
+            ata_model.settings.fs.counts = ones(ata_model.settings.n_items)
+            ata_model.settings.fs.sets = string.(collect(1:ata_model.settings.n_items))
+            ata_model.settings.fs.items = [[i] for i = 1:ata_model.settings.n_items]
+            ata_model.settings.forced0 = x_forced0
             if Inputs.friend_sets_var != String[]
                 ata_model.settings.fs.var = Symbol.(Inputs.friend_sets_var)
                 val = Symbol.(Inputs.friend_sets_var)
+                _add_friends!(ata_model)
                 write(f, "ata_model.settings.fs.var = $val\n\n")
                 message[2] = message[2] * "- Variable for Friend sets loaded.\n"
             end
-
-            if Inputs.length_min != Int64[]
-                lengthmin = zeros(Int64, ata_model.settings.T)
-                lengthweight = ones(Int64, ata_model.settings.T)
-                t1 = 1
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        lengthmin[t1] = Int(Inputs.length_min[g])
-                        lengthweight[t1] = Inputs.length_weight[g]
-                        t1 += 1
-                    end
-                end
-                for t = 1:ata_model.settings.T
-                    ata_model.constraints[t].constr_A = vcat(
-                        ata_model.constraints[t].constr_A,
-                        (-lengthweight[t]) .* ones(Float64, ata_model.settings.n_items)',
-                    )
-                    ata_model.constraints[t].constr_b = vcat(
-                        ata_model.constraints[t].constr_b,
-                        -lengthmin[t] * lengthweight[t],
-                    )
-                    ata_model.constraints[t].length_min = lengthmin[t]
-                end
-                write(f, "length_min = $lengthmin\n")
-                message[2] = message[2] * "- Minimum length of tests constrained.\n"
+            #enemy sets
+            if Inputs.enemy_sets_var != String[]
+                ata_model.settings.es.var = Symbol.(Inputs.enemy_sets_var)
+                val = Symbol.(Inputs.enemy_sets_var)
+                _add_enemies!(ata_model)
+                write(f, "enemy_sets_var = $val\n\n")
+                message[2] = message[2] * "- Variable for Enemy sets loaded.\n"
             end
 
-            if Inputs.length_max != Int64[]
-                lengthmax = zeros(Int64, ata_model.settings.T)
-                lengthweight = ones(Int64, ata_model.settings.T)
-                t1 = 1
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        lengthmax[t1] = Int(Inputs.length_max[g])
-                        lengthweight[t1] = Inputs.length_weight[g]
-                        t1 += 1
-                    end
-                end
-                for t = 1:ata_model.settings.T
-                    ata_model.constraints[t].constr_A = vcat(
-                        ata_model.constraints[t].constr_A,
-                        (lengthweight[t]) .* ones(ata_model.settings.n_items)',
-                    )
-                    ata_model.constraints[t].constr_b = vcat(
-                        ata_model.constraints[t].constr_b,
-                        lengthmax[t] * lengthweight[t],
-                    )
-                    ata_model.constraints[t].length_max = lengthmax[t]
-                end
-                write(f, "length_max = $lengthmax\n")
-                message[2] = message[2] * "- Maximum length of tests constrained.\n"
-            end
-
+            #expected score
             if Inputs.expected_score_var != String[]
                 t1 = 1
                 for g = 1:ata_model.settings.n_groups
@@ -267,6 +277,8 @@ function start_ata(;
                     message[2] = message[2] * "- Upper bounds for expected score loaded.\n"
                 end
             end
+            _add_exp_score!(ata_model)
+            #sum vars
             if Inputs.sum_vars != Vector{Vector{String}}(undef, 0)
                 t1 = 1
                 for g = 1:ata_model.settings.n_groups
@@ -320,6 +332,7 @@ function start_ata(;
                     message[2] = message[2] * "- Minimum item use constrained.\n"
                 end
             end
+            #item use
             if size(Inputs.item_use_max, 1) > 0
                 if any(Inputs.item_use_max .< ata_model.settings.T)
                     ata_model.settings.iu.max = Inputs.item_use_max
@@ -330,6 +343,7 @@ function start_ata(;
                     message[2] = message[2] * "- Maximum item use constrained.\n"
                 end
             end
+            #obj_fun
             if Inputs.obj_type == "MAXIMIN"
                 ata_model.obj.cores =
                     [MaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
@@ -436,11 +450,7 @@ function start_ata(;
                     return nothing
                 end
             end
-            #fictiuos friendSets
-            ata_model.settings.fs.counts = ones(ata_model.settings.n_items)
-            ata_model.settings.fs.sets = string.(collect(1:ata_model.settings.n_items))
-            ata_model.settings.fs.items = [[i] for i = 1:ata_model.settings.n_items]
-            ata_model.settings.forced0 = x_forced0
+
             if Inputs.categories != String[]
                 val = Symbol.(Inputs.categories)
                 ata_model.output.categories = copy(val)

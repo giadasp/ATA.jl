@@ -1,19 +1,10 @@
 
 """
-    add_friends!(ata_model::AbstractModel)
-
-# Description
-
-Add friend sets to the `ATA.AbstractModel` as specified in the `settings_file` loaded by [`start_ata`](#ATA.start_ata) function.
-It requires the [`start_ata`](#ATA.startATA) step.
-
-# Arguments
-
-- **`ata_model::AbstractModel`** : Required. The model built with `start_ata()` function.
+    _add_friends!(ata_model::AbstractModel)
 """
-function add_friends!(ata_model::AbstractModel)
+function _add_friends!(ata_model::AbstractModel)
     message = ["", ""]
-    try
+
         n_items = ata_model.settings.n_items
         FriendSets =
             string.(
@@ -82,10 +73,6 @@ function add_friends!(ata_model::AbstractModel)
             ata_model.output.infos,
             ["success", string("- ", n_fs, " friend sets added.\n")],
         )
-    catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
-    end
+
     return nothing
 end

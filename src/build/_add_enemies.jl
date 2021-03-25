@@ -1,6 +1,6 @@
 
 """
-    add_enemies!(ata_model::AbstractModel)
+    _add_enemies!(ata_model::AbstractModel)
 
 # Description
 
@@ -11,9 +11,7 @@ It requires the [`start_ata`](#ATA.start_ata) step.
 
 - **`ata_model::AbstractModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 """
-function add_enemies!(ata_model::AbstractModel)
-    message = ["", ""]
-    try
+function _add_enemies!(ata_model::AbstractModel)
         bank = ata_model.settings.bank
         n_items = ata_model.settings.n_items
         if size(ata_model.constraints[1].constr_b, 1) > 0
@@ -94,10 +92,5 @@ function add_enemies!(ata_model::AbstractModel)
                 ["success", string("- ", nes, " enemy sets added and constrained.\n")],
             )
         end
-    catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
-    end
     return nothing
 end
