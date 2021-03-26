@@ -238,6 +238,8 @@ function start_ata(;
                         t1 += 1
                     end
                 end
+                message[2] =
+                message[2] * "- Expected score variable loaded.\n"
             end
             t1 = 1
             if Inputs.expected_score_pts != Float64[]
@@ -248,11 +250,22 @@ function start_ata(;
                         t1 += 1
                     end
                 end
+            else
+                for g = 1:ata_model.settings.n_groups
+                    for t = 1:ata_model.settings.Tg[g]
+                        ata_model.constraints[t1].expected_score.pts =
+                            [0.0]
+                        t1 += 1
+                    end
+                end
+                message[2] =
+                message[2] * "- Expected score points loaded.\n"
             end
-            message[2] =
-                message[2] * "- Expected score variable and expected_score_pts loaded.\n"
+            min_exp_score = false
+            max_exp_score = false
             if size(Inputs.expected_score_min, 1) > 0
                 if any(vcat(Inputs.expected_score_min...) .> 0)
+                    min_exp_score = true
                     t1 = 1
                     for g = 1:ata_model.settings.n_groups
                         for t = 1:ata_model.settings.Tg[g]
@@ -266,6 +279,7 @@ function start_ata(;
             end
             if size(Inputs.expected_score_max, 1) > 0
                 if any(vcat(Inputs.expected_score_max...) .< 1.00)
+                    max_exp_score = true
                     t1 = 1
                     for g = 1:ata_model.settings.n_groups
                         for t = 1:ata_model.settings.Tg[g]
@@ -277,7 +291,10 @@ function start_ata(;
                     message[2] = message[2] * "- Upper bounds for expected score loaded.\n"
                 end
             end
-            _add_exp_score!(ata_model)
+            if max_exp_score || min_exp_score
+                _add_exp_score!(ata_model)
+                message[2] = message[2] * "- Expected scores computed.\n"
+            end
             #sum vars
             if Inputs.sum_vars != Vector{Vector{String}}(undef, 0)
                 t1 = 1
