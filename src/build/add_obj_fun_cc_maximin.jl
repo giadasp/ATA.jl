@@ -1,8 +1,11 @@
-include(
-    "add_obj_fun_cc_maximin_psychometrics.jl"
-)
 """
-    add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, kwargs...)
+    add_obj_fun!(
+        ata_model::CcMaximinModel;
+        psychometrics = false,
+        items_file = "",
+        items::Vector{Psychometrics.Item} = Psychometrics.Item[],
+        kwargs...
+    )
 
 # Description
 
@@ -14,7 +17,13 @@ Computes the IIFs at predefined ability points using `R` sampled item parameters
 - **`ata_model::CcMaximinModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 
 """
-function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, items_file = "", kwargs...)
+function add_obj_fun!(
+    ata_model::CcMaximinModel;
+    psychometrics = false,
+    items_file = "",
+    items::Vector{Psychometrics.Item} = Psychometrics.Item[],
+    kwargs...
+    )
     message = ["", ""]
     try
         T = ata_model.settings.T
@@ -109,7 +118,12 @@ function add_obj_fun!(ata_model::CcMaximinModel; psychometrics = false, items_fi
             JLD2.@save "OPT/IIF_CC.jld2" IIF
             JLD2.@save "OPT/ICF_CC.jld2" ICF
         else
-            load_item_parameters_chain!(ata_model; items_file = items_file, kwargs...)
+            load_item_parameters_chain!(
+                ata_model;
+                items_file = items_file,
+                items = items,
+                kwargs...
+            )
         end
         message = [
             "success",

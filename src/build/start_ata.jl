@@ -69,6 +69,8 @@ function start_ata(;
                 ata_model = MinimaxModel()
             elseif Inputs.obj_type == "CCMAXIMIN"
                 ata_model = CcMaximinModel()
+            elseif Inputs.obj_type == "SOYSTERMAXIMIN"
+                ata_model = SoysterMaximinModel()
             elseif Inputs.obj_type == "custom"
                 ata_model = CustomModel()
             else

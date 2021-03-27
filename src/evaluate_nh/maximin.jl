@@ -1,7 +1,7 @@
 #MAXIMIN or MINIMAX neighbourhood
 function analyse_NH(
     NH_start::Neighbourhood,
-    ata_model::MaximinModel;
+    ata_model::Union{MaximinModel, SoysterMaximinModel};
     fF = true,
     n_fill = 1,
     opt_feas = 0.9,

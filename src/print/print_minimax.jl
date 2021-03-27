@@ -1,6 +1,6 @@
 """
     print_results(
-        ata_model::MaximinModel;
+        ata_model::Union{MaximinModel, SoysterMaximinModel};
         group_by_fs = false,
         results_folder = "results",
         sim_pool::DataFrames.DataFrame = DataFrame(),
@@ -12,13 +12,13 @@ Print the features of the assembled tests.
 
 # Arguments
 
-- **`ata_model::MaximinModel`** : Required. The model built with `ATA` fuctions, `ata_model.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
+- **`ata_model::Union{MaximinModel, SoysterMaximinModel}`** : Required. The model built with `ATA` fuctions, `ata_model.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
 - **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.Model}).
 - **`results_folder`** : Optional. Default: "results". The folder in which the output is stored.
 - **`sim_pool::DataFrames.DataFrame`** : Optional. Default: DataFrame(). The pool with true item paramaters. For simulation studies.
 """
 function print_results(
-    ata_model::MaximinModel;
+    ata_model::Union{MaximinModel, SoysterMaximinModel};
     group_by_fs = false,
     results_folder = "results",
     sim_pool::DataFrames.DataFrame = DataFrame(),
