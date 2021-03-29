@@ -93,6 +93,7 @@ function soyster_load_parameters_chain!(
                     IIF[t][k, i] = minimum(IIF_i[:, k])
                     ICF[t][k, i] = minimum(ICF_i[:, k])
                 end
+                ata_model.obj.cores[t].IIF = IIF[t]
             end
         end
     catch e

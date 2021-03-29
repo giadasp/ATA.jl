@@ -94,6 +94,7 @@ function de_jong_load_parameters_chain!(
                     ICF[t][k, i] = StatsBase.mean(ICF_i[:, k]) .- StatsBase.std(ICF_i[:, k])
                 end
             end
+            ata_model.obj.cores[t].IIF = IIF[t]
         end
         JLD2.@save "opt/IIF.jld2" IIF
         JLD2.@save "opt/ICF.jld2" ICF
