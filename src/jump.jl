@@ -61,7 +61,7 @@ function jump!(
         end
     end
     #Group IIFs by friend set
-    if ata_model.obj.name in ["maximin", "soyster_maximin", "de_jong_maximin" "minimax"]
+    if ata_model.obj.name in ["maximin", "soyster_maximin", "de_jong_maximin", "minimax"]
         IIF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
         if ata_model.settings.n_fs != ata_model.settings.n_items
             #group IIFs

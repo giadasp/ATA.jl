@@ -23,16 +23,7 @@ function group_by_friends!(ata_model::AbstractModel) #last
             )
             return nothing
         end
-        if size(ata_model.constraints[1].constr_b, 1) == 0
-            push!(
-                ata_model.output.infos,
-                [
-                    "danger",
-                    "No constraints to group, run add_constraints!(model) before.\n",
-                ],
-            )
-            return nothing
-        else
+        if any([size(ata_model.constraints[t].constr_b, 1) > 0 for t in 1 : ata_model.settings.T])
             A = Vector{Matrix{Float64}}(undef, ata_model.settings.T)
             b = Vector{Vector{Float64}}(undef, ata_model.settings.T)
             A_new = Vector{Matrix{Float64}}(undef, ata_model.settings.T)
@@ -86,41 +77,40 @@ function group_by_friends!(ata_model::AbstractModel) #last
             end
             #update ata_model.forced0
             ata_model.settings.forced0 = x_forced0_new
-            DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0_new)
-            #item use
-            if size(ata_model.settings.iu.min, 1) > 0
-                item_use_min = ata_model.settings.iu.min
-                item_use_min_new = zeros(Int, n_fs)
-                for fs = 1:n_fs
-                    item_use_min_new[fs] = Int(
-                        maximum(ata_model.settings.iu.min[ata_model.settings.fs.items[fs]]),
-                    )
-                end
-                ata_model.settings.iu.min = item_use_min_new
-                open("OPT/Settings.jl", "a") do f
-                    write(f, "item_use_min = $item_use_min_new\n\n")
-                end
-            end
-            if size(ata_model.settings.iu.max, 1) > 0
-                item_use_max = ata_model.settings.iu.max
-                item_use_max_new = zeros(Int, n_fs)
-                for fs = 1:n_fs
-                    item_use_max_new[fs] = Int(
-                        minimum(ata_model.settings.iu.max[ata_model.settings.fs.items[fs]]),
-                    )
-                end
-                ata_model.settings.iu.max = item_use_max_new
-                open("OPT/Settings.jl", "a") do f
-                    write(f, "item_use_max = $item_use_max_new\n\n")
-                end
-            end
-            #enemy sets
-
-            push!(
-                ata_model.output.infos,
-                ["success", string("- Grouped in ", n_fs, " Friend sets.\n")],
-            )
+            DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0_new)   
+            message[2] = message[2] * "- Categorical and linear quantitative constraints grouped.\n"  
         end
+        #item use
+        if ata_model.settings.to_apply[1]
+            item_use_max = ata_model.settings.iu.max
+            item_use_max_new = zeros(Int, n_fs)
+            for fs = 1:n_fs
+                item_use_max_new[fs] = Int(
+                    minimum(ata_model.settings.iu.max[ata_model.settings.fs.items[fs]]),
+                )
+            end
+            ata_model.settings.iu.max = item_use_max_new
+            open("OPT/Settings.jl", "a") do f
+                write(f, "item_use_max = $item_use_max_new\n\n")
+            end
+            message[2] = message[2] * "- Maximum item use grouped.\n"
+        end
+        if ata_model.settings.to_apply[2]
+            item_use_min = ata_model.settings.iu.min
+            item_use_min_new = zeros(Int, n_fs)
+            for fs = 1:n_fs
+                item_use_min_new[fs] = Int(
+                    maximum(ata_model.settings.iu.min[ata_model.settings.fs.items[fs]]),
+                )
+            end
+            ata_model.settings.iu.min = item_use_min_new
+            open("OPT/Settings.jl", "a") do f
+                write(f, "item_use_min = $item_use_min_new\n\n")
+            end
+            message[2] = message[2] * "- Minimum item use grouped.\n"
+        end
+        message[1] = "success"
+        push!(message)
     catch e
         message[1] = "danger"
         message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
