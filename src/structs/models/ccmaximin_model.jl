@@ -1,9 +1,9 @@
-mutable struct CcMaximinModel <: AbstractModel
+mutable struct CCMaximinModel <: AbstractModel
     settings::Settings
     constraints::Vector{Constraint}
     obj::CcMaximinObjective
     output::Output
-    CcMaximinModel(settings, constraints, obj, output) =
+    CCMaximinModel(settings, constraints, obj, output) =
         new(settings, constraints, obj, output)
-    CcMaximinModel() = new(Settings(), Constraint[], CcMaximinObjective(), Output())
+    CCMaximinModel() = new(Settings(), Constraint[], CcMaximinObjective(), Output())
 end

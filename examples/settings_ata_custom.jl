@@ -86,7 +86,7 @@ Inputs = InputSettings(
     ####################################################################
 
     # 26. obj_type
-    "custom", # "MAXIMIN", "CCMAXIMIN", "", "custom", "MINIMAX"
+    "custom", # "maximin", "cc_maximin", "", "custom", "minimax"
     # 27. obj_points (required in MAXIMIN, CC, MINIMAX)
     [[-0.60], [0.30], [0.60]],
     # 28. obj_targets (required in MINIMAX)

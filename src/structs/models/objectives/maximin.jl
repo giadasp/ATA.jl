@@ -9,6 +9,6 @@ mutable struct MaximinObjective <: AbstractObjective
     sense::String
     cores::Vector{MaximinObjectiveCore}
 
-    MaximinObjective(cores::Vector{MaximinObjectiveCore}) = new("MAXIMIN", "max", cores)
-    MaximinObjective() = new("MAXIMIN", "max", MaximinObjectiveCore[])
+    MaximinObjective(cores::Vector{MaximinObjectiveCore}) = new("maximin", "max", cores)
+    MaximinObjective() = new("maximin", "max", MaximinObjectiveCore[])
 end

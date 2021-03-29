@@ -26,7 +26,7 @@ print_results(
         sim_pool::DataFrames.DataFrame = DataFrame(),
 )
 print_results(
-    ata_model::CcMaximinModel;
+    ata_model::CCMaximinModel;
     group_by_fs = false,
     results_folder = "results",
     sim_pool::DataFrames.DataFrame = DataFrame(),

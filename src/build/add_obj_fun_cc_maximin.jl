@@ -1,6 +1,6 @@
 """
     add_obj_fun!(
-        ata_model::CcMaximinModel;
+        ata_model::CCMaximinModel;
         psychometrics = false,
         items_file = "",
         items::Vector{Psychometrics.Item} = Psychometrics.Item[],
@@ -14,11 +14,11 @@ Computes the IIFs at predefined ability points using `R` sampled item parameters
 
 # Arguments
 
-- **`ata_model::CcMaximinModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
+- **`ata_model::CCMaximinModel`** : Required. The model built with `start_ata()` and with settings loaded by [`start_ata`](#ATA.start_ata) function.
 
 """
 function add_obj_fun!(
-    ata_model::CcMaximinModel;
+    ata_model::CCMaximinModel;
     psychometrics = false,
     items_file = "",
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],

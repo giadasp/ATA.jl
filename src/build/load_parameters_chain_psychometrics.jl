@@ -1,5 +1,5 @@
 function load_parameters_chain!(
-    ata_model::CcMaximinModel;
+    ata_model::CCMaximinModel;
     items_file = "items.jld2",
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
     kwargs...,

@@ -39,16 +39,16 @@ function plot_results(
             n = n_items * T
         end
 
-        if ata_model.obj.name == "CCMAXIMIN"
+        if ata_model.obj.name == "cc_maximin"
             JLD2.@load "OPT/IIF_CC.jld2" IIF
             JLD2.@load "OPT/ICF_CC.jld2" ICF
             IIF_CC = copy(IIF)
             ICF_CC = copy(ICF)
         end
 
-        if ata_model.obj.name == "MAXIMIN" ||
-           ata_model.obj.name == "CCMAXIMIN" ||
-           ata_model.obj.name == "MINIMAX"
+        if ata_model.obj.name == "maximin" ||
+           ata_model.obj.name == "cc_maximin" ||
+           ata_model.obj.name == "minimax"
             JLD2.@load "OPT/IIF.jld2" IIF
             JLD2.@load "OPT/ICF.jld2" ICF
         end
@@ -75,9 +75,9 @@ function plot_results(
         end
 
         #TIF e ICF
-        if ata_model.obj.name == "MAXIMIN" ||
-           ata_model.obj.name == "CCMAXIMIN" ||
-           ata_model.obj.name == "MINIMAX"
+        if ata_model.obj.name == "maximin" ||
+           ata_model.obj.name == "cc_maximin" ||
+           ata_model.obj.name == "minimax"
             if isfile("sim_pool.csv")
                 sim_pool = CSV.read("sim_pool.csv", DataFrames.DataFrame)
             else
@@ -120,7 +120,7 @@ function plot_results(
                 results_folder = results_folder,
             )
 
-            if ata_model.obj.name == "CCMAXIMIN"
+            if ata_model.obj.name == "cc_maximin"
                 ATAPlot.plot_ATA_CC(
                     ata_model,
                     IIFf,

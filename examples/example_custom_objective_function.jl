@@ -142,7 +142,7 @@ assemble!(
 # If siman is chosen, the optimality and feasibility of the best neighbourhood
 # is reported in "results/results_ata.jl"
 
-ata_model.obj.name = "MAXIMIN"
+ata_model.obj.name = "maximin"
 print_results(ata_model; group_by_fs = true, results_folder = "results")
 
 

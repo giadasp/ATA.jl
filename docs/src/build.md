@@ -63,7 +63,7 @@ add_obj_fun!(
     kwargs...
 )
 add_obj_fun!(
-    ata_model::CcMaximinModel;
+    ata_model::CCMaximinModel;
     psychometrics = false,
     items_file = "",
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],

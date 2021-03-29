@@ -11,6 +11,6 @@ mutable struct CcMaximinObjective <: AbstractObjective
     name::String
     sense::String
     cores::Vector{CcMaximinObjectiveCore}
-    CcMaximinObjective(cores) = new("CCMAXIMIN", "max", cores)
-    CcMaximinObjective() = new("CCMAXIMIN", "max", CcMaximinObjectiveCore[])
+    CcMaximinObjective(cores) = new("cc_maximin", "max", cores)
+    CcMaximinObjective() = new("cc_maximin", "max", CcMaximinObjectiveCore[])
 end

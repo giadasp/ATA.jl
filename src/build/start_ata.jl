@@ -63,19 +63,21 @@ function start_ata(;
     try
         infos = ata_model.output.infos
         if Inputs.obj_type != ""
-            if Inputs.obj_type == "MAXIMIN"
+            if Inputs.obj_type == "maximin"
                 ata_model = MaximinModel()
-            elseif Inputs.obj_type == "MINIMAX"
+            elseif Inputs.obj_type == "minimax"
                 ata_model = MinimaxModel()
-            elseif Inputs.obj_type == "CCMAXIMIN"
-                ata_model = CcMaximinModel()
-            elseif Inputs.obj_type == "SOYSTERMAXIMIN"
+            elseif Inputs.obj_type == "cc_maximin"
+                ata_model = CCMaximinModel()
+            elseif Inputs.obj_type == "soyster_maximin"
                 ata_model = SoysterMaximinModel()
+            elseif Inputs.obj_type == "de_jong_maximin"
+                ata_model = DeJongMaximinModel()
             elseif Inputs.obj_type == "custom"
                 ata_model = CustomModel()
             else
                 error(
-                    "Only \"MAXIMIN\", \"MINIMAX\", \"CCMAXIMIN\", \"custom\" and \"\" objective types are supported.",
+                    "Only \"maximin\", \"minimax\", \"cc_maximin\", \"soyster_maximin\", \"de_jong_maximin\", \"custom\" and \"\" objective types are supported.",
                 )
             end
             message[2] =
@@ -363,7 +365,7 @@ function start_ata(;
                 end
             end
             #obj_fun
-            if Inputs.obj_type == "MAXIMIN"
+            if Inputs.obj_type == "maximin"
                 ata_model.obj.cores =
                     [MaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
@@ -385,7 +387,7 @@ function start_ata(;
                     )
                     return nothing
                 end
-            elseif Inputs.obj_type == "CCMAXIMIN"
+            elseif Inputs.obj_type == "cc_maximin"
                 ata_model.obj.cores =
                     [CcMaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
@@ -409,7 +411,7 @@ function start_ata(;
                     )
                     return nothing
                 end
-            elseif Inputs.obj_type == "MINIMAX"
+            elseif Inputs.obj_type == "minimax"
                 ata_model.obj.cores =
                     [MinimaxObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0

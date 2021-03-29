@@ -39,15 +39,15 @@
 #             n = n_items * T
 #         end
 
-#         if ata_model.obj.name == "CCMAXIMIN"
+#         if ata_model.obj.name == "cc_maximin"
 #             JLD2.@load "OPT/IIF_CC.jld2" IIF
 #             JLD2.@load "OPT/ICF_CC.jld2" ICF
 #             IIF_CC = copy(IIF)
 #             ICF_CC = copy(ICF)
 #         end
-#         if ata_model.obj.name == "MAXIMIN" ||
-#            ata_model.obj.name == "CCMAXIMIN" ||
-#            ata_model.obj.name == "MINIMAX"
+#         if ata_model.obj.name == "maximin" ||
+#            ata_model.obj.name == "cc_maximin" ||
+#            ata_model.obj.name == "minimax"
 #             JLD2.@load "OPT/IIF.jld2" IIF
 #         end
 #         if isfile("OPT/ICF.jld2")
@@ -80,9 +80,9 @@
 #         end
 #         #DelimitedFiles.writedlm(string(results_folder,"/olMatrixOUT.csv"),olMatrixOUT)
 #         #TIF e ICF
-#         if ata_model.obj.name == "MAXIMIN" ||
-#            ata_model.obj.name == "CCMAXIMIN" ||
-#            ata_model.obj.name == "MINIMAX"
+#         if ata_model.obj.name == "maximin" ||
+#            ata_model.obj.name == "cc_maximin" ||
+#            ata_model.obj.name == "minimax"
 #             if isfile("sim_pool.csv")
 #                 sim_pool = CSV.read("sim_pool.csv", DataFrames.DataFrame)
 #             else
@@ -90,7 +90,7 @@
 #             end
 #         end
 #         #save values
-#         if ata_model.obj.name == "CCMAXIMIN"
+#         if ata_model.obj.name == "cc_maximin"
 #             min = Float64[]
 #             First = Float64[]
 #             Median = Float64[]
@@ -161,7 +161,7 @@
 #             end
 #             CSV.write(string(results_folder, "/tif_at_theta_pts.csv"), tif_at_theta_pts)
 
-#         elseif ata_model.obj.name == "MAXIMIN" || ata_model.obj.name == "MINIMAX"
+#         elseif ata_model.obj.name == "maximin" || ata_model.obj.name == "minimax"
 #             estimated = Float64[]
 #             if isfile("sim_pool.csv")
 #                 true = Float64[]

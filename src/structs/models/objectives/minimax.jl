@@ -12,6 +12,6 @@ mutable struct MinimaxObjective <: AbstractObjective
     sense::String
     cores::Vector{MinimaxObjectiveCore}
 
-    MinimaxObjective(cores) = new("MINIMAX", "min", cores)
-    MinimaxObjective() = new("MINIMAX", "min", MinimaxObjectiveCore[])
+    MinimaxObjective(cores) = new("minimax", "min", cores)
+    MinimaxObjective() = new("minimax", "min", MinimaxObjectiveCore[])
 end

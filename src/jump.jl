@@ -17,7 +17,7 @@ function jumpATA!(
         )
     end
     n_items = ata_model.settings.n_items
-    if ata_model.obj.name == "MAXIMIN"
+    if ata_model.obj.name == "maximin"
         if isfile("OPT/IIF.jld2")
             JLD2.@load "OPT/IIF.jld2" IIF
             message *= "- Assembling tests with MAXIMIN..."
@@ -25,10 +25,10 @@ function jumpATA!(
             message *= "No IIF.jld2 file in OPT folder, Run add_obj_fun!() first!"
             push!(ata_model.output.infos, message)
         end
-    elseif ata_model.obj.name == "CCMAXIMIN"
+    elseif ata_model.obj.name == "cc_maximin"
         message *= "You must use the Simulated Annealing algorithm to assemble tests with CC objective function."
         push!(ata_model.output.infos, message)
-    elseif ata_model.obj.name == "MINIMAX"
+    elseif ata_model.obj.name == "minimax"
         if isfile("OPT/IIF.jld2")
             JLD2.@load "OPT/IIF.jld2" IIF
             message *= "- Assembling tests with MINIMAX..."
@@ -65,9 +65,9 @@ function jumpATA!(
         end
     end
     #Group IIFs by friend set
-    if ata_model.obj.name == "MAXIMIN" ||
-       ata_model.obj.name == "CCMAXIMIN" ||
-       ata_model.obj.name == "MINIMAX"
+    if ata_model.obj.name == "maximin" ||
+       ata_model.obj.name == "cc_maximin" ||
+       ata_model.obj.name == "minimax"
         IIF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
         if ata_model.settings.n_fs != ata_model.settings.n_items
             #group IIFs
@@ -347,7 +347,7 @@ function jumpATA!(
 
     ncons = copy(c) - 1
 
-    if ata_model.obj.name == "MAXIMIN"
+    if ata_model.obj.name == "maximin"
         #Objective bound
         JuMP.@variable(m, w >= 0)
         for t = 1:ata_model.settings.T
@@ -362,7 +362,7 @@ function jumpATA!(
             end
         end
         JuMP.@objective(m, Min, (-w))
-    elseif ata_model.obj.name == "MINIMAX"
+    elseif ata_model.obj.name == "minimax"
         #Objective bound
         JuMP.@variable(m, epsilon >= 0)
         for t = 1:ata_model.settings.T
