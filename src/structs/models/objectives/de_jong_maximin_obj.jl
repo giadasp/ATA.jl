@@ -2,7 +2,7 @@ mutable struct DeJongMaximinObjective <: AbstractObjective
     name::String
     sense::String
     R::Int64
-    cores::Vector{CCMaximinObjectiveCore}
+    cores::Vector{MaximinObjectiveCore}
 
     DeJongMaximinObjective(R::Int64, cores::Vector{MaximinObjectiveCore}) =
         new("de_jong_maximin", "max", R, cores)
