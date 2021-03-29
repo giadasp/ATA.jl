@@ -1,7 +1,7 @@
 #warmup CC MAXIMIN
 function find_best_itemᵥ(
     NH::Neighbourhood,
-    coreₜ::CcMaximinObjectiveCore,
+    coreₜ::CCMaximinObjectiveCore,
     opt_feas::Float64,
     v::Int64,
     iu::ItemUse,

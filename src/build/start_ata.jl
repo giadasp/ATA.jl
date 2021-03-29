@@ -389,7 +389,7 @@ function start_ata(;
                 end
             elseif Inputs.obj_type == "cc_maximin"
                 ata_model.obj.cores =
-                    [CcMaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
+                    [CCMaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
                     t1 = 1
                     for g = 1:ata_model.settings.n_groups

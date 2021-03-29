@@ -3,7 +3,7 @@ function eval_TIFₜ(xₜ::Vector{Float64}, coreₜ::MaximinObjectiveCore) # x =
     return minimum(LinearAlgebra.BLAS.gemv('N', coreₜ.IIF, xₜ))::Float64
 end
 
-function eval_TIFₜ(xₜ::Vector{Float64}, coreₜ::CcMaximinObjectiveCore) # x = I
+function eval_TIFₜ(xₜ::Vector{Float64}, coreₜ::CCMaximinObjectiveCore) # x = I
     IIF = coreₜ.IIF
     α = coreₜ.alpha
     K, I, R = size(IIF)
