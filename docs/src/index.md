@@ -6,7 +6,7 @@ end
 ```
 # ATA.jl: Automated Test Assembly Made Easy
 
-Version 0.10.0
+Version 0.13.0
 
 A package for automated test assembly (ATA) written in Julia.
 Simulated Annealing algorithm is available for large scale ATA models.
