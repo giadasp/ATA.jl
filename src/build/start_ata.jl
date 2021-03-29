@@ -62,7 +62,7 @@ function start_ata(;
     end
     try
         infos = ata_model.output.infos
-        if Inputs.c
+        if Inputs.obj_type != ""
             if Inputs.obj_type == "maximin"
                 ata_model = MaximinModel()
             elseif Inputs.obj_type == "minimax"
