@@ -76,7 +76,7 @@ function soyster_load_parameters_chain!(
                         model = irt_model,
                         parametrization = irt_parametrization,
                         D = irt_D,
-                    )[1]
+                    )
                     ICF_i[:, k] = item_char(
                         df,
                         ata_model.obj.cores[t].points[k];
@@ -87,7 +87,7 @@ function soyster_load_parameters_chain!(
                         :,
                         :,
                         1,
-                    ][1]
+                    ]
                     IIF[t][k, i] = minimum(IIF_i[:, k])
                     ICF[t][k, i] = minimum(ICF_i[:, k])
                 end
