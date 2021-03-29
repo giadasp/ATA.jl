@@ -62,7 +62,7 @@ function add_obj_fun!(
         end
         JLD2.@save "OPT/IIF.jld2" IIF
         JLD2.@save "OPT/ICF.jld2" ICF
-        R = ata_model.obj.cores[1].R
+        R = ata_model.obj.R
         K = zeros(Int, T)
         IIF = Vector{Array{Float64,3}}(undef, T)
         ICF = Vector{Array{Float64,3}}(undef, T)
@@ -118,7 +118,7 @@ function add_obj_fun!(
             JLD2.@save "OPT/IIF_CC.jld2" IIF
             JLD2.@save "OPT/ICF_CC.jld2" ICF
         else
-            load_item_parameters_chain!(
+            cc_maximin_load_parameters_chain!(
                 ata_model;
                 items_file = items_file,
                 items = items,

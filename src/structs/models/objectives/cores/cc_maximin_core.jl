@@ -1,5 +1,4 @@
 mutable struct CCMaximinObjectiveCore
-    R::Int64
     alpha::Float64
     points::Vector{Float64}
     IIF::Array{Float64,3}

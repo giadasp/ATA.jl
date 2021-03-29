@@ -396,10 +396,10 @@ function start_ata(;
                         for t = 1:ata_model.settings.Tg[g]
                             ata_model.obj.cores[t1].points = Inputs.obj_points[g]
                             ata_model.obj.cores[t1].alpha = Inputs.obj_aux_float
-                            ata_model.obj.cores[t1].R = Inputs.obj_aux_int
                             t1 += 1
                         end
                     end
+                    ata_model.obj.R = Inputs.obj_aux_int
                     message[2] = message[2] * "- Optimization points loaded.\n"
                 else
                     push!(
