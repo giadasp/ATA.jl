@@ -6,5 +6,5 @@ mutable struct SoysterMaximinObjective <: AbstractObjective
 
     SoysterMaximinObjective(R::Int64, cores::Vector{MaximinObjectiveCore}) = new("soyster_maximin", "max", R, cores)
     SoysterMaximinObjective(cores::Vector{MaximinObjectiveCore}) = new("soyster_maximin", "max", 1, cores)
-    SoysterMaximinObjective() = new("soyster_maximin", "max", MaximinObjectiveCore[])
+    SoysterMaximinObjective() = new("soyster_maximin", "max", 1, MaximinObjectiveCore[])
 end
