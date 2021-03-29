@@ -47,7 +47,7 @@ group_by_friends!(ata_model::AbstractModel)
 ## Add Objective Function
 
 ```@docs
-add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel}; kwargs...)
+add_obj_fun!(ata_model::Union{MaximinModel, MinimaxModel}; kwargs...)
 add_obj_fun!(
     ata_model::SoysterMaximinModel;
     psychometrics = false,

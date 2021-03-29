@@ -365,7 +365,7 @@ function start_ata(;
                 end
             end
             #obj_fun
-            if Inputs.obj_type == "maximin"
+            if Inputs.obj_type in ["maximin", "soyster_maximin", "de_jong_maximin"]
                 ata_model.obj.cores =
                     [MaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
