@@ -26,8 +26,8 @@ print_last_info(ata_model)
 
 # Assembly settings
 
-# Set the solver, "siman" for simulated annealing, "jumpATA" for MILP solver.
-solver = "jumpATA"
+# Set the solver, "siman" for simulated annealing, "jump" for MILP solver.
+solver = "jump"
 
 # MILP (Not suggested for large scale ATA)
 # Select the solver, Cbc as open-source is a good option.

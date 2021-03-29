@@ -14,7 +14,7 @@ function compact_ata(;
     overlap_delim = ";",
     group_by_friends = true,
     add_obj_fun = true,
-    solver = "siman", #"jumpATA",
+    solver = "siman", #"jump",
     print_it = true,
     print_folder = "results",
     plot_it = true,

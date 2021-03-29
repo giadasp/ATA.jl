@@ -61,7 +61,7 @@ ata_model.obj.args = (
 # Assembly settings
 
 # SIMAN (Suggested for Large scale ATA):
-# Set the solver, "siman" for simulated annealing, "jumpATA" for MILP solver.
+# Set the solver, "siman" for simulated annealing, "jump" for MILP solver.
 solver = "siman"
 
 # SIMAN (Suggested for Large scale ATA):

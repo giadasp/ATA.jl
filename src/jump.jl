@@ -1,4 +1,4 @@
-function jumpATA!(
+function jump!(
     ata_model::AbstractModel;
     starting_design = Matrix{Float64}(undef, 0, 0),
     results_folder = "results",

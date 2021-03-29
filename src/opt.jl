@@ -1,7 +1,7 @@
 include("simAn.jl")
 
 """
-    assemble!(ata_model::AbstractModel; solver="jumpATA", starting_design=Matrix{Float64}(undef, 0, 0), results_folder="results", start_temp=0.1, geom_temp=0.1, n_item_sample=1, n_test_sample=1, opt_feas=0.0, n_fill=1, max_time=1000.00, max_conv=2, feas_nh=0, opt_nh=5, verbosity=2, optimizer_constructor="GLPK", optimizer_attributes=[("tm_lim", 1000)])
+    assemble!(ata_model::AbstractModel; solver="jump", starting_design=Matrix{Float64}(undef, 0, 0), results_folder="results", start_temp=0.1, geom_temp=0.1, n_item_sample=1, n_test_sample=1, opt_feas=0.0, n_fill=1, max_time=1000.00, max_conv=2, feas_nh=0, opt_nh=5, verbosity=2, optimizer_constructor="GLPK", optimizer_attributes=[("tm_lim", 1000)])
 
 # Description
 
@@ -10,7 +10,7 @@ Assemble the tests.
 # Arguments
 
 - **`ata_model::AbstractModel`** : Required. The model built with ATA fuctions. 
-- **`solver`** : Optional. Default: `"jumpATA"`. Values: `"jumpATA"`, `"siman"`. The solving interface to be used (JuMP or internal solver based on Simulated Annealing).
+- **`solver`** : Optional. Default: `"jump"`. Values: `"jump"`, `"siman"`. The solving interface to be used (JuMP or internal solver based on Simulated Annealing).
 - **`starting_design`** : Optional. Default: `Matrix{Float64}(undef, 0, 0)`. The starting design matrix. Must be a `Matrix{Float64}`.
 - **`results_folder`** : Optional. Default: `"results"`. The folder in which the output is stored.
 
@@ -31,7 +31,7 @@ Assemble the tests.
       - **`feas_nh`** : Optional. Default: `0`. Values: `[1, Inf)`. Maximum number of Feasibility neighbourhoods to explore, set to the minimum if the model is small or not highly constrained.
       - **`opt_nh`** : Optional. Default: `5`. Values: `[1, Inf)`. Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
 
-## jumpATA arguments
+## jump arguments
 
   - **`optimizer_constructor`** : Optional. Default: `"GLPK"`. Values: `"GLPK"`, `"Knitro"`, `"Gurobi"`, `"Cbc"`, `"CPLEX"`, `"Xpress"`, `"SCIP"`, `"Juniper"`. JuMP solver selection. Remember to load the required package before assemble!.
   - **`optimizer_attributes`** : Optional. Default: `[("tm_lim", 1000)]`. Values: An array of pairs `(attribute, value)`. Attributes and related values for the JuMP solver.
@@ -41,7 +41,7 @@ Assemble the tests.
 """
 function assemble!(
     ata_model::AbstractModel;
-    solver = "jumpATA",
+    solver = "jump",
     starting_design = Matrix{Float64}(undef, 0, 0),
     results_folder = "results",
     start_temp = 0.1,
@@ -77,8 +77,8 @@ function assemble!(
             opt_nh = opt_nh,
             kwargs...,
         )
-    elseif solver == "jumpATA"
-        jumpATA!(
+    elseif solver == "jump"
+        jump!(
             ata_model;
             results_folder = results_folder,
             starting_design = starting_design,
@@ -89,7 +89,7 @@ function assemble!(
     else
         push!(
             ata_model.output.infos,
-            ["danger", "only \"siman\" and \"jumpATA\" are supported.\n"],
+            ["danger", "only \"siman\" and \"jump\" are supported.\n"],
         )
     end
     return nothing
