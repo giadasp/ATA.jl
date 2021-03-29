@@ -28,12 +28,12 @@ function de_jong_load_parameters_chain!(
             items = items[collect(keys(items))[1]]
         end
         IIF = Vector{Array{Float64,2}}(undef, T)
-        ICF = Vector{Array{Float64,2}}(undef, T)
+        # ICF = Vector{Array{Float64,2}}(undef, T)
         K = zeros(Int, T)
         for t = 1:T
             K[t] = size(ata_model.obj.cores[t].points, 1)
             IIF[t] = zeros(K[t], n_items)
-            ICF[t] = zeros(K[t], n_items)
+            # ICF[t] = zeros(K[t], n_items)
         end
         for i = 1:n_items
             item = items[i]
@@ -66,7 +66,6 @@ function de_jong_load_parameters_chain!(
             for t = 1:T
                 IIF_i = zeros(R, K[t])
                 IIF_i_t_min = Inf .* ones(K[t])
-                IIF_i_t_min = Inf .* ones(K[t])
                 #check if chain has length R
                 for k = 1:K[t]
                     IIF_i[:, k] = item_info(
@@ -76,19 +75,19 @@ function de_jong_load_parameters_chain!(
                         parametrization = irt_parametrization,
                         D = irt_D,
                     )
-                    ICF_i[:, k] = item_char(
-                        df,
-                        ata_model.obj.cores[t].points[k];
-                        model = irt_model,
-                        parametrization = irt_parametrization,
-                        D = irt_D,
-                    )[1][
-                        :,
-                        :,
-                        1,
-                    ]
+                    # ICF_i[:, k] = item_char(
+                    #     df,
+                    #     ata_model.obj.cores[t].points[k];
+                    #     model = irt_model,
+                    #     parametrization = irt_parametrization,
+                    #     D = irt_D,
+                    # )[1][
+                    #     :,
+                    #     :,
+                    #     1,
+                    # ]
                     IIF[t][k, i] = StatsBase.mean(IIF_i[:, k]) - StatsBase.std(IIF_i[:, k])
-                    ICF[t][k, i] = StatsBase.mean(IIF_i[:, k]) - StatsBase.std(IIF_i[:, k])
+                    # ICF[t][k, i] = StatsBase.mean(IIF_i[:, k]) - StatsBase.std(IIF_i[:, k])
                 end
             end
         end
