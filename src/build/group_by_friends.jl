@@ -23,7 +23,9 @@ function group_by_friends!(ata_model::AbstractModel) #last
             )
             return nothing
         end
-        if any([size(ata_model.constraints[t].constr_b, 1) > 0 for t in 1 : ata_model.settings.T])
+        if any([
+            size(ata_model.constraints[t].constr_b, 1) > 0 for t = 1:ata_model.settings.T
+        ])
             A = Vector{Matrix{Float64}}(undef, ata_model.settings.T)
             b = Vector{Vector{Float64}}(undef, ata_model.settings.T)
             A_new = Vector{Matrix{Float64}}(undef, ata_model.settings.T)
@@ -77,17 +79,17 @@ function group_by_friends!(ata_model::AbstractModel) #last
             end
             #update ata_model.forced0
             ata_model.settings.forced0 = x_forced0_new
-            DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0_new)   
-            message[2] = message[2] * "- Categorical and linear quantitative constraints grouped.\n"  
+            DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0_new)
+            message[2] =
+                message[2] * "- Categorical and linear quantitative constraints grouped.\n"
         end
         #item use
         if ata_model.settings.to_apply[1]
             item_use_max = ata_model.settings.iu.max
             item_use_max_new = zeros(Int, n_fs)
             for fs = 1:n_fs
-                item_use_max_new[fs] = Int(
-                    minimum(ata_model.settings.iu.max[ata_model.settings.fs.items[fs]]),
-                )
+                item_use_max_new[fs] =
+                    Int(minimum(ata_model.settings.iu.max[ata_model.settings.fs.items[fs]]))
             end
             ata_model.settings.iu.max = item_use_max_new
             open("OPT/Settings.jl", "a") do f
@@ -99,9 +101,8 @@ function group_by_friends!(ata_model::AbstractModel) #last
             item_use_min = ata_model.settings.iu.min
             item_use_min_new = zeros(Int, n_fs)
             for fs = 1:n_fs
-                item_use_min_new[fs] = Int(
-                    maximum(ata_model.settings.iu.min[ata_model.settings.fs.items[fs]]),
-                )
+                item_use_min_new[fs] =
+                    Int(maximum(ata_model.settings.iu.min[ata_model.settings.fs.items[fs]]))
             end
             ata_model.settings.iu.min = item_use_min_new
             open("OPT/Settings.jl", "a") do f

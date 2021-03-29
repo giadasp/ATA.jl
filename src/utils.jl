@@ -522,7 +522,11 @@ function item_info(
     parametrization = "at-b", #"at-b, at-ab, at+b, at+ab"
     D = 1,
 ) #true, false
-    return item_info(pars, [theta], model = model, parametrization = parametrization, D = D)[:, 1, :]
+    return item_info(pars, [theta], model = model, parametrization = parametrization, D = D)[
+        :,
+        1,
+        :,
+    ]
 end
 
 function student_likelihood(

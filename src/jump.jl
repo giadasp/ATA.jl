@@ -10,26 +10,32 @@ function jump!(
     if !isdir(results_folder)
         mkdir(results_folder)
     else
-        message[2] = message[2] * string(
-            "- There is already a folder with this name, files in ",
-            results_folder,
-            " will be overwritten.\n",
-        )
+        message[2] =
+            message[2] * string(
+                "- There is already a folder with this name, files in ",
+                results_folder,
+                " will be overwritten.\n",
+            )
     end
     n_items = ata_model.settings.n_items
     if ata_model.obj.name in ["maximin", "minimax", "soyster_maximin", "de_jong_maximin"]
-        if any([size(ata_model.obj.cores[t].IIF, 1) > 0  for t=1:ata_model.settings.T])
-            IIF = [ata_model.obj.cores[t].IIF  for t=1:ata_model.settings.T]
-            message[2] = message[2] * string("- Assembling tests with ", ata_model.obj.name, " objective...\n")
+        if any([size(ata_model.obj.cores[t].IIF, 1) > 0 for t = 1:ata_model.settings.T])
+            IIF = [ata_model.obj.cores[t].IIF for t = 1:ata_model.settings.T]
+            message[2] =
+                message[2] *
+                string("- Assembling tests with ", ata_model.obj.name, " objective...\n")
         else
             message[1] = "danger"
-            message[2] = message[2] * "- IIFs have not been computed. Run add_obj_fun!() first.\n"
+            message[2] =
+                message[2] * "- IIFs have not been computed. Run add_obj_fun!() first.\n"
             push!(ata_model.output.infos, message)
             return nothing
         end
     elseif ata_model.obj.name == "cc_maximin"
         message[1] = "danger"
-        message[2] = message[2] * "- You must use the siman solver to assemble tests with chance-constrained MAXIMIN objective function.\n"
+        message[2] =
+            message[2] *
+            "- You must use the siman solver to assemble tests with chance-constrained MAXIMIN objective function.\n"
         push!(ata_model.output.infos, message)
         return nothing
     elseif ata_model.obj.name == ""
@@ -347,7 +353,7 @@ function jump!(
 
     ncons = copy(c) - 1
 
-    if ata_model.obj.name in ["maximin" , "soyster_maximin", "de_jong_maximin"]
+    if ata_model.obj.name in ["maximin", "soyster_maximin", "de_jong_maximin"]
         #Objective bound
         JuMP.@variable(m, w >= 0)
         for t = 1:ata_model.settings.T
@@ -386,7 +392,9 @@ function jump!(
         JuMP.@objective(m, Min, epsilon)
     end
     JuMP.optimize!(m)
-    message[2] = message[2] * string("- The model has termination status:", JuMP.termination_status(m), "\n.")
+    message[2] =
+        message[2] *
+        string("- The model has termination status:", JuMP.termination_status(m), "\n.")
     #println(string("The model has termination status:", JuMP.termination_status(m)))
     design = abs.(round.(JuMP.value.(x)))
     DelimitedFiles.writedlm(string(results_folder, "/design.csv"), design)

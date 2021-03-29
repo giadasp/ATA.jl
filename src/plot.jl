@@ -46,7 +46,8 @@ function plot_results(
             ICF_CC = copy(ICF)
         end
 
-        if ata_model.obj.name in ["maximin" , "soyster_maximin", "de_jong_maximin", "cc_maximin" , "minimax"]
+        if ata_model.obj.name in
+           ["maximin", "soyster_maximin", "de_jong_maximin", "cc_maximin", "minimax"]
             JLD2.@load "OPT/IIF.jld2" IIF
             JLD2.@load "OPT/ICF.jld2" ICF
         end
@@ -73,7 +74,8 @@ function plot_results(
         end
 
         #TIF e ICF
-        if ata_model.obj.name in ["maximin" , "soyster_maximin", "de_jong_maximin", "cc_maximin" , "minimax"]
+        if ata_model.obj.name in
+           ["maximin", "soyster_maximin", "de_jong_maximin", "cc_maximin", "minimax"]
             if isfile("sim_pool.csv")
                 sim_pool = CSV.read("sim_pool.csv", DataFrames.DataFrame)
             else

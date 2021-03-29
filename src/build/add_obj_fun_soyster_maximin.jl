@@ -22,8 +22,8 @@ function add_obj_fun!(
     psychometrics = false,
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
     items_file = "",
-    kwargs...
-    )
+    kwargs...,
+)
     message = ["", ""]
     try
         T = ata_model.settings.T
@@ -72,7 +72,7 @@ function add_obj_fun!(
                     ata_model.output.infos,
                     [
                         "danger",
-                        "- Soyster MAXIMIN objective requires a jld2 file \"BSPar.jld2\" with sampled values for the item parameters.\n Otherwise provide a `Psychometrics.Item` using the `items_file` or `items` arguments and set the keyword `psychometrics` to true."
+                        "- Soyster MAXIMIN objective requires a jld2 file \"BSPar.jld2\" with sampled values for the item parameters.\n Otherwise provide a `Psychometrics.Item` using the `items_file` or `items` arguments and set the keyword `psychometrics` to true.",
                     ],
                 )
                 return nothing
@@ -106,15 +106,25 @@ function add_obj_fun!(
                             parametrization = irt_parametrization,
                             D = irt_D,
                         )
-                        IIF[t][k, :] = [min(IIF[t][k, i], IIF_k_t_r[k, i]) for k = 1 : K[t], i = 1 : n_items]
+                        IIF[t][k, :] = [
+                            min(IIF[t][k, i], IIF_k_t_r[k, i]) for k = 1:K[t],
+                            i = 1:n_items
+                        ]
                         ICF_k_t_r = item_char(
                             df,
                             ata_model.obj.cores[t].points[k];
                             model = irt_model,
                             parametrization = irt_parametrization,
                             D = irt_D,
-                        )[1][:,:,1]
-                        ICF[t][k, :] =  [min(ICF[t][k, i], ICF_k_t_r[k, i]) for k = 1 : K[t], i = 1 : n_items]
+                        )[1][
+                            :,
+                            :,
+                            1,
+                        ]
+                        ICF[t][k, :] = [
+                            min(ICF[t][k, i], ICF_k_t_r[k, i]) for k = 1:K[t],
+                            i = 1:n_items
+                        ]
                     end
                     ata_model.obj.cores[t].IIF = IIF[t]
                 end
@@ -126,7 +136,7 @@ function add_obj_fun!(
                 ata_model;
                 items_file = items_file,
                 items = items,
-                kwargs...
+                kwargs...,
             )
         end
         message = [

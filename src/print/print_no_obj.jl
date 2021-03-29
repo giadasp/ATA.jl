@@ -76,32 +76,34 @@ function print_results(
             points = [-1.5, -1.0, -0.5, 0, 0.5, 1.0, 1.5]
             ICF = Vector{Matrix{Float64}}(undef, T)
             for t = 1:T
-                    ICF[t] = zeros(size(points, 1), n_items)
-                    for k = 1 : size(points, 1)
-                        ICF[t][k, :] =
-                            (item_char(
-                                ata_model.settings.irt.parameters,
-                                points[k],
-                                model = ata_model.settings.irt.model,
-                                parametrization = ata_model.settings.irt.parametrization,
-                                D = ata_model.settings.irt.D,
-                            )[1][:,:,1])
-                    end
+                ICF[t] = zeros(size(points, 1), n_items)
+                for k = 1:size(points, 1)
+                    ICF[t][k, :] = (item_char(
+                        ata_model.settings.irt.parameters,
+                        points[k],
+                        model = ata_model.settings.irt.model,
+                        parametrization = ata_model.settings.irt.parametrization,
+                        D = ata_model.settings.irt.D,
+                    )[1][
+                        :,
+                        :,
+                        1,
+                    ])
+                end
             end
             IIF = Vector{Matrix{Float64}}(undef, T)
 
             for t = 1:T
-                    IIF[t] = zeros(7, n_items)
-                    for k = 1 : 7
-                        IIF[t][k, :] =
-                            item_info(
-                                ata_model.settings.irt.parameters,
-                                points[k],
-                                model = ata_model.settings.irt.model,
-                                parametrization = ata_model.settings.irt.parametrization,
-                                D = ata_model.settings.irt.D,
-                            )
-                    end
+                IIF[t] = zeros(7, n_items)
+                for k = 1:7
+                    IIF[t][k, :] = item_info(
+                        ata_model.settings.irt.parameters,
+                        points[k],
+                        model = ata_model.settings.irt.model,
+                        parametrization = ata_model.settings.irt.parametrization,
+                        D = ata_model.settings.irt.D,
+                    )
+                end
             end
             #save values
             estimated = Float64[]
@@ -128,17 +130,18 @@ function print_results(
             end
             tif_at_theta_pts = DataFrames.DataFrame(estimated = estimated)
             if size(sim_pool, 1) > 0
-                tif_at_theta_pts[!,:True] = True
+                tif_at_theta_pts[!, :True] = True
                 DataFrames.rename(tif_at_theta_pts, Symbol.(["estimated", "true"]))
             end
             CSV.write(string(results_folder, "/tif_at_theta_pts.csv"), tif_at_theta_pts)
-                    #expected score
+            #expected score
             es_print_irt = Vector{Vector{Float64}}(undef, T)
             for t = 1:T
                 if size(ICF[t], 1) > 0
                     es_print_irt[t] = zeros(size(ICF[t], 1))
                     for k = 1:size(ICF[t], 1)
-                        es_print_irt[t][k] = ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
+                        es_print_irt[t][k] =
+                            ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
                     end
                 end
             end
@@ -248,4 +251,3 @@ function print_results(
         println("No solution found")
     end
 end
-

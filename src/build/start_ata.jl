@@ -145,10 +145,7 @@ function start_ata(;
             elseif ata_model.settings.irt.model == "2PL"
                 DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b]) #nqp values in interval\r\n",
             elseif ata_model.settings.irt.model == "3PL"
-                DataFrames.rename!(
-                    ata_model.settings.irt.parameters,
-                    [:a, :b, :c],
-                ) #nqp values in interval\r\n",
+                DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b, :c]) #nqp values in interval\r\n",
             else
                 push!(
                     ata_model.output.infos,
@@ -158,58 +155,58 @@ function start_ata(;
             end
             CSV.write("OPT/irt_parameters.csv", ata_model.settings.irt.parameters)
             message[2] = message[2] * "- IRT item parameters loaded.\n"
-                        #test length
-                        if Inputs.length_min != Int64[]
-                            lengthmin = zeros(Int64, ata_model.settings.T)
-                            lengthweight = ones(Int64, ata_model.settings.T)
-                            t1 = 1
-                            for g = 1:ata_model.settings.n_groups
-                                for t = 1:ata_model.settings.Tg[g]
-                                    lengthmin[t1] = Int(Inputs.length_min[g])
-                                    lengthweight[t1] = Inputs.length_weight[g]
-                                    t1 += 1
-                                end
-                            end
-                            for t = 1:ata_model.settings.T
-                                ata_model.constraints[t].constr_A = vcat(
-                                    ata_model.constraints[t].constr_A,
-                                    (-lengthweight[t]) .* ones(Float64, ata_model.settings.n_items)',
-                                )
-                                ata_model.constraints[t].constr_b = vcat(
-                                    ata_model.constraints[t].constr_b,
-                                    -lengthmin[t] * lengthweight[t],
-                                )
-                                ata_model.constraints[t].length_min = lengthmin[t]
-                            end
-                            write(f, "length_min = $lengthmin\n")
-                            message[2] = message[2] * "- Minimum length of tests constrained.\n"
-                        end
-            
-                        if Inputs.length_max != Int64[]
-                            lengthmax = zeros(Int64, ata_model.settings.T)
-                            lengthweight = ones(Int64, ata_model.settings.T)
-                            t1 = 1
-                            for g = 1:ata_model.settings.n_groups
-                                for t = 1:ata_model.settings.Tg[g]
-                                    lengthmax[t1] = Int(Inputs.length_max[g])
-                                    lengthweight[t1] = Inputs.length_weight[g]
-                                    t1 += 1
-                                end
-                            end
-                            for t = 1:ata_model.settings.T
-                                ata_model.constraints[t].constr_A = vcat(
-                                    ata_model.constraints[t].constr_A,
-                                    (lengthweight[t]) .* ones(ata_model.settings.n_items)',
-                                )
-                                ata_model.constraints[t].constr_b = vcat(
-                                    ata_model.constraints[t].constr_b,
-                                    lengthmax[t] * lengthweight[t],
-                                )
-                                ata_model.constraints[t].length_max = lengthmax[t]
-                            end
-                            write(f, "length_max = $lengthmax\n")
-                            message[2] = message[2] * "- Maximum length of tests constrained.\n"
-                        end
+            #test length
+            if Inputs.length_min != Int64[]
+                lengthmin = zeros(Int64, ata_model.settings.T)
+                lengthweight = ones(Int64, ata_model.settings.T)
+                t1 = 1
+                for g = 1:ata_model.settings.n_groups
+                    for t = 1:ata_model.settings.Tg[g]
+                        lengthmin[t1] = Int(Inputs.length_min[g])
+                        lengthweight[t1] = Inputs.length_weight[g]
+                        t1 += 1
+                    end
+                end
+                for t = 1:ata_model.settings.T
+                    ata_model.constraints[t].constr_A = vcat(
+                        ata_model.constraints[t].constr_A,
+                        (-lengthweight[t]) .* ones(Float64, ata_model.settings.n_items)',
+                    )
+                    ata_model.constraints[t].constr_b = vcat(
+                        ata_model.constraints[t].constr_b,
+                        -lengthmin[t] * lengthweight[t],
+                    )
+                    ata_model.constraints[t].length_min = lengthmin[t]
+                end
+                write(f, "length_min = $lengthmin\n")
+                message[2] = message[2] * "- Minimum length of tests constrained.\n"
+            end
+
+            if Inputs.length_max != Int64[]
+                lengthmax = zeros(Int64, ata_model.settings.T)
+                lengthweight = ones(Int64, ata_model.settings.T)
+                t1 = 1
+                for g = 1:ata_model.settings.n_groups
+                    for t = 1:ata_model.settings.Tg[g]
+                        lengthmax[t1] = Int(Inputs.length_max[g])
+                        lengthweight[t1] = Inputs.length_weight[g]
+                        t1 += 1
+                    end
+                end
+                for t = 1:ata_model.settings.T
+                    ata_model.constraints[t].constr_A = vcat(
+                        ata_model.constraints[t].constr_A,
+                        (lengthweight[t]) .* ones(ata_model.settings.n_items)',
+                    )
+                    ata_model.constraints[t].constr_b = vcat(
+                        ata_model.constraints[t].constr_b,
+                        lengthmax[t] * lengthweight[t],
+                    )
+                    ata_model.constraints[t].length_max = lengthmax[t]
+                end
+                write(f, "length_max = $lengthmax\n")
+                message[2] = message[2] * "- Maximum length of tests constrained.\n"
+            end
             #friend sets
             #fictiuos friendSets
             ata_model.settings.fs.counts = ones(ata_model.settings.n_items)
@@ -242,8 +239,7 @@ function start_ata(;
                         t1 += 1
                     end
                 end
-                message[2] =
-                message[2] * "- Expected score variable loaded.\n"
+                message[2] = message[2] * "- Expected score variable loaded.\n"
             end
             t1 = 1
             if Inputs.expected_score_pts != Float64[]
@@ -257,13 +253,11 @@ function start_ata(;
             else
                 for g = 1:ata_model.settings.n_groups
                     for t = 1:ata_model.settings.Tg[g]
-                        ata_model.constraints[t1].expected_score.pts =
-                            [0.0]
+                        ata_model.constraints[t1].expected_score.pts = [0.0]
                         t1 += 1
                     end
                 end
-                message[2] =
-                message[2] * "- Expected score points loaded.\n"
+                message[2] = message[2] * "- Expected score points loaded.\n"
             end
             min_exp_score = false
             max_exp_score = false
@@ -400,7 +394,9 @@ function start_ata(;
                         end
                     end
                     ata_model.obj.R = Inputs.obj_aux_int
-                    message[2] = message[2] * "- Optimization points, number of replications, and alpha loaded.\n"
+                    message[2] =
+                        message[2] *
+                        "- Optimization points, number of replications, and alpha loaded.\n"
                 else
                     push!(
                         ata_model.output.infos,
@@ -423,7 +419,9 @@ function start_ata(;
                         end
                     end
                     ata_model.obj.R = Inputs.obj_aux_int
-                    message[2] = message[2] * "- Optimization points and number of replications loaded.\n"
+                    message[2] =
+                        message[2] *
+                        "- Optimization points and number of replications loaded.\n"
                 else
                     push!(
                         ata_model.output.infos,
@@ -433,7 +431,7 @@ function start_ata(;
                         ],
                     )
                     return nothing
-                end    
+                end
             elseif Inputs.obj_type == "minimax"
                 ata_model.obj.cores =
                     [MinimaxObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]

@@ -22,8 +22,8 @@ function add_obj_fun!(
     psychometrics = false,
     items_file = "",
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
-    kwargs...
-    )
+    kwargs...,
+)
     message = ["", ""]
     try
         T = ata_model.settings.T
@@ -110,7 +110,11 @@ function add_obj_fun!(
                             model = irt_model,
                             parametrization = irt_parametrization,
                             D = irt_D,
-                        )[1][:,:,1] # K[t] x I x R
+                        )[1][
+                            :,
+                            :,
+                            1,
+                        ] # K[t] x I x R
                     end
                     ata_model.obj.cores[t].IIF = IIF[t]
                 end
@@ -122,7 +126,7 @@ function add_obj_fun!(
                 ata_model;
                 items_file = items_file,
                 items = items,
-                kwargs...
+                kwargs...,
             )
         end
         message = [

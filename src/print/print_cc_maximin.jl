@@ -95,7 +95,8 @@ function print_results(
                 second_qle = vcat(second_qle, StatsBase.quantile(IIF_t_k, [0.5]))
                 third_qle = vcat(third_qle, StatsBase.quantile(IIF_t_k, [0.75]))
                 fourth_qle = vcat(fourth_qle, maximum(IIF_t_k))
-                alpha = vcat(alpha, StatsBase.quantile(IIF_t_k, ata_model.obj.cores[t].alpha))
+                alpha =
+                    vcat(alpha, StatsBase.quantile(IIF_t_k, ata_model.obj.cores[t].alpha))
                 estimated = vcat(
                     estimated,
                     item_info(
@@ -120,11 +121,12 @@ function print_results(
                 end
             end
         end
-        tif_at_theta_pts =
-            DataFrames.DataFrame(hcat(zero_qle, first_qle, second_qle, third_qle, fourth_qle, alpha, estimated))
+        tif_at_theta_pts = DataFrames.DataFrame(
+            hcat(zero_qle, first_qle, second_qle, third_qle, fourth_qle, alpha, estimated),
+        )
 
         if size(sim_pool, 1) > 0
-            tif_at_theta_pts[!,:True] = True
+            tif_at_theta_pts[!, :True] = True
             DataFrames.rename(
                 tif_at_theta_pts,
                 [
@@ -158,15 +160,18 @@ function print_results(
         for t = 1:T
             if size(ICF[t], 1) == 0
                 ICF[t] = zeros(size(ata_model.obj.cores[t].points, 1), n_items)
-                for k = 1 : size(ata_model.obj.cores[t].points, 1)
-                    ICF[t][k, :] =
-                        (item_char(
-                            ata_model.settings.irt.parameters,
-                            ata_model.obj.cores[t].points[k],
-                            model = ata_model.settings.irt.model,
-                            parametrization = ata_model.settings.irt.parametrization,
-                            D = ata_model.settings.irt.D,
-                        )[1][:,:,1])
+                for k = 1:size(ata_model.obj.cores[t].points, 1)
+                    ICF[t][k, :] = (item_char(
+                        ata_model.settings.irt.parameters,
+                        ata_model.obj.cores[t].points[k],
+                        model = ata_model.settings.irt.model,
+                        parametrization = ata_model.settings.irt.parametrization,
+                        D = ata_model.settings.irt.D,
+                    )[1][
+                        :,
+                        :,
+                        1,
+                    ])
                 end
             end
         end
@@ -281,4 +286,3 @@ function print_results(
         println("No solution found")
     end
 end
-

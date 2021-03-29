@@ -5,5 +5,6 @@ mutable struct SoysterMaximinModel <: AbstractModel
     output::Output
     SoysterMaximinModel(settings, constraints, obj, output) =
         new(settings, constraints, obj, output)
-    SoysterMaximinModel() = new(Settings(), Constraint[], SoysterMaximinObjective(), Output())
+    SoysterMaximinModel() =
+        new(Settings(), Constraint[], SoysterMaximinObjective(), Output())
 end

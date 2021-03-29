@@ -23,8 +23,8 @@ function add_obj_fun!(
     psychometrics = false,
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
     items_file = "",
-    kwargs...
-    )
+    kwargs...,
+)
     message = ["", ""]
     try
         T = ata_model.settings.T
@@ -72,7 +72,7 @@ function add_obj_fun!(
                 ata_model;
                 items_file = items_file,
                 items = items,
-                kwargs...
+                kwargs...,
             )
         end
         message = [

@@ -17,7 +17,13 @@ function de_jong_load_parameters_chain!(
         R = ata_model.obj.R
         n_items = ata_model.settings.n_items
         if !isfile(items_file) || (size(items, 1) > 0)
-            error(string("- ", items_file, " does not exist.\nProvide a `Psychometrics.Item` vector through the `items` argument, or the name of a file which can be loaded by `FileIO` that contains that vector through the `items_file` argument.\n"))
+            error(
+                string(
+                    "- ",
+                    items_file,
+                    " does not exist.\nProvide a `Psychometrics.Item` vector through the `items` argument, or the name of a file which can be loaded by `FileIO` that contains that vector through the `items_file` argument.\n",
+                ),
+            )
         elseif isfile(items_file)
             items = FileIO.load(items_file)
             items = items[collect(keys(items))[1]]
@@ -27,44 +33,42 @@ function de_jong_load_parameters_chain!(
         K = zeros(Int, T)
         for t = 1:T
             K[t] = size(ata_model.obj.cores[t].points, 1)
-            IIF[t] = zeros(K[t], n_items, R)
-            ICF[t] = zeros(K[t], n_items, R)
+            IIF[t] = zeros(K[t], n_items)
+            ICF[t] = zeros(K[t], n_items)
             IIF_t_min = Inf .* ones(K[t], n_items)
             ICF_t_min = Inf .* ones(K[t], n_items)
             #check if chain has length R
             if size(items[1].parameters.chain, 1) != R
                 error("Item 1 does not have R=", R, " chains.")
             end
-            for t in 1:T
-                for i = 1 : n_items
-                    IIF_i = zeros(R, K[t])
-                    ICF_i = zeros(R, K[t])
-                    for r = 1 : R
-                        if irt_model == "1PL"
-                            if !(items[1].parameters isa Psychometrics.Parameters1PL)
-                                error("Item 1 is not of type ", irt_model, ".")
-                            end
-                            df = DataFrames.DataFrame(b = [items[i].parameters.chain[r][1]])
-                        elseif irt_model == "2PL"
-                            if !(items[1].parameters isa Psychometrics.Parameters2PL)
-                                error("Item 1 is not of type ", irt_model, ".")
-                            end
-                            df = DataFrames.DataFrame(
-                                a = [items[i].parameters.chain[r][1]],
-                                b = [items[i].parameters.chain[r][2]],
-                            )
-                        elseif irt_model == "3PL"
-                            if !(items[1].parameters isa Psychometrics.Parameters3PL)
-                                error("Item 1 is not of type ", irt_model, ".")
-                            end
-                            df = DataFrames.DataFrame(
-                                a = [items[i].parameters.chain[r][1]],
-                                b = [items[i].parameters.chain[r][2]],
-                                c = [items[i].parameters.chain[r][3]],
-                            )
+            for i = 1:n_items
+                IIF_i = zeros(R, K[t])
+                ICF_i = zeros(R, K[t])
+                for r = 1:R
+                    if irt_model == "1PL"
+                        if !(items[1].parameters isa Psychometrics.Parameters1PL)
+                            error("Item 1 is not of type ", irt_model, ".")
                         end
+                        df = DataFrames.DataFrame(b = [items[i].parameters.chain[r][1]])
+                    elseif irt_model == "2PL"
+                        if !(items[1].parameters isa Psychometrics.Parameters2PL)
+                            error("Item 1 is not of type ", irt_model, ".")
+                        end
+                        df = DataFrames.DataFrame(
+                            a = [items[i].parameters.chain[r][1]],
+                            b = [items[i].parameters.chain[r][2]],
+                        )
+                    elseif irt_model == "3PL"
+                        if !(items[1].parameters isa Psychometrics.Parameters3PL)
+                            error("Item 1 is not of type ", irt_model, ".")
+                        end
+                        df = DataFrames.DataFrame(
+                            a = [items[i].parameters.chain[r][1]],
+                            b = [items[i].parameters.chain[r][2]],
+                            c = [items[i].parameters.chain[r][3]],
+                        )
                     end
-                    for k = 1 : K[t]
+                    for k = 1:K[t]
                         IIF_i[r, k] = item_info(
                             df,
                             ata_model.obj.cores[t].points[k];
@@ -72,21 +76,27 @@ function de_jong_load_parameters_chain!(
                             parametrization = irt_parametrization,
                             D = irt_D,
                         )[1]
-                        IIF[t][k, :] = [StatsBase.mean(IIF_i[:, k]) .- StatsBase.std(IIF_i[:, k]) for i in 1 : n_items]
                         ICF_i[r, k] = item_char(
                             df,
                             ata_model.obj.cores[t].points[k];
                             model = irt_model,
                             parametrization = irt_parametrization,
                             D = irt_D,
-                        )[1][:,:,1][1]
-                        ICF[t][k, :] = [StatsBase.mean(ICF_i[:, k]) .- StatsBase.std(ICF_i[:, k]) for i in 1 : n_items]
+                        )[1][
+                            :,
+                            :,
+                            1,
+                        ][1]
                     end
                 end
+                for k = 1:K[t]
+                    IIF[t][k, i] = StatsBase.mean(IIF_i[:, k]) .- StatsBase.std(IIF_i[:, k])
+                    ICF[t][k, i] = StatsBase.mean(ICF_i[:, k]) .- StatsBase.std(ICF_i[:, k])
+                end
             end
-            JLD2.@save "OPT/IIF_CC.jld2" IIF
-            JLD2.@save "OPT/ICF_CC.jld2" ICF
         end
+        JLD2.@save "opt/IIF.jld2" IIF
+        JLD2.@save "opt/ICF.jld2" ICF
     catch e
         message[1] = "danger"
         message[2] = message[2] * string("- ", sprint(showerror, e), "\n")

@@ -16,7 +16,13 @@ function cc_maximin_load_parameters_chain!(
         R = ata_model.obj.R
         n_items = ata_model.settings.n_items
         if !isfile(items_file) || (size(items, 1) > 0)
-            error(string("- ", items_file, " does not exist.\nProvide a `Psychometrics.Item` vector through the `items` argument, or the name of a file which can be loaded by `FileIO` that contains that vector through the `items_file` argument.\n"))
+            error(
+                string(
+                    "- ",
+                    items_file,
+                    " does not exist.\nProvide a `Psychometrics.Item` vector through the `items` argument, or the name of a file which can be loaded by `FileIO` that contains that vector through the `items_file` argument.\n",
+                ),
+            )
         elseif isfile(items_file)
             items = FileIO.load(items_file)
             items = items[collect(keys(items))[1]]
@@ -70,7 +76,11 @@ function cc_maximin_load_parameters_chain!(
                         model = irt_model,
                         parametrization = irt_parametrization,
                         D = irt_D,
-                    )[1][:,:,1] # K[t] x I x R
+                    )[1][
+                        :,
+                        :,
+                        1,
+                    ] # K[t] x I x R
                 end
                 ata_model.obj.cores[t].IIF = IIF[t]
             end

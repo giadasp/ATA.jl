@@ -18,7 +18,7 @@ Print the features of the assembled tests.
 - **`sim_pool::DataFrames.DataFrame`** : Optional. Default: DataFrame(). The pool with true item paramaters. For simulation studies.
 """
 function print_results(
-    ata_model::Union{MaximinModel, SoysterMaximinModel, DeJongMaximinModel};
+    ata_model::Union{MaximinModel,SoysterMaximinModel,DeJongMaximinModel};
     group_by_fs = false,
     results_folder = "results",
     sim_pool::DataFrames.DataFrame = DataFrame(),
@@ -78,15 +78,18 @@ function print_results(
         for t = 1:T
             if size(ICF[t], 1) == 0
                 ICF[t] = zeros(size(ata_model.obj.cores[t].points, 1), n_items)
-                for k = 1 : size(ata_model.obj.cores[t].points, 1)
-                    ICF[t][k, :] =
-                        (item_char(
-                            ata_model.settings.irt.parameters,
-                            ata_model.obj.cores[t].points[k],
-                            model = ata_model.settings.irt.model,
-                            parametrization = ata_model.settings.irt.parametrization,
-                            D = ata_model.settings.irt.D,
-                        )[1][:,:,1])
+                for k = 1:size(ata_model.obj.cores[t].points, 1)
+                    ICF[t][k, :] = (item_char(
+                        ata_model.settings.irt.parameters,
+                        ata_model.obj.cores[t].points[k],
+                        model = ata_model.settings.irt.model,
+                        parametrization = ata_model.settings.irt.parametrization,
+                        D = ata_model.settings.irt.D,
+                    )[1][
+                        :,
+                        :,
+                        1,
+                    ])
                 end
             end
         end
@@ -117,7 +120,7 @@ function print_results(
         end
         tif_at_theta_pts = DataFrames.DataFrame(estimated = estimated, target = target)
         if size(sim_pool, 1) > 0
-            tif_at_theta_pts[!,:True] = True
+            tif_at_theta_pts[!, :True] = True
             DataFrames.rename(tif_at_theta_pts, Symbol.(["estimated", "target", "true"]))
         end
         CSV.write(string(results_folder, "/tif_at_theta_pts.csv"), tif_at_theta_pts)
@@ -128,7 +131,8 @@ function print_results(
             if size(ICF[t], 1) > 0
                 es_print_irt[t] = zeros(size(ICF[t], 1))
                 for k = 1:size(ICF[t], 1)
-                    es_print_irt[t][k] = ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
+                    es_print_irt[t][k] =
+                        ((ICF[t][k, :]'*design[:, t]))[1] / sum(design[:, t])
                 end
             end
         end
@@ -234,4 +238,3 @@ function print_results(
         println("No solution found")
     end
 end
-
