@@ -35,66 +35,66 @@ function soyster_load_parameters_chain!(
             K[t] = size(ata_model.obj.cores[t].points, 1)
             IIF[t] = zeros(K[t], n_items)
             ICF[t] = zeros(K[t], n_items)
-            IIF_t_min = Inf .* ones(K[t], n_items)
-            ICF_t_min = Inf .* ones(K[t], n_items)
-            #check if chain has length R
-            if size(items[1].parameters.chain, 1) != R
+        end
+        for i = 1:n_items
+            item = items[i]
+            if size(item.parameters.chain, 1) != R
                 error("Item 1 does not have R=", R, " chains.")
             end
-            for i = 1:n_items
-                IIF_i = zeros(R, K[t])
-                ICF_i = zeros(R, K[t])
-                for r = 1:R
-                    if irt_model == "1PL"
-                        if !(items[1].parameters isa Psychometrics.Parameters1PL)
-                            error("Item 1 is not of type ", irt_model, ".")
-                        end
-                        df = DataFrames.DataFrame(b = [items[i].parameters.chain[r][1]])
-                    elseif irt_model == "2PL"
-                        if !(items[1].parameters isa Psychometrics.Parameters2PL)
-                            error("Item 1 is not of type ", irt_model, ".")
-                        end
-                        df = DataFrames.DataFrame(
-                            a = [items[i].parameters.chain[r][1]],
-                            b = [items[i].parameters.chain[r][2]],
-                        )
-                    elseif irt_model == "3PL"
-                        if !(items[1].parameters isa Psychometrics.Parameters3PL)
-                            error("Item 1 is not of type ", irt_model, ".")
-                        end
-                        df = DataFrames.DataFrame(
-                            a = [items[i].parameters.chain[r][1]],
-                            b = [items[i].parameters.chain[r][2]],
-                            c = [items[i].parameters.chain[r][3]],
-                        )
-                    end
-                    for k = 1:K[t]
-                        IIF_i[r, k] = item_info(
-                            df,
-                            ata_model.obj.cores[t].points[k];
-                            model = irt_model,
-                            parametrization = irt_parametrization,
-                            D = irt_D,
-                        )[1]
-                        ICF_i[r, k] = item_char(
-                            df,
-                            ata_model.obj.cores[t].points[k];
-                            model = irt_model,
-                            parametrization = irt_parametrization,
-                            D = irt_D,
-                        )[1][
-                            :,
-                            :,
-                            1,
-                        ][1]
-                    end
+            if irt_model == "1PL"
+                if !(item.parameters isa Psychometrics.Parameters1PL)
+                    error("Item 1 is not of type ", irt_model, ".")
                 end
+                df = DataFrames.DataFrame(b = [item.parameters.chain[r][1]])
+            elseif irt_model == "2PL"
+                if !(item.parameters isa Psychometrics.Parameters2PL)
+                    error("Item 1 is not of type ", irt_model, ".")
+                end
+                df = DataFrames.DataFrame(
+                    a = [item.parameters.chain[r][1] for r = 1:R],
+                    b = [item.parameters.chain[r][2] for r = 1:R],
+                )
+            elseif irt_model == "3PL"
+                if !(item.parameters isa Psychometrics.Parameters3PL)
+                    error("Item 1 is not of type ", irt_model, ".")
+                end
+                df = DataFrames.DataFrame(
+                    a = [item.parameters.chain[r][1] for r = 1:R],
+                    b = [item.parameters.chain[r][2] for r = 1:R],
+                    c = [item.parameters.chain[r][3] for r = 1:R],
+                )
+            end
+            for t = 1:T
+                IIF_i = zeros(R, K[t])
+                IIF_i_t_min = Inf .* ones(K[t])
+                IIF_i_t_min = Inf .* ones(K[t])
+                #check if chain has length R
                 for k = 1:K[t]
+                    IIF_i[:, k] = item_info(
+                        df,
+                        ata_model.obj.cores[t].points[k];
+                        model = irt_model,
+                        parametrization = irt_parametrization,
+                        D = irt_D,
+                    )[1]
+                    ICF_i[:, k] = item_char(
+                        df,
+                        ata_model.obj.cores[t].points[k];
+                        model = irt_model,
+                        parametrization = irt_parametrization,
+                        D = irt_D,
+                    )[1][
+                        :,
+                        :,
+                        1,
+                    ][1]
                     IIF[t][k, i] = minimum(IIF_i[:, k])
                     ICF[t][k, i] = minimum(ICF_i[:, k])
                 end
-                ata_model.obj.cores[t].IIF = IIF[t]
             end
+        end
+        for t = 1:T
+            ata_model.obj.cores[t].IIF = IIF[t]
         end
     catch e
         message[1] = "danger"
