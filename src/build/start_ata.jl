@@ -62,7 +62,7 @@ function start_ata(;
     end
     try
         infos = ata_model.output.infos
-        if Inputs.c
+        if Inputs.obj_type != ""
             if Inputs.obj_type == "maximin"
                 ata_model = MaximinModel()
             elseif Inputs.obj_type == "minimax"
@@ -365,7 +365,7 @@ function start_ata(;
                 end
             end
             #obj_fun
-            if Inputs.obj_type in ["maximin"]
+            if Inputs.obj_type in ["maximin", "soyster_maximin", "de_jong_maximin"]
                 ata_model.obj.cores =
                     [MaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
@@ -382,7 +382,7 @@ function start_ata(;
                         ata_model.output.infos,
                         [
                             "danger",
-                            "- maximin, soyster_maximin, de_jong_maximin, cc_maximin and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
+                            "error: MAXIMIN, CCMAXIMIN and MINIMAX objective types require optimization points. Use obj_points field in input settings.",
                         ],
                     )
                     return nothing
@@ -400,40 +400,17 @@ function start_ata(;
                         end
                     end
                     ata_model.obj.R = Inputs.obj_aux_int
-                    message[2] = message[2] * "- Optimization points, number of replications, and alpha loaded.\n"
+                    message[2] = message[2] * "- Optimization points loaded.\n"
                 else
                     push!(
                         ata_model.output.infos,
                         [
                             "danger",
-                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
+                            "error: MAXIMIN, CCMAXIMIN and MINIMAX objective types require optimization points. Use obj_points field in input settings.",
                         ],
                     )
                     return nothing
                 end
-            elseif Inputs.obj_type in ["soyster_maximin", "de_jong_maximin"]
-                ata_model.obj.cores =
-                    [MaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
-                if size(Inputs.obj_points, 1) > 0
-                    t1 = 1
-                    for g = 1:ata_model.settings.n_groups
-                        for t = 1:ata_model.settings.Tg[g]
-                            ata_model.obj.cores[t1].points = Inputs.obj_points[g]
-                            t1 += 1
-                        end
-                    end
-                    ata_model.obj.R = Inputs.obj_aux_int
-                    message[2] = message[2] * "- Optimization points and number of replications loaded.\n"
-                else
-                    push!(
-                        ata_model.output.infos,
-                        [
-                            "danger",
-                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
-                        ],
-                    )
-                    return nothing
-                end    
             elseif Inputs.obj_type == "minimax"
                 ata_model.obj.cores =
                     [MinimaxObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
@@ -451,7 +428,7 @@ function start_ata(;
                         ata_model.output.infos,
                         [
                             "danger",
-                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
+                            "error: MAXIMIN, CCMAXIMIN and MINIMAX objective types require optimization points. Use obj_points field in input settings.",
                         ],
                     )
                     return nothing
@@ -465,13 +442,13 @@ function start_ata(;
                                 [
                                     "danger",
                                     string(
-                                        "- For group ",
+                                        "error: for group ",
                                         g,
                                         " size of obj_targets (",
                                         size(Inputs.obj_targets[g], 1),
                                         ") is not the same as size of obj_points (",
                                         size(Inputs.obj_points[g], 1),
-                                        ").\n",
+                                        "). /n",
                                     ),
                                 ],
                             )
@@ -488,7 +465,7 @@ function start_ata(;
                         ata_model.output.infos,
                         [
                             "danger",
-                            "- minimax objective function requires targets. Use obj_targets field in input settings.\n",
+                            "error: MINIMAX objective type requires targets. Use obj_targets field in input settings.",
                         ],
                     )
                     return nothing
