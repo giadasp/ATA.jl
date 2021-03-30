@@ -227,7 +227,7 @@ function jump!(
                     return nothing
                 end
             end
-            if (any(starting_design != 0 && starting_design != 1))
+            if any((ata_model.output.design .!= 0.0) .& (ata_model.output.design .!= 1.0))
                 message[1] = "danger"
                 message[2] = message[2] * "- Starting design must contain only 1s or 0s.\n"
                 push!(ata_model.output.infos, message)

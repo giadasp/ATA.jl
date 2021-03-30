@@ -68,7 +68,7 @@ function siman!(
             )
             return nothing
         end
-        if (any(starting_design != 0 && starting_design != 1))
+        if any((ata_model.output.design .!= 0.0) .& (ata_model.output.design .!= 1.0))
             push!(
                 ata_model.output.infos,
                 ["danger", "- Starting design must contain only 1 or 0.\n"],
