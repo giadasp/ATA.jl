@@ -19,16 +19,21 @@ function jump!(
                 )
         end
         n_items = ata_model.settings.n_items
-        if ata_model.obj.name in ["maximin", "minimax", "soyster_maximin", "de_jong_maximin"]
+        if ata_model.obj.name in
+           ["maximin", "minimax", "soyster_maximin", "de_jong_maximin"]
             if any([size(ata_model.obj.cores[t].IIF, 1) > 0 for t = 1:ata_model.settings.T])
                 IIF = [ata_model.obj.cores[t].IIF for t = 1:ata_model.settings.T]
                 message[2] =
-                    message[2] *
-                    string("- Assembling tests with ", ata_model.obj.name, " objective...\n")
+                    message[2] * string(
+                        "- Assembling tests with ",
+                        ata_model.obj.name,
+                        " objective...\n",
+                    )
             else
                 message[1] = "danger"
                 message[2] =
-                    message[2] * "- IIFs have not been computed. Run add_obj_fun!() first.\n"
+                    message[2] *
+                    "- IIFs have not been computed. Run add_obj_fun!() first.\n"
                 push!(ata_model.output.infos, message)
                 return nothing
             end
@@ -68,7 +73,8 @@ function jump!(
             end
         end
         #Group IIFs by friend set
-        if ata_model.obj.name in ["maximin", "soyster_maximin", "de_jong_maximin", "minimax"]
+        if ata_model.obj.name in
+           ["maximin", "soyster_maximin", "de_jong_maximin", "minimax"]
             IIF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
             if ata_model.settings.n_fs != ata_model.settings.n_items
                 #group IIFs
@@ -88,8 +94,10 @@ function jump!(
                 end
             else
                 IIF_new = IIF
-                ICF_new =
-                    [ata_model.constraints[t].expected_score.val for t = 1:ata_model.settings.T]
+                ICF_new = [
+                    ata_model.constraints[t].expected_score.val for
+                    t = 1:ata_model.settings.T
+                ]
             end
         end
         # group expected score by friend set
@@ -202,7 +210,8 @@ function jump!(
                     size(starting_design, 2) != ata_model.settings.T
                 )
                     message[1] = "danger"
-                    message[2] = message[2] * "- Starting design must be of size: (n_fs x T).\n"
+                    message[2] =
+                        message[2] * "- Starting design must be of size: (n_fs x T).\n"
                     push!(ata_model.output.infos, message)
                     return nothing
                 end
@@ -212,7 +221,8 @@ function jump!(
                     size(starting_design, 2) != ata_model.settings.T
                 )
                     message[1] = "danger"
-                    message[2] = message[2] * "- Starting design must be of size: (I x T).\n"
+                    message[2] =
+                        message[2] * "- Starting design must be of size: (I x T).\n"
                     push!(ata_model.output.infos, message)
                     return nothing
                 end

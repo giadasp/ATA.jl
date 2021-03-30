@@ -1,7 +1,7 @@
 #MAXIMIN CC neighbourhood
 function analyse_NH(
     NH_start::Neighbourhood,
-    ata_model::CCMaximinModel;
+    ata_model::Union{MaximinModel,CCMaximinModel,SoysterMaximinModel,DeJongMaximinModel};
     fF = true,
     n_fill = 1,
     opt_feas = 0.9,
@@ -23,7 +23,6 @@ function analyse_NH(
     NH₁ = _mycopy(NH_start, NH₁)
     NH₀ = _mycopy(NH_start, NH₀)
     NH⁺ = _mycopy(NH_start, NH⁺)
-
     f_star = ones(2) .* Inf
     f_evals = 0
     t = copy(start_temp)
@@ -31,11 +30,8 @@ function analyse_NH(
     n_items = ata_model.settings.n_items
     n_fs = ata_model.settings.n_fs
     fs_counts = ata_model.settings.fs.counts * ones(Float64, T)'
-    switches = 0
-    removes = 0
-    adds = 0
     if n_fill > 0
-        #warm up
+        #Fill up
         println("Fill-up starting...")
         round = 1
         for round = 1:n_fill
@@ -53,6 +49,7 @@ function analyse_NH(
                         v = copy(v2)
                     end
                 end
+                coreᵥ = ata_model.obj.cores[v]
                 #filling
                 n_t = LinearAlgebra.dot(NH₁.x[:, v], ata_model.settings.fs.counts)
                 #try to add other items, the first time it goes over n_max it stops
@@ -74,7 +71,7 @@ function analyse_NH(
                     else
                         NH_add = find_best_itemᵥ(
                             NH₁,
-                            ata_model.obj.cores[v],
+                            coreᵥ,
                             opt_feas,
                             v,
                             ata_model.settings.iu,
@@ -103,7 +100,8 @@ function analyse_NH(
                         NH₁ = _mycopy(NH_add, NH₁)
                     else
                         warmup[v] = false
-                        Printf.@printf("\n  f₁:	%16.3f", NH₁.f)
+                        #NH₁ = _mycopy(NH_add, NH₁)
+                        Printf.@printf("\n f₁:  %16.3f", NH₁.f)
                         println("-Test ", v, " filled up with ", n_t, " items, ")
                     end
                 else
@@ -112,10 +110,10 @@ function analyse_NH(
                 end
             end
         end#end of round, round = nRound
+        println("End of fill-up")
         NH₀ = _mycopy(NH₁, NH₀)
         NH₀.f = _comp_f(NH₀, opt_feas)
         NH⁺ = _mycopy(NH₀, NH⁺)
-        println("End of fill-up")
         if sum(NH₀.infeas + NH₀.ol) + NH₀.iu == 0
             println("Feasible solution found in fill-up")
             fF = false
@@ -123,14 +121,13 @@ function analyse_NH(
             println("Feasible solution not found in fill-up")
         end
     end
-
     if verbosity > 1
         print_neighbourhood(NH⁺)
     end
-    # statistics to repogeom_temp at each temp change, set back to zero
     coverage_ok = 0
     convergence = 0
-
+    nT = copy(n_test_sample)
+    nI = copy(n_item_sample)
     while coverage_ok == 0
         NH₁ = _mycopy(NH₀, NH₁)
         weights = (1 - opt_feas) .* (NH₀.infeas + NH₀.ol) - opt_feas .* (NH₀.obj)
@@ -148,8 +145,8 @@ function analyse_NH(
         #println(iteratorTestItem[1:nItemoStatsBase.sample])
         #it = 0
         #xnew = copy(NH₀.x)
-        if n_test_sample > T
-            n_test_sample = T
+        if nT > T
+            nT = T
         end
         while exit == 0 && v₂ < n_test_sample #it<size(iteratorTestItem, 1) #
             #it+= 1
@@ -164,10 +161,10 @@ function analyse_NH(
             #v = iteratorTestItem[it][2]
             #NH₀.x = copy(xnew)
             taken_items = findall(isone.(NH₀.x[:, v]))
-            if n_item_sample > size(taken_items, 1)
+            if nI > size(taken_items, 1)
                 nI = Int(size(taken_items, 1))
             else
-                nI = n_item_sample
+                nI = nI
             end
             taken_items = Random.shuffle!(taken_items) # !removed
             # exit2 = 0
@@ -268,7 +265,6 @@ function analyse_NH(
                             if p < 1e-10
                                 p = zeros(Float64)[1]
                             end
-
                             if (rand() < p)
                                 #remove
                                 #exit = 1
@@ -283,6 +279,7 @@ function analyse_NH(
                             end
                         end
                     end
+                    #try to switch
                     idxₜ₂ = findall(iszero.(NH₁.x[:, v]))
                     idxₜ₂ = Random.shuffle!(idxₜ₂)#i₂ = 1, ..., I !removed
                     betterFound = 0
@@ -376,7 +373,6 @@ function analyse_NH(
                     end #end of betterFound (betterFound = 1)
                 end #end of add_remove
             end #end of itemorder h₂ (exit = 1)
-
         end #end of testorder v₂ (exit = 1)
         if sum(NH₀.infeas + NH₀.ol) + NH₀.iu <= 0 && fF == true
             fF = false
@@ -396,8 +392,8 @@ function analyse_NH(
         if f_star[2] == f_star[1]
             convergence += 1
             Printf.@printf(" %2d", convergence)
-            n_test_sample += 1
-            n_item_sample += 1
+            nT += 1
+            nI += 1
         end
         #println("convergence is ", convergence)
         # ? how many are equal f₀ in the last iterations?
