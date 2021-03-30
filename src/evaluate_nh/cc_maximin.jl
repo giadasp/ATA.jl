@@ -252,6 +252,8 @@ function analyse_NH(
                             if (NH₁.f < NH⁺.f)
                                 exit = 1
                                 convergence = 0
+                                nT = copy(n_test_sample)
+                                nI = copy(n_item_sample)
                                 NH⁺ = _mycopy(NH₁, NH⁺)
                                 if verbosity == 2
                                     Printf.@printf("\n f⁺ : %5.3f", NH⁺.f)
@@ -343,6 +345,8 @@ function analyse_NH(
                                     exit = 1
                                     betterFound = 1
                                     convergence = 0
+                                    nT = copy(n_test_sample)
+                                    nI = copy(n_item_sample)
                                     NH⁺ = _mycopy(NH₁, NH⁺)
                                     if verbosity == 2
                                         Printf.@printf("\n f⁺ : %5.3f", NH⁺.f)
