@@ -129,9 +129,6 @@ function analyse_NH(
     end
     # statistics to repogeom_temp at each temp change, set back to zero
     coverage_ok = 0
-    if n_test_sample > T
-        n_test_sample = T
-    end
     convergence = 0
 
     while coverage_ok == 0
@@ -151,6 +148,9 @@ function analyse_NH(
         #println(iteratorTestItem[1:nItemoStatsBase.sample])
         #it = 0
         #xnew = copy(NH₀.x)
+        if n_test_sample > T
+            n_test_sample = T
+        end
         while exit == 0 && v₂ < n_test_sample #it<size(iteratorTestItem, 1) #
             #it+= 1
             v₂ += 1
@@ -395,7 +395,9 @@ function analyse_NH(
         #if exit == 0
         if f_star[2] == f_star[1]
             convergence += 1
-            Printf.@printf(" %5d", convergence)
+            Printf.@printf(" %2d", convergence)
+            n_test_sample += 1
+            n_item_sample += 1
         end
         #println("convergence is ", convergence)
         # ? how many are equal f₀ in the last iterations?
