@@ -1,5 +1,5 @@
-function soyster_load_parameters_chain!(
-    ata_model::SoysterMaximinModel;
+function robust_load_parameters_chain!(
+    ata_model::DeJongMaximinModel;
     items_file = "items.jld2",
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
     kwargs...,
@@ -27,12 +27,12 @@ function soyster_load_parameters_chain!(
             items = FileIO.load(items_file)
             items = items[collect(keys(items))[1]]
         end
-        IIF = Vector{Array{Float64,2}}(undef, T)
+        standard_deviation = Vector{Array{Float64,2}}(undef, T)
         # ICF = Vector{Array{Float64,2}}(undef, T)
         K = zeros(Int, T)
         for t = 1:T
             K[t] = size(ata_model.obj.cores[t].points, 1)
-            IIF[t] = zeros(K[t], n_items)
+            standard_deviation[t] = zeros(K[t], n_items)
             # ICF[t] = zeros(K[t], n_items)
         end
         for i = 1:n_items
@@ -65,7 +65,6 @@ function soyster_load_parameters_chain!(
             end
             for t = 1:T
                 IIF_i = zeros(R, K[t])
-                IIF_i_t_min = Inf .* ones(K[t])
                 #check if chain has length R
                 for k = 1:K[t]
                     IIF_i[:, k] = item_info(
@@ -86,13 +85,13 @@ function soyster_load_parameters_chain!(
                     #     :,
                     #     1,
                     # ]
-                    IIF[t][k, i] = StatsBase.mean(IIF_i[:, k]) - 3*StatsBase.std(IIF_i[:, k])
+                    standard_deviation[t][k, i] = StatsBase.std(IIF_i[:, k])
                     # ICF[t][k, i] = StatsBase.mean(IIF_i[:, k]) - StatsBase.std(IIF_i[:, k])
                 end
             end
         end
         for t = 1:T
-            ata_model.obj.cores[t].IIF = IIF[t]
+            ata_model.obj.cores[t].standard_deviation = standard_deviation[t]
         end
     catch e
         message[1] = "danger"

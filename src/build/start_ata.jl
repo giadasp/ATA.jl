@@ -73,6 +73,8 @@ function start_ata(;
                 ata_model = SoysterMaximinModel()
             elseif Inputs.obj_type == "de_jong_maximin"
                 ata_model = DeJongMaximinModel()
+            elseif Inputs.obj_type == "robust_maximin"
+                ata_model = RobustMaximinModel()
             elseif Inputs.obj_type == "custom"
                 ata_model = CustomModel()
             else
@@ -160,12 +162,10 @@ function start_ata(;
                 lengthmin = zeros(Int64, ata_model.settings.T)
                 lengthweight = ones(Int64, ata_model.settings.T)
                 t1 = 1
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        lengthmin[t1] = Int(Inputs.length_min[g])
-                        lengthweight[t1] = Inputs.length_weight[g]
-                        t1 += 1
-                    end
+                for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                    lengthmin[t1] = Int(Inputs.length_min[g])
+                    lengthweight[t1] = Inputs.length_weight[g]
+                    t1 += 1
                 end
                 for t = 1:ata_model.settings.T
                     ata_model.constraints[t].constr_A = vcat(
@@ -186,12 +186,10 @@ function start_ata(;
                 lengthmax = zeros(Int64, ata_model.settings.T)
                 lengthweight = ones(Int64, ata_model.settings.T)
                 t1 = 1
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        lengthmax[t1] = Int(Inputs.length_max[g])
-                        lengthweight[t1] = Inputs.length_weight[g]
-                        t1 += 1
-                    end
+                for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                    lengthmax[t1] = Int(Inputs.length_max[g])
+                    lengthweight[t1] = Inputs.length_weight[g]
+                    t1 += 1
                 end
                 for t = 1:ata_model.settings.T
                     ata_model.constraints[t].constr_A = vcat(
@@ -232,30 +230,24 @@ function start_ata(;
             #expected score
             if Inputs.expected_score_var != String[]
                 t1 = 1
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        ata_model.constraints[t1].expected_score.var =
-                            Symbol.(Inputs.expected_score_var[g])
-                        t1 += 1
-                    end
+                for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                    ata_model.constraints[t1].expected_score.var =
+                        Symbol.(Inputs.expected_score_var[g])
+                    t1 += 1
                 end
                 message[2] = message[2] * "- Expected score variable loaded.\n"
             end
-            t1 = 1
             if Inputs.expected_score_pts != Float64[]
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        ata_model.constraints[t1].expected_score.pts =
-                            Inputs.expected_score_pts[g]
-                        t1 += 1
-                    end
+                t1 = 1
+                for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                    ata_model.constraints[t1].expected_score.pts =
+                        Inputs.expected_score_pts[g]
+                    t1 += 1
                 end
             else
-                for g = 1:ata_model.settings.n_groups
-                    for t = 1:ata_model.settings.Tg[g]
-                        ata_model.constraints[t1].expected_score.pts = [0.0]
-                        t1 += 1
-                    end
+                for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                    ata_model.constraints[t1].expected_score.pts = [0.0]
+                    t1 += 1
                 end
                 message[2] = message[2] * "- Expected score points loaded.\n"
             end
@@ -265,12 +257,10 @@ function start_ata(;
                 if any(vcat(Inputs.expected_score_min...) .> 0)
                     min_exp_score = true
                     t1 = 1
-                    for g = 1:ata_model.settings.n_groups
-                        for t = 1:ata_model.settings.Tg[g]
-                            ata_model.constraints[t1].expected_score.min =
-                                Inputs.expected_score_min[g]
-                            t1 += 1
-                        end
+                    for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                        ata_model.constraints[t1].expected_score.min =
+                            Inputs.expected_score_min[g]
+                        t1 += 1
                     end
                     message[2] = message[2] * "- Lower bounds for expected score loaded.\n"
                 end
@@ -279,12 +269,10 @@ function start_ata(;
                 if any(vcat(Inputs.expected_score_max...) .< 1.00)
                     max_exp_score = true
                     t1 = 1
-                    for g = 1:ata_model.settings.n_groups
-                        for t = 1:ata_model.settings.Tg[g]
-                            ata_model.constraints[t1].expected_score.max =
-                                Inputs.expected_score_max[g]
-                            t1 += 1
-                        end
+                    for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                        ata_model.constraints[t1].expected_score.max =
+                            Inputs.expected_score_max[g]
+                        t1 += 1
                     end
                     message[2] = message[2] * "- Upper bounds for expected score loaded.\n"
                 end
@@ -376,7 +364,7 @@ function start_ata(;
                         ata_model.output.infos,
                         [
                             "danger",
-                            "- maximin, soyster_maximin, de_jong_maximin, cc_maximin and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
+                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
                         ],
                     )
                     return nothing
@@ -396,13 +384,13 @@ function start_ata(;
                     ata_model.obj.R = Inputs.obj_aux_int
                     message[2] =
                         message[2] *
-                        "- Optimization points, number of replications, and alpha loaded.\n"
+                        string("- Optimization points, number of samples (",  ata_model.obj.R,"), and alpha (", Inputs.obj_aux_float,") loaded.\n")
                 else
                     push!(
                         ata_model.output.infos,
                         [
                             "danger",
-                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
+                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
                         ],
                     )
                     return nothing
@@ -427,7 +415,33 @@ function start_ata(;
                         ata_model.output.infos,
                         [
                             "danger",
-                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
+                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
+                        ],
+                    )
+                    return nothing
+                end
+            elseif Inputs.obj_type in ["robust_maximin"]
+                ata_model.obj.cores =
+                    [RobustMaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
+                if size(Inputs.obj_points, 1) > 0
+                    t1 = 1
+                    for g = 1:ata_model.settings.n_groups
+                        for t = 1:ata_model.settings.Tg[g]
+                            ata_model.obj.cores[t1].points = Inputs.obj_points[g]
+                            t1 += 1
+                        end
+                    end
+                    ata_model.obj.R = Inputs.obj_aux_int
+                    ata_model.obj.Gamma = Inputs.obj_aux_float
+                    message[2] =
+                        message[2] *
+                        string("- Optimization points, number of samples (",  ata_model.obj.R,"), and Gamma (", ata_model.obj.Gamma,") loaded.\n")
+                else
+                    push!(
+                        ata_model.output.infos,
+                        [
+                            "danger",
+                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
                         ],
                     )
                     return nothing
@@ -449,7 +463,7 @@ function start_ata(;
                         ata_model.output.infos,
                         [
                             "danger",
-                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
+                            "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
                         ],
                     )
                     return nothing

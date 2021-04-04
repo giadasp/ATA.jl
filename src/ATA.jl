@@ -23,7 +23,7 @@ include("print/print.jl")
 include("compact_ata.jl")
 
 function __init__()
-    @require JuMP = "4076af6c-e467-56ae-b986-b466b2749572" include("jump.jl")
+    @require JuMP = "4076af6c-e467-56ae-b986-b466b2749572" include("jump/jump.jl")
 
     @require Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76" begin
         function add_Cbc!(m)

@@ -1,6 +1,6 @@
 """
     add_obj_fun!(
-        ata_model::DeJongMaximinModel;
+        ata_model::RobustMaximinModel;
         psychometrics = false,
         items::Vector{Psychometrics.Item} = Psychometrics.Item[],
         items_file = "",
@@ -10,18 +10,15 @@
 # Description
 
 It adds the objective function as specified in the `settings_file`. It requires the [`start_ata`](#ATA.start_ata) build step.  
-
-Computes the IIFs at predefined ability points using the sampled item parameter estimates.
-For each pair of item and ability point \$(i, θ_k)\$, the IIF\$(θ_k)_i\$ is computed as the mean minus the standard deviation
-of the IIF\$(θ_k)_{ir}\$ computed on the R sampled item parameter estimates, where \$r = 1, \\ldots, R\$.
-
+Computes the IIFs at predefined ability points using the estimated item parameters in the item bank.
+It computes also the standard deviations of the IIFs given R samples of the item parameters provided by a vector of `Psychometrics.Item`.
 The vector of items can be passed either through the argument `items` (`Vector{Psychometrics.Item}`) or through the argument `items_file` (string file name).
 In both cases, the items in the vector must have the same order of the items in the item bank and they must contain the R sampled item parameters in the field `parameters.chain`.
-    
-- **`ata_model::DeJongMaximinModel`** : Required.
+
+- **`ata_model::RobustMaximinModel`** : Required.
 """
 function add_obj_fun!(
-    ata_model::DeJongMaximinModel;
+    ata_model::RobustMaximinModel;
     psychometrics = false,
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
     items_file = "",
@@ -30,16 +27,17 @@ function add_obj_fun!(
     message = ["", ""]
     try
         if psychometrics
-            de_jong_load_parameters_chain!(
-                ata_model;
-                items_file = items_file,
-                items = items,
-                kwargs...,
+            compute_estimated_iif!(ata_model)
+            robust_load_parameters_chain!(
+                    ata_model;
+                    items_file = items_file,
+                    items = items,
+                    kwargs...,
             )
         end
         message = [
             "success",
-            "- IIFs for all item parameters samples computed.\n",
+            "- Objective function loaded.\n- IIFs computed.\n- Standard deviations computed.\n",
         ]
         open("OPT/Settings.jl", "a") do f
             write(f, "K = $K\n\n")

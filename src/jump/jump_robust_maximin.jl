@@ -1,5 +1,5 @@
 function jump!(
-    ata_model::AbstractModel;
+    ata_model::Union{RobustMaximinModel};
     starting_design = Matrix{Float64}(undef, 0, 0),
     results_folder = "results",
     optimizer_constructor = "GLPK",
@@ -19,9 +19,7 @@ function jump!(
                 )
         end
         n_items = ata_model.settings.n_items
-        if ata_model.obj.name in
-           ["maximin", "minimax", "soyster_maximin", "de_jong_maximin"]
-            if any([size(ata_model.obj.cores[t].IIF, 1) > 0 for t = 1:ata_model.settings.T])
+       if any([size(ata_model.obj.cores[t].IIF, 1) > 0 for t = 1:ata_model.settings.T])
                 IIF = [ata_model.obj.cores[t].IIF for t = 1:ata_model.settings.T]
                 message[2] =
                     message[2] * string(
@@ -37,17 +35,6 @@ function jump!(
                 push!(ata_model.output.infos, message)
                 return nothing
             end
-        elseif ata_model.obj.name == "cc_maximin"
-            message[1] = "danger"
-            message[2] =
-                message[2] *
-                "- You must use the siman solver to assemble tests with chance-constrained MAXIMIN objective function.\n"
-            push!(ata_model.output.infos, message)
-            return nothing
-        elseif ata_model.obj.name == ""
-            IIF = []
-            message[2] = message[2] * "- Assembling tests with NO objective function...\n"
-        end
 
         if ata_model.settings.n_fs == 0
             ata_model.settings.n_fs = ata_model.settings.n_items
@@ -73,8 +60,6 @@ function jump!(
             end
         end
         #Group IIFs by friend set
-        if ata_model.obj.name in
-           ["maximin", "soyster_maximin", "de_jong_maximin", "minimax"]
             IIF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
             if ata_model.settings.n_fs != ata_model.settings.n_items
                 #group IIFs
@@ -99,7 +84,6 @@ function jump!(
                     t = 1:ata_model.settings.T
                 ]
             end
-        end
         # group expected score by friend set
         ICF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
         if ata_model.settings.n_fs != ata_model.settings.n_items
@@ -363,46 +347,28 @@ function jump!(
 
 
         ncons = copy(c) - 1
-
-        if ata_model.obj.name in ["maximin", "soyster_maximin", "de_jong_maximin"]
-            #Objective bound
-            JuMP.@variable(m, w >= 0)
-            for t = 1:ata_model.settings.T
-                for k = 1:size(ata_model.obj.cores[t].points, 1)
-                    JuMP.@constraint(
-                        m,
-                        sum(
-                            round(IIF_new[t][k, i]; digits = 4) * x[i, t] for
-                            i = 1:ata_model.settings.n_fs
-                        ) >= w
-                    )
+        f_gamma = zeros(ata_model.obj.Gamma + 1)
+        design_gamma = Vector{Matrix{Float64}}(undef, ata_model.obj.Gamma + 1)
+        for gamma in 1 : (ata_model.obj.Gamma + 1)
+            m_base = copy(m)
+                #Objective bound
+                JuMP.@variable(m_base, w >= 0)
+                for t = 1:ata_model.settings.T
+                    for k = 1:size(ata_model.obj.cores[t].points, 1)
+                        JuMP.@constraint(
+                            m_base,
+                            sum(
+                                round(IIF_new[t][k, i]; digits = 4) * x[i, t] for
+                                i = 1:ata_model.settings.n_fs
+                            ) >= w
+                        )
+                    end
                 end
-            end
-            JuMP.@objective(m, Min, (-w))
-        elseif ata_model.obj.name == "minimax"
-            #Objective bound
-            JuMP.@variable(m, epsilon >= 0)
-            for t = 1:ata_model.settings.T
-                for k = 1:size(ata_model.obj.cores[t].points, 1)
-                    JuMP.@constraint(
-                        m,
-                        sum(
-                            round(IIF_new[t][k, i]; digits = 4) * x[i, t] for
-                            i = 1:ata_model.settings.n_fs
-                        ) - ata_model.obj.cores[t].targets[k] <= epsilon
-                    )
-                    JuMP.@constraint(
-                        m,
-                        sum(
-                            round(IIF_new[t][k, i]; digits = 4) * x[i, t] for
-                            i = 1:ata_model.settings.n_fs
-                        ) - ata_model.obj.cores[t].targets[k] >= -epsilon
-                    )
-                end
-            end
-            JuMP.@objective(m, Min, epsilon)
+                JuMP.@objective(m_base, Min, (-w))
+            JuMP.optimize!(m_base)
+            design_gamma[gamma] = abs.(round.(JuMP.value.(x)))
+            f_gamma[gamma] = JuMP.value(w)
         end
-        JuMP.optimize!(m)
         message[1] = "success"
         message[2] =
             message[2] *
