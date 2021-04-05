@@ -245,6 +245,7 @@ function start_ata(;
                     t1 += 1
                 end
             else
+                t1 = 1
                 for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
                     ata_model.constraints[t1].expected_score.pts = [0.0]
                     t1 += 1
@@ -352,11 +353,9 @@ function start_ata(;
                     [MaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
                     t1 = 1
-                    for g = 1:ata_model.settings.n_groups
-                        for t = 1:ata_model.settings.Tg[g]
-                            ata_model.obj.cores[t1].points = Inputs.obj_points[g]
-                            t1 += 1
-                        end
+                    for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                        ata_model.obj.cores[t1].points = Inputs.obj_points[g]
+                        t1 += 1
                     end
                     message[2] = message[2] * "- Optimization points loaded.\n"
                 else
@@ -374,12 +373,10 @@ function start_ata(;
                     [CCMaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
                     t1 = 1
-                    for g = 1:ata_model.settings.n_groups
-                        for t = 1:ata_model.settings.Tg[g]
-                            ata_model.obj.cores[t1].points = Inputs.obj_points[g]
-                            ata_model.obj.cores[t1].alpha = Inputs.obj_aux_float
-                            t1 += 1
-                        end
+                    for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                        ata_model.obj.cores[t1].points = Inputs.obj_points[g]
+                        ata_model.obj.cores[t1].alpha = Inputs.obj_aux_float
+                        t1 += 1
                     end
                     ata_model.obj.R = Inputs.obj_aux_int
                     message[2] =
@@ -400,11 +397,9 @@ function start_ata(;
                     [MaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
                     t1 = 1
-                    for g = 1:ata_model.settings.n_groups
-                        for t = 1:ata_model.settings.Tg[g]
-                            ata_model.obj.cores[t1].points = Inputs.obj_points[g]
-                            t1 += 1
-                        end
+                    for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                        ata_model.obj.cores[t1].points = Inputs.obj_points[g]
+                        t1 += 1
                     end
                     ata_model.obj.R = Inputs.obj_aux_int
                     message[2] =
@@ -425,11 +420,9 @@ function start_ata(;
                     [RobustMaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
                     t1 = 1
-                    for g = 1:ata_model.settings.n_groups
-                        for t = 1:ata_model.settings.Tg[g]
-                            ata_model.obj.cores[t1].points = Inputs.obj_points[g]
-                            t1 += 1
-                        end
+                    for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                        ata_model.obj.cores[t1].points = Inputs.obj_points[g]
+                        t1 += 1
                     end
                     ata_model.obj.R = Inputs.obj_aux_int
                     ata_model.obj.Gamma = Inputs.obj_aux_float
@@ -451,11 +444,9 @@ function start_ata(;
                     [MinimaxObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
                 if size(Inputs.obj_points, 1) > 0
                     t1 = 1
-                    for g = 1:ata_model.settings.n_groups
-                        for t = 1:ata_model.settings.Tg[g]
-                            ata_model.obj.cores[t1].points = Inputs.obj_points[g]
-                            t1 += 1
-                        end
+                    for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
+                        ata_model.obj.cores[t1].points = Inputs.obj_points[g]
+                        t1 += 1
                     end
                     message[2] = message[2] * "- Optimization points loaded.\n"
                 else
