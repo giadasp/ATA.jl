@@ -69,8 +69,8 @@ function __init__()
         include("plot.jl")
     end
     @require ATADash = "236b7dbe-4167-40cb-a459-bcf8ce4b2cbd" begin
-        function run_app()
-            ATADash.ATA_app()
+        function ata_app()
+            ATADash.ata_app()
         end
     end
 end
@@ -92,7 +92,7 @@ export mean,
     resp_gen,
     student_likelihood,
     fs_to_items,#_mycopy,  fast_sort!, _myqle#, optimize
-    run_app,
+    ata_app,
     compact_ata
 
 ATA
