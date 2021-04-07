@@ -37,12 +37,8 @@ function siman!(
     else
         fF = true
     end
-    ata_model.settings.n_fs = size(ata_model.settings.fs.items, 1)
     T = ata_model.settings.T
     n_fs = ata_model.settings.n_fs
-    if n_fs == 0
-        n_fs = ata_model.settings.n_items
-    end
     n_items = ata_model.settings.n_items
     fs_counts = ata_model.settings.fs.counts * ones(Float64, T)'
     iu_max⁺ = 0

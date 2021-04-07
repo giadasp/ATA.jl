@@ -74,8 +74,8 @@ function _add_enemies!(ata_model::AbstractModel)
             end
         end
         for t = 1:ata_model.settings.T
-            DelimitedFiles.writedlm("OPT/A_$t.csv", A[t])
-            DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
+            DelimitedFiles.writedlm("opt/A_$t.csv", A[t])
+            DelimitedFiles.writedlm("opt/b_$t.csv", b[t])
         end
         #update model
         ata_model.settings.es.names = EnemySets
@@ -84,7 +84,7 @@ function _add_enemies!(ata_model::AbstractModel)
             ata_model.constraints[t].constr_b = b[t]
             ata_model.constraints[t].constr_A = A[t]
         end
-        JLD2.@save "OPT/ata_model.jld2" AbstractModel
+        JLD2.@save "opt/ata_model.jld2" AbstractModel
         push!(
             ata_model.output.infos,
             ["success", string("- ", nes, " enemy sets added and constrained.\n")],

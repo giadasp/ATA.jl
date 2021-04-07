@@ -21,10 +21,6 @@ print_last_info(ata_model)
 add_overlap!(ata_model; overlap_file = "overlap_matrix.csv", overlap_delim = ";")
 print_last_info(ata_model)
 
-# 4. Add overlap maxima (Optional, Needed if friend sets needs to be taken into account.)
-group_by_friends!(ata_model)
-print_last_info(ata_model)
-
 # custom objective type, function and arguments
 ata_model.obj.name = "custom"
 
@@ -117,7 +113,7 @@ opt_nh = Inf
 # Maximum number of Optimality neighbourhoods to explore, set to the minimum if the model is highly constrained.
 
 
-# 5. assemble
+# 4. assemble
 assemble!(
     ata_model;
     solver = solver,

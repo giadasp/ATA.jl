@@ -1,7 +1,7 @@
 
 
 """
-    group_by_friends!(ata_model::AbstractModel)
+    _group_by_friends!(ata_model::AbstractModel)
 
 # Description
 
@@ -11,7 +11,7 @@ Group the items by friend sets once the friend sets have been added to the `ATA.
 
 - **`ata_model::AbstractModel`** : Required. The model built with `start_ata()`, settings loaded by [`start_ata`](#ATA.start_ata) function and friend sets added by [`add_friends!`](#ATA.add_friends!-Tuple{ATA.AbstractModel}) function.
 """
-function group_by_friends!(ata_model::AbstractModel) #last
+function _group_by_friends!(ata_model::AbstractModel) #last
     message = ["", ""]
     try
         n_items = ata_model.settings.n_items
@@ -19,7 +19,7 @@ function group_by_friends!(ata_model::AbstractModel) #last
         if ata_model.settings.n_fs == 0
             push!(
                 ata_model.output.infos,
-                ["danger", "No friend sets found, run add_friends!(model) before.\n"],
+                ["danger", "No friend sets found, run start_ata() before.\n"],
             )
             return nothing
         end
@@ -30,10 +30,8 @@ function group_by_friends!(ata_model::AbstractModel) #last
             b = Vector{Vector{Float64}}(undef, ata_model.settings.T)
             A_new = Vector{Matrix{Float64}}(undef, ata_model.settings.T)
             for t = 1:ata_model.settings.T
-                for t = 1:ata_model.settings.T
-                    A[t] = ata_model.constraints[t].constr_A
-                    b[t] = ata_model.constraints[t].constr_b
-                end
+                A[t] = ata_model.constraints[t].constr_A
+                b[t] = ata_model.constraints[t].constr_b
             end
             n_fs = ata_model.settings.n_fs
             for t = 1:ata_model.settings.T
@@ -46,11 +44,11 @@ function group_by_friends!(ata_model::AbstractModel) #last
                 end
             end
             for t = 1:ata_model.settings.T
-                DelimitedFiles.writedlm("OPT/A_$t.csv", A_new[t])
-                DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
+                DelimitedFiles.writedlm("opt/A_$t.csv", A_new[t])
+                DelimitedFiles.writedlm("opt/b_$t.csv", b[t])
                 ata_model.constraints[t].constr_A = A_new[t]
             end
-            open("OPT/fs_items.jl", "w") do f
+            open("opt/fs_items.jl", "w") do f
                 write(f, "fs_items = Vector{Vector{Int64}}(undef, $n_fs)\n")
                 for fs = 1:n_fs
                     write(
@@ -59,7 +57,7 @@ function group_by_friends!(ata_model::AbstractModel) #last
                     )
                 end
             end
-            open("OPT/Settings.jl", "a") do f
+            open("opt/Settings.jl", "a") do f
                 write(f, "group_by_fs = true\n\n")
             end
             #transform forced0
@@ -79,9 +77,9 @@ function group_by_friends!(ata_model::AbstractModel) #last
             end
             #update ata_model.forced0
             ata_model.settings.forced0 = x_forced0_new
-            DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0_new)
+            DelimitedFiles.writedlm("opt/x_forced0.txt", x_forced0_new)
             message[2] =
-                message[2] * "- Categorical and linear quantitative constraints grouped.\n"
+                message[2] * "- Categorical and linear quantitative constraints grouped by friend sets.\n"
         end
         #item use
         if ata_model.settings.to_apply[1]
@@ -92,7 +90,7 @@ function group_by_friends!(ata_model::AbstractModel) #last
                     Int(minimum(ata_model.settings.iu.max[ata_model.settings.fs.items[fs]]))
             end
             ata_model.settings.iu.max = item_use_max_new
-            open("OPT/Settings.jl", "a") do f
+            open("opt/Settings.jl", "a") do f
                 write(f, "item_use_max = $item_use_max_new\n\n")
             end
             message[2] = message[2] * "- Maximum item use grouped.\n"
@@ -105,7 +103,7 @@ function group_by_friends!(ata_model::AbstractModel) #last
                     Int(maximum(ata_model.settings.iu.min[ata_model.settings.fs.items[fs]]))
             end
             ata_model.settings.iu.min = item_use_min_new
-            open("OPT/Settings.jl", "a") do f
+            open("opt/Settings.jl", "a") do f
                 write(f, "item_use_min = $item_use_min_new\n\n")
             end
             message[2] = message[2] * "- Minimum item use grouped.\n"

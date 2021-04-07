@@ -87,8 +87,8 @@ function add_obj_fun!(
                     ata_model.obj.cores[t].IIF = IIF[t]
                 end
             end
-            JLD2.@save "OPT/IIF_CC.jld2" IIF
-            JLD2.@save "OPT/ICF_CC.jld2" ICF
+            JLD2.@save "opt/IIF_CC.jld2" IIF
+            JLD2.@save "opt/ICF_CC.jld2" ICF
         else
             cc_maximin_load_parameters_chain!(
                 ata_model;
@@ -101,7 +101,7 @@ function add_obj_fun!(
             "success",
             "- IIFs for all item parameters samples computed.\n",
         ]
-        open("OPT/Settings.jl", "a") do f
+        open("opt/Settings.jl", "a") do f
             write(f, "K = $K\n\n")
         end
 

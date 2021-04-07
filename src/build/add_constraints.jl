@@ -164,17 +164,17 @@ function add_constraints!(
         #     message[2] = message[2] * "- Constraints on sum of quantitative variables added.\n"
         # end
         for t = 1:ata_model.settings.T
-            DelimitedFiles.writedlm("OPT/A_$t.csv", A[t])
-            DelimitedFiles.writedlm("OPT/b_$t.csv", b[t])
+            DelimitedFiles.writedlm("opt/A_$t.csv", A[t])
+            DelimitedFiles.writedlm("opt/b_$t.csv", b[t])
         end
-        DelimitedFiles.writedlm("OPT/x_forced0.txt", x_forced0)
+        DelimitedFiles.writedlm("opt/x_forced0.txt", x_forced0)
         #update model
         ata_model.settings.forced0 = x_forced0
         for t = 1:ata_model.settings.T
             ata_model.constraints[t].constr_b = b[t]
             ata_model.constraints[t].constr_A = A[t]
         end
-        JLD2.@save "OPT/ata_model.jld2" ata_model
+        JLD2.@save "opt/ata_model.jld2" ata_model
         message[1] = "success"
         push!(ata_model.output.infos, message)
     catch e

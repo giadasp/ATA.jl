@@ -38,12 +38,6 @@ add_overlap!(
 )
 ```
 
-## Group by Friend Sets
-
-```@docs
-group_by_friends!(ata_model::AbstractModel)
-```
-
 ## Add Objective Function
 
 ```@docs

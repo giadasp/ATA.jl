@@ -84,7 +84,7 @@ function start_ata(;
             end
             message[2] =
                 message[2] *
-                string("- ", ata_model.obj.name, " optimization type loaded.\n")
+                string("- ", ata_model.obj.name, " model initialized.\n")
         else
             ata_model = NoObjModel()
         end
@@ -132,31 +132,33 @@ function start_ata(;
         if !isdir("opt")
             mkdir("opt")
         end
-        open("OPT/Settings.jl", "w") do f
-            write(f, "#Settings \n\n")
-
-            ata_model.settings.irt.model = Inputs.irt_model
-            ata_model.settings.irt.parameters = DataFrames.DataFrame(
-                ata_model.settings.bank[!, Symbol.(Inputs.irt_parameters)],
-            )
-            ata_model.settings.irt.parametrization = Inputs.irt_parametrization
-            ata_model.settings.irt.D = Inputs.irt_D
-
-            if ata_model.settings.irt.model == "1PL"
-                DataFrames.rename!(ata_model.settings.irt.parameters, [:b])#nqp values in interval\r\n",
-            elseif ata_model.settings.irt.model == "2PL"
-                DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b]) #nqp values in interval\r\n",
-            elseif ata_model.settings.irt.model == "3PL"
-                DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b, :c]) #nqp values in interval\r\n",
-            else
-                push!(
-                    ata_model.output.infos,
-                    ["danger", "Only 1PL, 2PL and 3PL IRT models are allowed."],
+        #open("opt/Settings.jl", "w") do f
+            #write(f, "#Settings \n\n")
+            #IRT
+            if Inputs.irt_model != ""
+                ata_model.settings.irt.model = Inputs.irt_model
+                ata_model.settings.irt.parameters = DataFrames.DataFrame(
+                    ata_model.settings.bank[!, Symbol.(Inputs.irt_parameters)],
                 )
-                return nothing
+                ata_model.settings.irt.parametrization = Inputs.irt_parametrization
+                ata_model.settings.irt.D = Inputs.irt_D
+
+                if ata_model.settings.irt.model == "1PL"
+                    DataFrames.rename!(ata_model.settings.irt.parameters, [:b])#nqp values in interval\r\n",
+                elseif ata_model.settings.irt.model == "2PL"
+                    DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b]) #nqp values in interval\r\n",
+                elseif ata_model.settings.irt.model == "3PL"
+                    DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b, :c]) #nqp values in interval\r\n",
+                else
+                    push!(
+                        ata_model.output.infos,
+                        ["danger", "Only 1PL, 2PL and 3PL IRT models are allowed."],
+                    )
+                    return nothing
+                end
+                CSV.write("opt/irt_parameters.csv", ata_model.settings.irt.parameters)
+                message[2] = message[2] * "- IRT item parameters loaded.\n"
             end
-            CSV.write("OPT/irt_parameters.csv", ata_model.settings.irt.parameters)
-            message[2] = message[2] * "- IRT item parameters loaded.\n"
             #test length
             if Inputs.length_min != Int64[]
                 lengthmin = zeros(Int64, ata_model.settings.T)
@@ -178,7 +180,7 @@ function start_ata(;
                     )
                     ata_model.constraints[t].length_min = lengthmin[t]
                 end
-                write(f, "length_min = $lengthmin\n")
+                #write(f, "length_min = $lengthmin\n")
                 message[2] = message[2] * "- Minimum length of tests constrained.\n"
             end
 
@@ -202,11 +204,11 @@ function start_ata(;
                     )
                     ata_model.constraints[t].length_max = lengthmax[t]
                 end
-                write(f, "length_max = $lengthmax\n")
+                #write(f, "length_max = $lengthmax\n")
                 message[2] = message[2] * "- Maximum length of tests constrained.\n"
             end
-            #friend sets
-            #fictiuos friendSets
+            #fictiuos friend sets
+            ata_model.settings.n_fs = ata_model.settings.n_items
             ata_model.settings.fs.counts = ones(ata_model.settings.n_items)
             ata_model.settings.fs.sets = string.(collect(1:ata_model.settings.n_items))
             ata_model.settings.fs.items = [[i] for i = 1:ata_model.settings.n_items]
@@ -215,7 +217,7 @@ function start_ata(;
                 ata_model.settings.fs.var = Symbol.(Inputs.friend_sets_var)
                 val = Symbol.(Inputs.friend_sets_var)
                 _add_friends!(ata_model)
-                write(f, "ata_model.settings.fs.var = $val\n\n")
+                #write(f, "ata_model.settings.fs.var = $val\n\n")
                 message[2] = message[2] * "- Variable for Friend sets loaded.\n"
             end
             #enemy sets
@@ -223,7 +225,7 @@ function start_ata(;
                 ata_model.settings.es.var = Symbol.(Inputs.enemy_sets_var)
                 val = Symbol.(Inputs.enemy_sets_var)
                 _add_enemies!(ata_model)
-                write(f, "enemy_sets_var = $val\n\n")
+                ##write(f, "enemy_sets_var = $val\n\n")
                 message[2] = message[2] * "- Variable for Enemy sets loaded.\n"
             end
 
@@ -280,7 +282,7 @@ function start_ata(;
             end
             if max_exp_score || min_exp_score
                 _add_exp_score!(ata_model)
-                message[2] = message[2] * "- Expected scores computed.\n"
+                message[2] = message[2] * "- Expected scores (ICFs) computed.\n"
             end
             #sum vars
             if Inputs.sum_vars != Vector{Vector{String}}(undef, 0)
@@ -501,14 +503,14 @@ function start_ata(;
             if Inputs.categories != String[]
                 val = Symbol.(Inputs.categories)
                 ata_model.output.categories = copy(val)
-                write(f, "categories = $val\n\n")
+                #write(f, "categories = $val\n\n")
                 message[2] = message[2] * "- Categories for output loaded.\n"
             end
 
             #overlap matrix
             ata_model.settings.ol_max =
                 zeros(Float64, ata_model.settings.T, ata_model.settings.T)
-        end
+        #end
         message[2] =
             message[2] * string(
                 "ASSEMBLE ",
@@ -518,7 +520,7 @@ function start_ata(;
                 " GROUPS.\n",
             )
         #update model
-        JLD2.@save "OPT/ata_model.jld2" ata_model
+        JLD2.@save "opt/ata_model.jld2" ata_model
         message[1] = "success"
         push!(ata_model.output.infos, message)
     catch e

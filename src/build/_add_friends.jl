@@ -61,14 +61,14 @@ function _add_friends!(ata_model::AbstractModel)
     FriendSets = vcat(FriendSets, ata_model.settings.bank[items_single, :SINGLE_fs])
     fs_counts = vcat(fs_counts, ones(Int64, size(items_single, 1)))
     n_fs = size(fs_counts, 1)
-    DelimitedFiles.writedlm("OPT/FriendSets.csv", FriendSets)
+    DelimitedFiles.writedlm("opt/FriendSets.csv", FriendSets)
 
     #update model
     ata_model.settings.n_fs = n_fs
     ata_model.settings.fs.sets = FriendSets
     ata_model.settings.fs.items = fs_items
     ata_model.settings.fs.counts = fs_counts
-    JLD2.@save "OPT/ata_model.jld2" AbstractModel
+    JLD2.@save "opt/ata_model.jld2" AbstractModel
     push!(ata_model.output.infos, ["success", string("- ", n_fs, " friend sets added.\n")])
 
     return nothing

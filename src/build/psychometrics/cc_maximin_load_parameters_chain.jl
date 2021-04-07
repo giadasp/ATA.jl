@@ -85,8 +85,8 @@ function cc_maximin_load_parameters_chain!(
             end
             ata_model.obj.cores[t].IIF = IIF[t]
         end
-        JLD2.@save "OPT/IIF_CC.jld2" IIF
-        JLD2.@save "OPT/ICF_CC.jld2" ICF
+        JLD2.@save "opt/IIF_CC.jld2" IIF
+        JLD2.@save "opt/ICF_CC.jld2" ICF
     catch e
         message[1] = "danger"
         message[2] = message[2] * string("- ", sprint(showerror, e), "\n")

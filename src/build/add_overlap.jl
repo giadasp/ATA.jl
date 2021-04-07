@@ -65,7 +65,7 @@ function add_overlap!(
             # 	ol_max[t] = overlap_matrix[t, setdiff(collect(1:T), t)]
             # end
             overlap_matrix = Matrix{Float64}(overlap_matrix)[1:T, 1:T]
-            DelimitedFiles.writedlm("OPT/overlap.txt", overlap_matrix)
+            DelimitedFiles.writedlm("opt/overlap.txt", overlap_matrix)
             ata_model.settings.ol_max = overlap_matrix
             ata_model.settings.to_apply[3] = true
         else
@@ -85,7 +85,7 @@ function add_overlap!(
                 ],
             )
         end
-        JLD2.@save "OPT/ata_model.jld2" ata_model
+        JLD2.@save "opt/ata_model.jld2" ata_model
         push!(ata_model.output.infos, ["success", "- Maximum overlap constrained.\n"])
     catch e
         message[1] = "danger"

@@ -41,7 +41,7 @@ function add_obj_fun!(
             "success",
             "- IIFs for all item parameters samples computed.\n",
         ]
-        open("OPT/Settings.jl", "a") do f
+        open("opt/Settings.jl", "a") do f
             write(f, "K = $K\n\n")
         end
 

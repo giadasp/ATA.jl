@@ -39,7 +39,7 @@ function add_obj_fun!(
             "success",
             "- Objective function loaded.\n- IIFs computed.\n- Standard deviations computed.\n",
         ]
-        open("OPT/Settings.jl", "a") do f
+        open("opt/Settings.jl", "a") do f
             write(f, "K = $K\n\n")
         end
 

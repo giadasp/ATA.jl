@@ -42,10 +42,10 @@ function _add_exp_score!(ata_model::AbstractModel)
         ata_model.constraints[t].expected_score.val = ICF[t]
     end
     # for t = 1:ata_model.settings.T
-    # 	DelimitedFiles.writedlm("OPT/A_$t.csv", ata_model.constraints[t].constr_A)
-    # 	DelimitedFiles.writedlm("OPT/b_$t.csv", ata_model.constraints[t].constr_b)
+    # 	DelimitedFiles.writedlm("opt/A_$t.csv", ata_model.constraints[t].constr_A)
+    # 	DelimitedFiles.writedlm("opt/b_$t.csv", ata_model.constraints[t].constr_b)
     # end
-    JLD2.@save "OPT/ICF.jld2" ICF
+    JLD2.@save "opt/ICF.jld2" ICF
     push!(ata_model.output.infos, ["success", "- Expected Score constrained.\n"])
     return nothing
 end

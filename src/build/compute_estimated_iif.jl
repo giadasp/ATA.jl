@@ -21,6 +21,6 @@ function compute_estimated_iif!(ata_model)
         end
         ata_model.obj.cores[t].IIF = IIF[t]
     end
-    JLD2.@save "OPT/IIF.jld2" IIF
+    JLD2.@save "opt/IIF.jld2" IIF
     return nothing
 end

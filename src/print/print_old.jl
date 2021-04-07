@@ -40,18 +40,18 @@
 #         end
 
 #         if ata_model.obj.name == "cc_maximin"
-#             JLD2.@load "OPT/IIF_CC.jld2" IIF
-#             JLD2.@load "OPT/ICF_CC.jld2" ICF
+#             JLD2.@load "opt/IIF_CC.jld2" IIF
+#             JLD2.@load "opt/ICF_CC.jld2" ICF
 #             IIF_CC = copy(IIF)
 #             ICF_CC = copy(ICF)
 #         end
 #         if ata_model.obj.name == "maximin" ||
 #            ata_model.obj.name == "cc_maximin" ||
 #            ata_model.obj.name == "minimax"
-#             JLD2.@load "OPT/IIF.jld2" IIF
+#             JLD2.@load "opt/IIF.jld2" IIF
 #         end
-#         if isfile("OPT/ICF.jld2")
-#             JLD2.@load "OPT/ICF.jld2" ICF
+#         if isfile("opt/ICF.jld2")
+#             JLD2.@load "opt/ICF.jld2" ICF
 #         end
 #         if group_by_fs == true
 #             design = reshape(ata_model.output.design, n_fs, T)
@@ -193,7 +193,7 @@
 #         end
 
 #         #expected score
-#         if isfile("OPT/ICF.jld2")
+#         if isfile("opt/ICF.jld2")
 #             es_print_irt = Vector{Vector{Float64}}(undef, T)
 #             for t = 1:T
 #                 es_print_irt[t] = zeros(size(ICF[t], 1))
@@ -221,7 +221,7 @@
 #             write(io, "\r\n")
 #             write(io, "Expected score")
 #             write(io, "\r\n")
-#             if isfile("OPT/ICF.jld2")
+#             if isfile("opt/ICF.jld2")
 #                 for t = 1:T
 #                     DelimitedFiles.writedlm(
 #                         io,

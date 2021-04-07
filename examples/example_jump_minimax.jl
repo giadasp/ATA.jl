@@ -16,11 +16,7 @@ print_last_info(ata_model)
 add_constraints!(ata_model; constraints_file = "constraints.csv", constraints_delim = ";")
 print_last_info(ata_model)
 
-# 3. Add overlap maxima (Optional, Needed if friend sets needs to be taken into account.)
-group_by_friends!(ata_model)
-print_last_info(ata_model)
-
-# 4. Add objective function (Optional)
+# 3. Add objective function (Optional)
 add_obj_fun!(ata_model)
 print_last_info(ata_model)
 
@@ -35,7 +31,7 @@ optimizer_constructor = "Cbc"
 # #Optimizer attributes
 optimizer_attributes = [("seconds", 500), ("logLevel", 1)]
 
-# 5. assemble
+# 4. assemble
 assemble!(
     ata_model;
     solver = solver,

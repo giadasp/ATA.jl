@@ -49,10 +49,6 @@ function compact_ata(;
         )
         print_last_info(ata_model)
     end
-    if group_by_friends
-        group_by_friends!(ata_model)
-        print_last_info(ata_model)
-    end
     if add_obj_fun
         add_obj_fun!(ata_model; psychometrics = psychometrics)
         print_last_info(ata_model)
