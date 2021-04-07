@@ -342,11 +342,11 @@ uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [[Psychometrics]]
 deps = ["Dates", "Distributed", "Distributions", "Interpolations", "LinearAlgebra", "NLopt", "Random", "Requires", "SharedArrays", "SpecialFunctions"]
-git-tree-sha1 = "55008f5db60ff82f7d41e65e82979fea3395c6a8"
+git-tree-sha1 = "0ce6620f2a3d75050fe268089e84293cfbfd9b1b"
 repo-rev = "master"
 repo-url = "https://github.com/giadasp/Psychometrics.jl"
 uuid = "ce8202d9-98c3-4990-890a-8616ce2c06f9"
-version = "0.4.4"
+version = "0.4.5"
 
 [[QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
