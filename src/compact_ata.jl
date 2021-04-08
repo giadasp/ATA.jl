@@ -12,12 +12,11 @@ function compact_ata(;
     overlap::Matrix{Float64} = Matrix{Float64}(undef, 0, 0),
     overlap_file = "",
     overlap_delim = ";",
-    group_by_friends = true,
     add_obj_fun = true,
     solver = "siman", #"jump",
-    print_it = true,
-    print_folder = "results",
-    plot_it = true,
+    return_results = true,
+    results_folder = "results",
+    return_plots = true,
     plots_folder = "plots",
     sim_pool = DataFrames.DataFrame(),
     psychometrics = false,
@@ -55,14 +54,14 @@ function compact_ata(;
     end
     # 9. assemble
     assemble!(ata_model; solver = solver, kwargs...)
-    if print_it
+    if return_results
         print_results(
             ata_model;
-            results_folder = print_folder,
+            results_folder = results_folder,
             sim_pool = sim_pool,
         )
     end
-    if plot_it
+    if return_plots
         plot_results(
             ata_model;
             plots_folder = plots_folder,
