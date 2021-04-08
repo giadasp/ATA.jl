@@ -139,9 +139,9 @@ assemble!(
 # is reported in "results/results_ata.jl"
 
 ata_model.obj.name = "maximin"
-print_results(ata_model; group_by_fs = true, results_folder = "results")
+print_results(ata_model; results_folder = "results")
 
 
 #]add https://github.com/giadasp/ATAPlot.jl
 using ATAPlot
-plot_results(ata_model; group_by_fs = true, results_folder = "plots")
+plot_results(ata_model; plots_folder = "plots")

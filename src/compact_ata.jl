@@ -18,7 +18,7 @@ function compact_ata(;
     print_it = true,
     print_folder = "results",
     plot_it = true,
-    plot_folder = "plots",
+    plots_folder = "plots",
     sim_pool = DataFrames.DataFrame(),
     psychometrics = false,
     kwargs...,
@@ -58,7 +58,6 @@ function compact_ata(;
     if print_it
         print_results(
             ata_model;
-            group_by_fs = group_by_friends,
             results_folder = print_folder,
             sim_pool = sim_pool,
         )
@@ -66,8 +65,7 @@ function compact_ata(;
     if plot_it
         plot_results(
             ata_model;
-            group_by_fs = group_by_friends,
-            results_folder = plot_folder,
+            plots_folder = plots_folder,
         )
     end
     return ata_model::AbstractModel

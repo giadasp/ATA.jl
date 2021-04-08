@@ -1,5 +1,8 @@
 """
-	plot_results(ata_model; group_by_fs = false, results_folder = "plots")
+    plot_results(
+        ata_model::AbstractModel;
+        plots_folder = "plots",
+    )
 
 # Description
 
@@ -8,21 +11,19 @@ Plot the ICFs and TIFs of the assembled tests.
 # Arguments
 
 - **`ata_model::AbstractModel`** : Required. The model built with `ATA` fuctions, `ata_model.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
-- **`group_by_fs`** : Optional. Default: `false`. Set to `true` if items have been grouped by friend sets by [`group_by_friends!`](#ATA.group_by_friends!-Tuple{ATA.AbstractModel}).
-- **`results_folder`** : Optional. Default: "plots". The folder in which the output is stored.
+- **`plots_folder`** : Optional. Default: "plots". The folder in which the output is stored.
 """
 function plot_results(
     ata_model::AbstractModel;
-    group_by_fs = false,
-    results_folder = "plots",
+    plots_folder = "plots",
 )
-    if !isdir(results_folder)
-        mkdir(results_folder)
+    if !isdir(plots_folder)
+        mkdir(plots_folder)
     else
         println(
             string(
                 "There is already a folder with this name, files in ",
-                results_folder,
+                plots_folder,
                 " will be overwritten.\n",
             ),
         )
@@ -32,11 +33,25 @@ function plot_results(
         n_items = ata_model.settings.n_items
         length_max = [ata_model.constraints[t].length_max for t = 1:T]
         n_fs = size(ata_model.settings.fs.items, 1)
-
         if n_fs < ata_model.settings.n_items
             n = n_fs * T
+            design = reshape(ata_model.output.design, n_fs, T)
+            new_design = zeros(Float64, n_items, T)
+            for t = 1:T
+                new_design[
+                    vcat(
+                        ata_model.settings.fs.items[findall(
+                            design[:, t] .== one(Float64),
+                        )]...,
+                    ),
+                    t,
+                ] .= one(Float64)
+            end
+            design = new_design
+            DelimitedFiles.writedlm(string(plots_folder, "/designItemLevel.csv"), design)
         else
             n = n_items * T
+            design = reshape(ata_model.output.design, n_items, T)
         end
 
         if ata_model.obj.name == "cc_maximin"
@@ -52,27 +67,7 @@ function plot_results(
             JLD2.@load "opt/ICF.jld2" ICF
         end
 
-        if group_by_fs == true
-            design = reshape(ata_model.output.design, n_fs, T)
-            new_design = zeros(Float64, n_items, T)
-
-            for t = 1:T
-                new_design[
-                    vcat(
-                        ata_model.settings.fs.items[findall(
-                            design[:, t] .== one(Float64),
-                        )]...,
-                    ),
-                    t,
-                ] .= one(Float64)
-            end
-
-            design = new_design
-            DelimitedFiles.writedlm(string(results_folder, "/designItemLevel.csv"), design)
-        else
-            design = reshape(ata_model.output.design, n_items, T)
-        end
-
+       
         #TIF e ICF
         if ata_model.obj.name in
            ["maximin", "soyster_maximin", "de_jong_maximin", "cc_maximin", "minimax"]
@@ -115,7 +110,7 @@ function plot_results(
                 ICFf,
                 design;
                 sim_pool = sim_pool,
-                results_folder = results_folder,
+                plots_folder = plots_folder,
             )
 
             if ata_model.obj.name == "cc_maximin"
@@ -125,7 +120,7 @@ function plot_results(
                     ICFf,
                     design;
                     sim_pool = sim_pool,
-                    results_folder = results_folder,
+                    plots_folder = plots_folder,
                 )
             end
 

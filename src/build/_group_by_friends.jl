@@ -57,9 +57,9 @@ function _group_by_friends!(ata_model::AbstractModel) #last
                     )
                 end
             end
-            open("opt/Settings.jl", "a") do f
-                write(f, "group_by_fs = true\n\n")
-            end
+            # open("opt/Settings.jl", "a") do f
+            #     write(f, "group_by_fs = true\n\n")
+            # end
             #transform forced0
             x_forced0 = ata_model.settings.forced0
             x_forced0_new = Vector{Vector{Bool}}(undef, ata_model.settings.T)
