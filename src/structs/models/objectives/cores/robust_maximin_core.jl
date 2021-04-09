@@ -3,5 +3,5 @@ mutable struct RobustMaximinObjectiveCore
     standard_deviation::Array{Float64, 2}
     IIF::Array{Float64, 2}
     RobustMaximinObjectiveCore() =
-        new(0.05, Vector{Float64}(), Array{Float64,2}(undef, 0, 0), Array{Float64,2}(undef, 0, 0))
+        new(Vector{Float64}(), Array{Float64,2}(undef, 0, 0), Array{Float64,2}(undef, 0, 0))
 end
