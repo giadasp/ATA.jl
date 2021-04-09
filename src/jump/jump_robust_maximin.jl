@@ -62,21 +62,22 @@ function jump!(
         #Group IIFs by friend set
             IIF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
             if ata_model.settings.n_fs != ata_model.settings.n_items
-                #group IIFs
-                for t = 1:ata_model.settings.T
-                    if size(IIF, 1) > 0
-                        IIF_new[t] =
-                            Matrix{Float64}(undef, size(IIF[t], 1), ata_model.settings.n_fs)
-                    end
-                end
-                for fs = 1:ata_model.settings.n_fs
-                    for t = 1:ata_model.settings.T
-                        if size(IIF[t], 1) > 0
-                            IIF_new[t][:, fs] =
-                                sum(IIF[t][:, ata_model.settings.fs.items[fs]], dims = 2)
-                        end
-                    end
-                end
+                error("- RobustMaximinModel in conjunction with jump solver does not support friend sets.\n")
+                # #group IIFs
+                # for t = 1:ata_model.settings.T
+                #     if size(IIF, 1) > 0
+                #         IIF_new[t] =
+                #             Matrix{Float64}(undef, size(IIF[t], 1), ata_model.settings.n_fs)
+                #     end
+                # end
+                # for fs = 1:ata_model.settings.n_fs
+                #     for t = 1:ata_model.settings.T
+                #         if size(IIF[t], 1) > 0
+                #             IIF_new[t][:, fs] =
+                #                 sum(IIF[t][:, ata_model.settings.fs.items[fs]], dims = 2)
+                #         end
+                #     end
+                # end
             else
                 IIF_new = IIF
                 ICF_new = [
@@ -87,29 +88,30 @@ function jump!(
         # group expected score by friend set
         ICF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
         if ata_model.settings.n_fs != ata_model.settings.n_items
-            #group IIFs
-            for t = 1:ata_model.settings.T
-                if size(ata_model.constraints[t].expected_score.val, 1) > 0
-                    ICF_new[t] = zeros(
-                        Float64,
-                        size(ata_model.constraints[t].expected_score.val, 1),
-                        ata_model.settings.n_fs,
-                    )
-                end
-            end
-            for fs = 1:ata_model.settings.n_fs
-                for t = 1:ata_model.settings.T
-                    if size(ata_model.constraints[t].expected_score.val, 1) > 0
-                        ICF_new[t][:, fs] = sum(
-                            ata_model.constraints[t].expected_score.val[
-                                :,
-                                ata_model.settings.fs.items[fs],
-                            ],
-                            dims = 2,
-                        )
-                    end
-                end
-            end
+            error("- RobustMaximinModel in conjunction with jump solver does support friend sets.\n")
+            # #group IIFs
+            # for t = 1:ata_model.settings.T
+            #     if size(ata_model.constraints[t].expected_score.val, 1) > 0
+            #         ICF_new[t] = zeros(
+            #             Float64,
+            #             size(ata_model.constraints[t].expected_score.val, 1),
+            #             ata_model.settings.n_fs,
+            #         )
+            #     end
+            # end
+            # for fs = 1:ata_model.settings.n_fs
+            #     for t = 1:ata_model.settings.T
+            #         if size(ata_model.constraints[t].expected_score.val, 1) > 0
+            #             ICF_new[t][:, fs] = sum(
+            #                 ata_model.constraints[t].expected_score.val[
+            #                     :,
+            #                     ata_model.settings.fs.items[fs],
+            #                 ],
+            #                 dims = 2,
+            #             )
+            #         end
+            #     end
+            # end
         else
             ICF_new =
                 [ata_model.constraints[t].expected_score.val for t = 1:ata_model.settings.T]
@@ -345,38 +347,48 @@ function jump!(
             end
         end
 
-
+        #! works only when K=1 and when obj_points_t = obj_points_t' for all t != t'
         ncons = copy(c) - 1
         f_gamma = zeros(ata_model.obj.Gamma + 1)
         design_gamma = Vector{Matrix{Float64}}(undef, ata_model.obj.Gamma + 1)
+        d_i = ata_model.obj.cores[1].standard_deviation[1,:]
+        order_d_i = sortperm(d_i; rev = true)
+        first_Gamma_plus_one = order_d_i[1 : (ata_model.obj.Gamma + 1)]
+        set_to_zero = order_d_i[(ata_model.obj.Gamma + 2) : end]
+        first_Gamma_plus_one_d_i = copy(d_i)
+        first_Gamma_plus_one_d_i[set_to_zero] .= 0.0
         for gamma in 1 : (ata_model.obj.Gamma + 1)
+            d_l = first_Gamma_plus_one_d_i[gamma]
+            first_Gamma_plus_one_d_i_gamma = copy(first_Gamma_plus_one_d_i)
+            first_Gamma_plus_one_d_i_gamma[set_to_zero] .= d_l
             m_base = copy(m)
                 #Objective bound
                 JuMP.@variable(m_base, w >= 0)
                 for t = 1:ata_model.settings.T
-                    for k = 1:size(ata_model.obj.cores[t].points, 1)
+                    d_l = ata_model.obj.cores[t].standard_deviation # K x I
+                    #for k = 1:size(ata_model.obj.cores[t].points, 1)
+                        k = 1
                         JuMP.@constraint(
                             m_base,
                             sum(
-                                round(IIF_new[t][k, i]; digits = 4) * x[i, t] for
+                                (round(IIF_new[t][k, i]; digits = 4) - (first_Gamma_plus_one_d_i_gamma .- d_l)) * x[i, t] for
                                 i = 1:ata_model.settings.n_fs
-                            ) >= w
+                            ) - ata_model.obj.Gamma*d_l >= w
                         )
-                    end
+                    #end
                 end
                 JuMP.@objective(m_base, Min, (-w))
             JuMP.optimize!(m_base)
             design_gamma[gamma] = abs.(round.(JuMP.value.(x)))
             f_gamma[gamma] = JuMP.value(w)
         end
+        ata_model.output.design = design_gamma[findmax(f_gamma)[2]]
         message[1] = "success"
         message[2] =
             message[2] *
             string("- The model has termination status:", JuMP.termination_status(m), "\n.")
         #println(string("The model has termination status:", JuMP.termination_status(m)))
-        design = abs.(round.(JuMP.value.(x)))
-        DelimitedFiles.writedlm(string(results_folder, "/design.csv"), design)
-        ata_model.output.design = design
+        DelimitedFiles.writedlm(string(results_folder, "/design.csv"), ata_model.output.design)
         JLD2.@save string(results_folder, "/ata_model.jld2") ata_model
         push!(ata_model.output.infos, message)
     catch e

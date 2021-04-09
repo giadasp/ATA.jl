@@ -39,9 +39,9 @@ function add_obj_fun!(
             "success",
             "- Objective function loaded.\n- IIFs computed.\n- Standard deviations computed.\n",
         ]
-        open("opt/Settings.jl", "a") do f
-            write(f, "K = $K\n\n")
-        end
+        # open("opt/Settings.jl", "a") do f
+        #     write(f, "K = $K\n\n")
+        # end
 
         push!(ata_model.output.infos, message)
     catch e

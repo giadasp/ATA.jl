@@ -108,7 +108,7 @@ function siman!(
             NH⁺.ol = eval_overlap(NH⁺.x, fs_counts, ata_model.settings.ol_max, T, NH⁺.ol)
         end
         if fF == false
-            if ata_model.obj.name in ["maximin", "minimax", "cc_maximin", "soyster_maximin"]
+            if ata_model.obj.name in ["maximin", "minimax", "cc_maximin", "soyster_maximin", "de_jong_maximin"]
                 NH⁺.obj[v2] = eval_TIFₜ(x_Iₜ, ata_model.obj.cores[v2])
             elseif ata_model.obj.name == "custom"
                 NH⁺.obj = ata_model.obj.fun(x_Iₜ, ata_model.obj.args)

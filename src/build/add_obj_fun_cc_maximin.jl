@@ -101,10 +101,9 @@ function add_obj_fun!(
             "success",
             "- IIFs for all item parameters samples computed.\n",
         ]
-        open("opt/Settings.jl", "a") do f
-            write(f, "K = $K\n\n")
-        end
-
+        # open("opt/Settings.jl", "a") do f
+        #     write(f, "K = $K\n\n")
+        # end
         push!(ata_model.output.infos, message)
     catch e
         message[1] = "danger"
