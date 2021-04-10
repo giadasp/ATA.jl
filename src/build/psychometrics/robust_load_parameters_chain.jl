@@ -1,5 +1,5 @@
 function robust_load_parameters_chain!(
-    ata_model::DeJongMaximinModel;
+    ata_model::RobustMaximinModel;
     items_file = "items.jld2",
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
     kwargs...,
