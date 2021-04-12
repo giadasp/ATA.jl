@@ -1,5 +1,5 @@
 function jump!(
-    ata_model::Union{RobustMaximinModel};
+    ata_model::RobustMaximinModel;
     starting_design = Matrix{Float64}(undef, 0, 0),
     results_folder = "results",
     optimizer_constructor = "GLPK",
