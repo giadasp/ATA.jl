@@ -161,6 +161,14 @@ function jump!(
         ################################################################################
         #                                JuMP model
         ################################################################################
+        f_gamma = zeros(ata_model.obj.Gamma + 1)
+        design_gamma = Vector{Matrix{Float64}}(undef, ata_model.obj.Gamma + 1)
+        d_i = ata_model.obj.cores[1].standard_deviation[1,:]
+        order_d_i = sortperm(d_i; rev = true)
+        first_Gamma_plus_one = order_d_i[1 : (ata_model.obj.Gamma + 1)]
+        # first_Gamma_plus_one_d_i = copy(d_i)
+        # first_Gamma_plus_one_d_i[set_to_zero] .= 0.0
+        for gamma in 1 : (ata_model.obj.Gamma + 1)
 
         m = JuMP.Model()
         if optimizer_constructor == "GLPK"
@@ -348,37 +356,28 @@ function jump!(
         end
 
         #! works only when K=1 and when obj_points_t = obj_points_t' for all t != t'
-        ncons = copy(c) - 1
-        f_gamma = zeros(ata_model.obj.Gamma + 1)
-        design_gamma = Vector{Matrix{Float64}}(undef, ata_model.obj.Gamma + 1)
-        d_i = ata_model.obj.cores[1].standard_deviation[1,:]
-        order_d_i = sortperm(d_i; rev = true)
-        first_Gamma_plus_one = order_d_i[1 : (ata_model.obj.Gamma + 1)]
-        set_to_zero = order_d_i[(ata_model.obj.Gamma + 2) : end]
-        first_Gamma_plus_one_d_i = copy(d_i)
-        first_Gamma_plus_one_d_i[set_to_zero] .= 0.0
-        for gamma in 1 : (ata_model.obj.Gamma + 1)
-            d_l = first_Gamma_plus_one_d_i[gamma]
-            first_Gamma_plus_one_d_i_gamma = copy(first_Gamma_plus_one_d_i)
-            first_Gamma_plus_one_d_i_gamma[set_to_zero] .= d_l
-            m_base = copy(m)
+            set_to_zero = order_d_i[min(ata_model.settings.n_fs, (ata_model.obj.Gamma + 2)) : end]
+            d_l = d_i[order_d_i[gamma]]
+            first_Gamma_plus_one_d_i_gamma = copy(d_i)
+            first_Gamma_plus_one_d_i_gamma[order_d_i[gamma:end]] .= d_l
                 #Objective bound
-                JuMP.@variable(m_base, w >= 0)
+                JuMP.@variable(m, w >= 0)
+                
                 for t = 1:ata_model.settings.T
-                    d_l = ata_model.obj.cores[t].standard_deviation # K x I
+
                     #for k = 1:size(ata_model.obj.cores[t].points, 1)
                         k = 1
                         JuMP.@constraint(
-                            m_base,
+                            m,
                             sum(
-                                (round(IIF_new[t][k, i]; digits = 4) - (first_Gamma_plus_one_d_i_gamma .- d_l)) * x[i, t] for
+                                (round(IIF_new[t][k, i]; digits = 4) - (first_Gamma_plus_one_d_i_gamma .- d_l)[i]) * x[i, t] for
                                 i = 1:ata_model.settings.n_fs
                             ) - ata_model.obj.Gamma*d_l >= w
                         )
                     #end
                 end
-                JuMP.@objective(m_base, Min, (-w))
-            JuMP.optimize!(m_base)
+                JuMP.@objective(m, Min, (-w))
+            JuMP.optimize!(m)
             design_gamma[gamma] = abs.(round.(JuMP.value.(x)))
             f_gamma[gamma] = JuMP.value(w)
         end
