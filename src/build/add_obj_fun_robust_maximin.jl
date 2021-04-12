@@ -29,10 +29,10 @@ function add_obj_fun!(
         if psychometrics
             compute_estimated_iif!(ata_model)
             robust_load_parameters_chain!(
-                    ata_model;
-                    items_file = items_file,
-                    items = items,
-                    kwargs...,
+                ata_model;
+                items_file = items_file,
+                items = items,
+                kwargs...,
             )
         end
         message = [

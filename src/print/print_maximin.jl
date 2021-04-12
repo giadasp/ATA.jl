@@ -16,7 +16,12 @@ Print the features of the assembled tests.
 - **`sim_pool::DataFrames.DataFrame`** : Optional. Default: DataFrame(). The pool with true item paramaters. For simulation studies.
 """
 function print_results(
-    ata_model::Union{MaximinModel,SoysterMaximinModel,DeJongMaximinModel,RobustMaximinModel};
+    ata_model::Union{
+        MaximinModel,
+        SoysterMaximinModel,
+        DeJongMaximinModel,
+        RobustMaximinModel,
+    };
     results_folder = "results",
     sim_pool::DataFrames.DataFrame = DataFrame(),
 )

@@ -55,17 +55,10 @@ function compact_ata(;
     # 9. assemble
     assemble!(ata_model; solver = solver, kwargs...)
     if return_results
-        print_results(
-            ata_model;
-            results_folder = results_folder,
-            sim_pool = sim_pool,
-        )
+        print_results(ata_model; results_folder = results_folder, sim_pool = sim_pool)
     end
     if return_plots
-        plot_results(
-            ata_model;
-            plots_folder = plots_folder,
-        )
+        plot_results(ata_model; plots_folder = plots_folder)
     end
     return ata_model::AbstractModel
 end

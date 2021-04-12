@@ -5,6 +5,5 @@ mutable struct RobustMaximinModel <: AbstractModel
     output::Output
     RobustMaximinModel(settings, constraints, obj, output) =
         new(settings, constraints, obj, output)
-        RobustMaximinModel() =
-        new(Settings(), Constraint[], RobustMaximinObjective(), Output())
+    RobustMaximinModel() = new(Settings(), Constraint[], RobustMaximinObjective(), Output())
 end

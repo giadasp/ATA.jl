@@ -37,10 +37,7 @@ function add_obj_fun!(
                 kwargs...,
             )
         end
-        message = [
-            "success",
-            "- IIFs for all item parameters samples computed.\n",
-        ]
+        message = ["success", "- IIFs for all item parameters samples computed.\n"]
         # open("opt/Settings.jl", "a") do f
         #     write(f, "K = $K\n\n")
         # end

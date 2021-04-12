@@ -59,7 +59,7 @@ function assemble!(
     optimizer_attributes = [("tm_lim", 1000)],
     kwargs...,
 )
-    _group_by_friends!(ata_model) 
+    _group_by_friends!(ata_model)
     if solver == "siman"
         siman!(
             ata_model;

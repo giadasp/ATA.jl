@@ -79,7 +79,8 @@ function _group_by_friends!(ata_model::AbstractModel) #last
             ata_model.settings.forced0 = x_forced0_new
             DelimitedFiles.writedlm("opt/x_forced0.txt", x_forced0_new)
             message[2] =
-                message[2] * "- Categorical and linear quantitative constraints grouped by friend sets.\n"
+                message[2] *
+                "- Categorical and linear quantitative constraints grouped by friend sets.\n"
         end
         #item use
         if ata_model.settings.to_apply[1]

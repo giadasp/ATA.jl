@@ -13,10 +13,7 @@ Plot the ICFs and TIFs of the assembled tests.
 - **`ata_model::AbstractModel`** : Required. The model built with `ATA` fuctions, `ata_model.design` matrix must be `IxT` or `nfsxT` if the items are grouped by friend sets. 
 - **`plots_folder`** : Optional. Default: "plots". The folder in which the output is stored.
 """
-function plot_results(
-    ata_model::AbstractModel;
-    plots_folder = "plots",
-)
+function plot_results(ata_model::AbstractModel; plots_folder = "plots")
     if !isdir(plots_folder)
         mkdir(plots_folder)
     else
@@ -67,7 +64,7 @@ function plot_results(
             JLD2.@load "opt/ICF.jld2" ICF
         end
 
-       
+
         #TIF e ICF
         if ata_model.obj.name in
            ["maximin", "soyster_maximin", "de_jong_maximin", "cc_maximin", "minimax"]

@@ -36,11 +36,8 @@ function add_obj_fun!(
                 items = items,
                 kwargs...,
             )
-            message = [
-            "success",
-            "- IIFs for all item parameters samples computed.\n",
-        ]
-        push!(ata_model.output.infos, message)
+            message = ["success", "- IIFs for all item parameters samples computed.\n"]
+            push!(ata_model.output.infos, message)
         end
     catch e
         message[1] = "danger"

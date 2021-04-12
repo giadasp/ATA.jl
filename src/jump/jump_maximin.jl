@@ -1,5 +1,11 @@
 function jump!(
-    ata_model::Union{MaximinModel, DeJongMaximinModel, SoysterMaximinModel, NoObjModel, MinimaxModel};
+    ata_model::Union{
+        MaximinModel,
+        DeJongMaximinModel,
+        SoysterMaximinModel,
+        NoObjModel,
+        MinimaxModel,
+    };
     starting_design = Matrix{Float64}(undef, 0, 0),
     results_folder = "results",
     optimizer_constructor = "GLPK",
