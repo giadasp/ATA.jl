@@ -23,31 +23,28 @@ function add_constraints!(
     constraints_file = "constraints.csv",
     constraints_delim = ";",
 )
-    message = ["", ""]
     if size(constraints, 1) > 0
         categorical_constraints = constraints
-        message[2] = message[2] * "- Constraints dataframe loaded.\n"
+        success!(ata_model, "Constraints dataframe loaded.")
     elseif !isfile(constraints_file)
-        message[1] = "danger"
-        message[2] =
-            message[2] * string(
+        error!(
+            ata_model,
+            string(
                 "Constraints file with name ",
                 constraints_file,
-                " does not exist. Provide a valid constraints dataframe or a name of an existing file.\n",
-            )
-        push!(ata_model.output.infos, message)
+                " does not exist. Provide a valid constraints dataframe or a name of an existing file.",
+            ),
+        )
         return nothing
     else
         try
             categorical_constraints =
                 CSV.read(constraints_file, DataFrames.DataFrame, delim = constraints_delim)
         catch e
-            message[1] = "danger"
-            message[2] = message[2] * "- Error in reading constraints file.\n"
-            push!(ata_model.output.infos, message)
+            error!(ata_model, "Error in reading constraints file.")
             return nothing
         end
-        message[2] = message[2] * "- Constraints file loaded.\n"
+        success!(ata_model, "Constraints file loaded.")
     end
     try
         n_items = ata_model.settings.n_items
@@ -67,9 +64,10 @@ function add_constraints!(
         end
         x_forced0 = ata_model.settings.forced0
         if size(categorical_constraints, 1) == 0
-            message[2] =
-                message[2] *
-                string("No lines in file ", constraints_file, " nothing added.\n")
+            error!(
+                ata_model,
+                string("No lines in file ", constraints_file, " nothing added."),
+            )
         else
             categorical_constraints.var = Symbol.(categorical_constraints.var)
             CatCons = Vector{Vector{Float64}}(undef, ata_model.settings.T)
@@ -140,29 +138,9 @@ function add_constraints!(
                     end
                 end
             end
-            message[2] =
-                message[2] * "- Linear constraints (categorical and quantitative) added.\n"
+            success!(ata_model, "Linear constraints (categorical and quantitative) added.")
         end
-        #add sum vars constraints
-        # if size(ata_model.constraints[t].sum_vars, 1) > 1
-        #     for t = 1:ata_model.settings.T
-        #         for var = 1:size(ata_model.constraints[t].sum_vars, 1)
-        #             vals = copy(
-        #                 ata_model.settings.bank[!, ata_model.constraints[t].sum_vars[var]],
-        #             )
-        #             vals[findall(ismissing.(vals))] .= 0.0
-        #             if !ismissing(ata_model.constraints[t].sum_vars_min[var])
-        #                 A[t] = vcat(A[t], .-vals')
-        #                 push!(b[t], -ata_model.constraints[t].sum_vars_min[var])
-        #             end
-        #             if !ismissing(ata_model.constraints[t].sum_vars_max[var])
-        #                 A[t] = vcat(A[t], vals')
-        #                 push!(b[t], ata_model.constraints[t].sum_vars_max[var])
-        #             end
-        #         end
-        #     end
-        #     message[2] = message[2] * "- Constraints on sum of quantitative variables added.\n"
-        # end
+
         for t = 1:ata_model.settings.T
             DelimitedFiles.writedlm("opt/A_$t.csv", A[t])
             DelimitedFiles.writedlm("opt/b_$t.csv", b[t])
@@ -175,12 +153,9 @@ function add_constraints!(
             ata_model.constraints[t].constr_A = A[t]
         end
         JLD2.@save "opt/ata_model.jld2" ata_model
-        message[1] = "success"
-        push!(ata_model.output.infos, message)
+
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string("", sprint(showerror, e)))
     end
     return nothing
 end

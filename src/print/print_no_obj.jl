@@ -23,13 +23,15 @@ function print_results(
     if !isdir(results_folder)
         mkdir(results_folder)
     else
-        println(
+        success!(
+            ata_model,
             string(
                 "There is already a folder with this name, files in ",
                 results_folder,
-                " will be overwritten.\n",
+                " will be overwritten.",
             ),
         )
+
     end
     if size(ata_model.output.design, 1) > 0
         T = ata_model.settings.T
@@ -200,28 +202,7 @@ function print_results(
                     #DelimitedFiles.writedlm(io,hcat(vals,[sum(skipmissing(ata_model.settings.bank[Symbol(cats)][design[:,t].==1].== i))   for i in vals,t=1:T]),", ")
                     write(io, "\r\n")
                 end
-                write(io, "Sum variables")
-                write(io, "\r\n")
-                for var in unique(vcat([ata_model.constraints[t].sum_vars for t = 1:T]...))
-                    write(io, var)
-                    write(io, "\r\n")
-                    DelimitedFiles.writedlm(
-                        io,
-                        round.(
-                            [
-                                sum(
-                                    skipmissing(
-                                        ata_model.settings.bank[!, var] .* design[:, t],
-                                    ),
-                                ) for t = 1:T
-                            ],
-                            digits = 3,
-                        )',
-                        "\t",
-                    )
-                    write(io, "\r\n")
-                end
-                write(io, "\r\n")
+
                 write(io, "Overlap matrix")
                 write(io, "\r\n")
                 olMatrixOUT =

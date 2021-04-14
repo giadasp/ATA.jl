@@ -18,14 +18,16 @@ function siman!(
     verbosity = 2,
     kwargs...,
 )
-    message = ""
     if !isdir(results_folder)
         mkdir(results_folder)
     else
-        message *= string(
-            "There is already a folder with this name, files in ",
-            results_folder,
-            " will be overwritten.\n",
+        success!(
+            ata_model,
+            string(
+                "There is already a folder with this name, files in ",
+                results_folder,
+                " will be overwritten.",
+            ),
         )
     end
 
@@ -58,17 +60,11 @@ function siman!(
             size(starting_design, 1) != n_fs ||
             size(starting_design, 2) != ata_model.settings.T
         )
-            push!(
-                ata_model.output.infos,
-                ["danger", "- Starting design must be of size: (n_items x T).\n"],
-            )
+            error!(ata_model, "Starting design must be of size: (n_items x T).")
             return nothing
         end
         if any((ata_model.output.design .!= 0.0) .& (ata_model.output.design .!= 1.0))
-            push!(
-                ata_model.output.infos,
-                ["danger", "- Starting design must contain only 1 or 0.\n"],
-            )
+            error!(ata_model, "Starting design must contain only 1 or 0.")
             return nothing
         end
         x₀ = Float64.(starting_design)

@@ -6,29 +6,33 @@ function jump!(
     optimizer_attributes = [("tm_lim", 500000), ("msg_lev", 3)],
     kwargs...,
 )
-    message = ["", ""]
+
     try
         if !isdir(results_folder)
             mkdir(results_folder)
         else
-            message[2] =
-                message[2] * string(
-                    "- There is already a folder with this name, files in ",
+            success!(
+                ata_model,
+                string(
+                    "There is already a folder with this name, files in ",
                     results_folder,
-                    " will be overwritten.\n",
-                )
+                    " will be overwritten.",
+                ),
+            )
         end
         n_items = ata_model.settings.n_items
         if any([size(ata_model.obj.cores[t].IIF, 1) > 0 for t = 1:ata_model.settings.T])
             IIF = [ata_model.obj.cores[t].IIF for t = 1:ata_model.settings.T]
-            message[2] =
-                message[2] *
-                string("- Assembling tests with ", ata_model.obj.name, " objective...\n")
+            success!(
+                ata_model,
+                string("Assembling tests with ", ata_model.obj.name, " objective..."),
+            )
         else
-            message[1] = "danger"
-            message[2] =
-                message[2] * "- IIFs have not been computed. Run add_obj_fun!() first.\n"
-            push!(ata_model.output.infos, message)
+            error!(
+                ata_model,
+                string("IIFs have not been computed. Run add_obj_fun!() first."),
+            )
+
             return nothing
         end
 
@@ -58,8 +62,9 @@ function jump!(
         #Group IIFs by friend set
         IIF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
         if ata_model.settings.n_fs != ata_model.settings.n_items
-            error(
-                "- RobustMaximinModel in conjunction with jump solver does not support friend sets.\n",
+            error!(
+                ata_model,
+                "RobustMaximinModel in conjunction with jump solver does not support friend sets.",
             )
             # #group IIFs
             # for t = 1:ata_model.settings.T
@@ -84,8 +89,9 @@ function jump!(
         # group expected score by friend set
         ICF_new = [zeros(Float64, 0, 0) for t = 1:ata_model.settings.T]
         if ata_model.settings.n_fs != ata_model.settings.n_items
-            error(
-                "- RobustMaximinModel in conjunction with jump solver does support friend sets.\n",
+            error!(
+                ata_model,
+                "RobustMaximinModel in conjunction with jump solver does support friend sets.",
             )
             # #group IIFs
             # for t = 1:ata_model.settings.T
@@ -200,10 +206,8 @@ function jump!(
                         size(starting_design, 1) != ata_model.settings.n_fs ||
                         size(starting_design, 2) != ata_model.settings.T
                     )
-                        message[1] = "danger"
-                        message[2] =
-                            message[2] * "- Starting design must be of size: (n_fs x T).\n"
-                        push!(ata_model.output.infos, message)
+                        error!(ata_model, "Starting design must be of size: (n_fs x T).")
+
                         return nothing
                     end
                 else
@@ -211,20 +215,16 @@ function jump!(
                         size(starting_design, 1) != ata_model.settings.n_items ||
                         size(starting_design, 2) != ata_model.settings.T
                     )
-                        message[1] = "danger"
-                        message[2] =
-                            message[2] * "- Starting design must be of size: (I x T).\n"
-                        push!(ata_model.output.infos, message)
+                        error!(ata_model, "Starting design must be of size: (I x T).")
+
                         return nothing
                     end
                 end
                 if any(
                     (ata_model.output.design .!= 0.0) .& (ata_model.output.design .!= 1.0),
                 )
-                    message[1] = "danger"
-                    message[2] =
-                        message[2] * "- Starting design must contain only 1s or 0s.\n"
-                    push!(ata_model.output.infos, message)
+                    error!(ata_model, "Starting design must contain only 1s or 0s.")
+
                     return nothing
                 end
             else
@@ -377,7 +377,7 @@ function jump!(
                     sum(
                         (
                             round(IIF_new[t][k, i]; digits = 4) -
-                            (first_Gamma_plus_one_d_i_gamma.-d_l)[i]
+                            (first_Gamma_plus_one_d_i_gamma[i] .- d_l)
                         ) * x[i, t] for i = 1:ata_model.settings.n_fs
                     ) - ata_model.obj.Gamma * d_l >= w
                 )
@@ -387,10 +387,16 @@ function jump!(
             JuMP.optimize!(m)
             design_gamma[gamma] = abs.(round.(JuMP.value.(x)))
             f_gamma[gamma] = JuMP.value(w)
-            message[1] = "success"
-            message[2] =
-                message[2] *
-                string("- With l =",gamma, " the model has termination status:", JuMP.termination_status(m), "\n.")
+            success!(
+                ata_model,
+                string(
+                    "With l =",
+                    gamma,
+                    " the model had termination status:",
+                    JuMP.termination_status(m),
+                    ".",
+                ),
+            )
         end
         ata_model.output.design = design_gamma[findmax(f_gamma)[2]]
         DelimitedFiles.writedlm(
@@ -398,11 +404,10 @@ function jump!(
             ata_model.output.design,
         )
         JLD2.@save string(results_folder, "/ata_model.jld2") ata_model
-        push!(ata_model.output.infos, message)
+
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

@@ -3,7 +3,6 @@
     _add_friends!(ata_model::AbstractModel)
 """
 function _add_friends!(ata_model::AbstractModel)
-    message = ["", ""]
 
     n_items = ata_model.settings.n_items
     FriendSets =
@@ -69,7 +68,7 @@ function _add_friends!(ata_model::AbstractModel)
     ata_model.settings.fs.items = fs_items
     ata_model.settings.fs.counts = fs_counts
     JLD2.@save "opt/ata_model.jld2" AbstractModel
-    push!(ata_model.output.infos, ["success", string("- ", n_fs, " friend sets added.\n")])
+    success!(ata_model, string(n_fs, " friend sets added."))
 
     return nothing
 end

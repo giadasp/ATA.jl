@@ -23,11 +23,11 @@ function add_overlap!(
     overlap_file = "overlap_matrix.csv",
     overlap_delim = ";",
 )
-    message = ["", ""]
+
     #load overlap matrix
     if size(overlap, 1) > 0
         overlap_matrix = overlap
-        message[2] = message[2] * "- Overlap matrix loaded.\n"
+        success!(ata_model, "Overlap matrix loaded.")
     elseif isfile(overlap_file)
         try
             overlap_matrix = CSV.read(
@@ -37,21 +37,18 @@ function add_overlap!(
                 header = false,
             )
         catch e
-            message[1] = "danger"
-            message[2] = message[2] * "- Error in reading the overlap file.\n"
-            push!(ata_model.output.infos, message)
+            error!(ata_model, "Error in reading the overlap file.")
             return nothing
         end
-        message[2] = message[2] * "- Overlap file loaded.\n"
+        success!(ata_model, "Overlap file loaded.")
     else
-        push!(
-            ata_model.output.infos,
-            [
-                "danger",
+        error!(
+            ata_model,
+            string(
                 "Overlap file with name ",
                 overlap_file,
                 " does not exist. Provide a valid overlap matrix or a name of an existing file.",
-            ],
+            ),
         )
         return nothing
     end
@@ -73,24 +70,20 @@ function add_overlap!(
                 ones(ata_model.settings.n_items, ata_model.settings.n_items) .*
                 ata_model.settings.n_items
             ata_model.settings.to_apply[3] = false
-            push!(
-                ata_model.output.infos,
-                [
-                    "success",
-                    string(
-                        "- No lines in ",
-                        overlap_file,
-                        ", overlap constraints are not applied.\n",
-                    ),
-                ],
+            success!(
+                ata_model,
+                string(
+                    "No lines in ",
+                    overlap_file,
+                    ", overlap constraints are not applied.",
+                ),
             )
         end
         JLD2.@save "opt/ata_model.jld2" ata_model
-        push!(ata_model.output.infos, ["success", "- Maximum overlap constrained.\n"])
+        success!(ata_model, "Maximum overlap constrained.")
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

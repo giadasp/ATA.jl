@@ -28,7 +28,6 @@ function add_obj_fun!(
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
     kwargs...,
 )
-    message = ["", ""]
     try
         if !psychometrics
             R = ata_model.obj.R
@@ -40,7 +39,7 @@ function add_obj_fun!(
                     ata_model.output.infos,
                     [
                         "danger",
-                        "- ccmaximin objective requires a jld2 file named \"BSPar.jld2\" with sampled values for the item parameters.\nAlternatively, a vector of `Psychometrics.Item` with samples in chain can be provided.",
+                        "ccmaximin objective requires a jld2 file named \"BSPar.jld2\" with sampled values for the item parameters.\nAlternatively, a vector of `Psychometrics.Item` with samples in chain can be provided.",
                     ],
                 )
                 return nothing
@@ -97,15 +96,14 @@ function add_obj_fun!(
                 kwargs...,
             )
         end
-        message = ["success", "- IIFs for all item parameters samples computed.\n"]
+        success!(ata_model, "IIFs for all item parameters samples computed.")
         # open("opt/Settings.jl", "a") do f
         #     write(f, "K = $K\n\n")
         # end
-        push!(ata_model.output.infos, message)
+
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

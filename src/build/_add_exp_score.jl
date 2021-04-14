@@ -13,7 +13,6 @@ It requires the [`start_ata`](#ATA.start_ata) step.
 
 """
 function _add_exp_score!(ata_model::AbstractModel)
-    message = ["", ""]
     T = ata_model.settings.T
     n_items = ata_model.settings.n_items
     n_groups = ata_model.settings.n_groups
@@ -41,11 +40,12 @@ function _add_exp_score!(ata_model::AbstractModel)
     for t = 1:T
         ata_model.constraints[t].expected_score.val = ICF[t]
     end
+    success!(ata_model, "Expected scores (ICFs) based on IRT parameters computed.")
     # for t = 1:ata_model.settings.T
     # 	DelimitedFiles.writedlm("opt/A_$t.csv", ata_model.constraints[t].constr_A)
     # 	DelimitedFiles.writedlm("opt/b_$t.csv", ata_model.constraints[t].constr_b)
     # end
     JLD2.@save "opt/ICF.jld2" ICF
-    push!(ata_model.output.infos, ["success", "- Expected Score constrained.\n"])
+    success!(ata_model, "Expected Score constrained.")
     return nothing
 end

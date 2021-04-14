@@ -14,15 +14,14 @@ For each pair of item, and ability point \$(i, θ_k)\$, an IIF\$(θ_k)_{i}\$ is 
 - **`ata_model::Union{MaximinModel, MinimaxModel}`** : Required. 
 """
 function add_obj_fun!(ata_model::Union{MaximinModel,MinimaxModel}; kwargs...)
-    message = ["", ""]
+
     try
         compute_estimated_iif!(ata_model)
-        message = ["success", "- Estimated IIFs computed.\n"]
-        push!(ata_model.output.infos, message)
+        success!(ata_model, "Estimated IIFs computed.")
+
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

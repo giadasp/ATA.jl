@@ -483,7 +483,7 @@ function item_info(
         #i = (a.^2 ) .* ((1 .- p) ./ p) .* ((p .- c) ./ (1 .- c)).^2 
         i = pder .^ 2 ./ (p .* (1 .- p))
     else
-        error("GRM still not supported.\n")
+        error("GRM still not supported.")
         #i = pder .^ 2 ./ p
     end
     i = sum(i, dims = 3)[:, :, 1]

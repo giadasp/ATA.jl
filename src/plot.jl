@@ -17,11 +17,12 @@ function plot_results(ata_model::AbstractModel; plots_folder = "plots")
     if !isdir(plots_folder)
         mkdir(plots_folder)
     else
-        println(
+        success!(
+            ata_model,
             string(
                 "There is already a folder with this name, files in ",
                 plots_folder,
-                " will be overwritten.\n",
+                " will be overwritten.",
             ),
         )
     end

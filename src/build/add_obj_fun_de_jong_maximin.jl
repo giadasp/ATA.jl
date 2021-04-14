@@ -27,7 +27,7 @@ function add_obj_fun!(
     items_file = "",
     kwargs...,
 )
-    message = ["", ""]
+
     try
         if psychometrics
             de_jong_load_parameters_chain!(
@@ -37,16 +37,15 @@ function add_obj_fun!(
                 kwargs...,
             )
         end
-        message = ["success", "- IIFs for all item parameters samples computed.\n"]
+        success!(ata_model, "IIFs for all item parameters samples computed.")
         # open("opt/Settings.jl", "a") do f
         #     write(f, "K = $K\n\n")
         # end
 
-        push!(ata_model.output.infos, message)
+
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

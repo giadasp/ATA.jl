@@ -85,10 +85,8 @@ function _add_enemies!(ata_model::AbstractModel)
             ata_model.constraints[t].constr_A = A[t]
         end
         JLD2.@save "opt/ata_model.jld2" AbstractModel
-        push!(
-            ata_model.output.infos,
-            ["success", string("- ", nes, " enemy sets added and constrained.\n")],
-        )
+        success!(ata_model, string("", nes, " enemy sets added and constrained."))
+
     end
     return nothing
 end

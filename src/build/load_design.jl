@@ -11,14 +11,13 @@ Useful for loading a custom starting design before the `assemble!` step or to pr
 - **`ata_model::AbstractModel`** : Required. The model built with `start_ata()`, settings loaded by [`start_ata`](#ATA.start_ata).
 """
 function load_design!(design::Matrix{Any}, ata_model::AbstractModel)
-    message = ["", ""]
+
     try
         ata_model.output.design = Float64.(design)
-        push!(ata_model.output.infos, ["success", string("- Starting design loaded.\n")])
+        success!(ata_model, string("Starting design loaded."))
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

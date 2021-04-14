@@ -12,15 +12,11 @@ Group the items by friend sets once the friend sets have been added to the `ATA.
 - **`ata_model::AbstractModel`** : Required. The model built with `start_ata()`, settings loaded by [`start_ata`](#ATA.start_ata) function and friend sets added by [`add_friends!`](#ATA.add_friends!-Tuple{ATA.AbstractModel}) function.
 """
 function _group_by_friends!(ata_model::AbstractModel) #last
-    message = ["", ""]
     try
         n_items = ata_model.settings.n_items
         #only works for categorical variables and item use, all the other contraitns need expansion by fs_items
         if ata_model.settings.n_fs == 0
-            push!(
-                ata_model.output.infos,
-                ["danger", "No friend sets found, run start_ata() before.\n"],
-            )
+            error!(ata_model, "No friend sets found, run start_ata() before.")
             return nothing
         end
         if any([
@@ -78,9 +74,10 @@ function _group_by_friends!(ata_model::AbstractModel) #last
             #update ata_model.forced0
             ata_model.settings.forced0 = x_forced0_new
             DelimitedFiles.writedlm("opt/x_forced0.txt", x_forced0_new)
-            message[2] =
-                message[2] *
-                "- Categorical and linear quantitative constraints grouped by friend sets.\n"
+            success!(
+                ata_model,
+                "Categorical and linear quantitative constraints grouped by friend sets.",
+            )
         end
         #item use
         if ata_model.settings.to_apply[1]
@@ -94,7 +91,7 @@ function _group_by_friends!(ata_model::AbstractModel) #last
             open("opt/Settings.jl", "a") do f
                 write(f, "item_use_max = $item_use_max_new\n\n")
             end
-            message[2] = message[2] * "- Maximum item use grouped.\n"
+            success!(ata_model, "Maximum item use grouped.")
         end
         if ata_model.settings.to_apply[2]
             item_use_min = ata_model.settings.iu.min
@@ -107,14 +104,10 @@ function _group_by_friends!(ata_model::AbstractModel) #last
             open("opt/Settings.jl", "a") do f
                 write(f, "item_use_min = $item_use_min_new\n\n")
             end
-            message[2] = message[2] * "- Minimum item use grouped.\n"
+            success!(ata_model, "Minimum item use grouped.")
         end
-        message[1] = "success"
-        push!(message)
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string("", sprint(showerror, e)))
     end
     return nothing
 end

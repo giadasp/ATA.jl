@@ -23,7 +23,7 @@
 #             string(
 #                 "There is already a folder with this name, files in ",
 #                 results_folder,
-#                 " will be overwritten.\n",
+#                 " will be overwritten."),
 #             ),
 #         )
 #     end

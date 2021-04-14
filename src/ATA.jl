@@ -16,6 +16,7 @@ using Psychometrics
 using FileIO
 
 include("structs/structs.jl")
+include("log/log.jl")
 include("utils.jl")
 include("build/build.jl")
 include("opt.jl")
@@ -77,6 +78,7 @@ end
 
 export mean,
     start_ata,
+    add_bank!,
     add_constraints!,
     add_overlap!,
     add_obj_fun!,

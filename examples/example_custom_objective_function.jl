@@ -11,15 +11,12 @@ ata_model = start_ata(;
     bank_file = "data/bank.csv",
     bank_delim = ";",
 )
-print_last_info(ata_model)
 
 # 2. Add categorical constraints (Optional)
 add_constraints!(ata_model; constraints_file = "constraints.csv", constraints_delim = ";")
-print_last_info(ata_model)
 
 # 3. Add overlap maxima (Optional)
 add_overlap!(ata_model; overlap_file = "overlap_matrix.csv", overlap_delim = ";")
-print_last_info(ata_model)
 
 # custom objective type, function and arguments
 ata_model.obj.name = "custom"
@@ -54,6 +51,7 @@ ata_model.obj.args = (
     fs_items = ata_model.settings.fs.items,
 )
 
+print_infos(ata_model)
 # Assembly settings
 
 # SIMAN (Suggested for Large scale ATA):

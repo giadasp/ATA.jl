@@ -88,10 +88,7 @@ function assemble!(
             kwargs...,
         )
     else
-        push!(
-            ata_model.output.infos,
-            ["danger", "only \"siman\" and \"jump\" are supported.\n"],
-        )
+        error!(ata_model, "only \"siman\" and \"jump\" are supported.")
     end
     return nothing
 end

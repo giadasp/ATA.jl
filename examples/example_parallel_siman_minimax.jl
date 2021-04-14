@@ -23,19 +23,16 @@ ata_model = start_ata(;
     bank_file = "data/bank.csv",
     bank_delim = ";",
 );
-print_last_info(ata_model)
 
 # 2. Add categorical constraints (Optional)
 add_constraints!(ata_model; constraints_file = "constraints.csv", constraints_delim = ";");
-print_last_info(ata_model)
 
 # 3. Add overlap maxima (Optional)
 add_overlap!(ata_model; overlap_file = "overlap_matrix.csv", overlap_delim = ";");
-print_last_info(ata_model)
 
 # 4. Add objective function (Optional)
 add_obj_fun!(ata_model);
-print_last_info(ata_model)
+print_infos(ata_model)
 
 #Assembly settings
 

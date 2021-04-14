@@ -24,7 +24,7 @@ function add_obj_fun!(
     items_file = "",
     kwargs...,
 )
-    message = ["", ""]
+
     try
         if psychometrics
             compute_estimated_iif!(ata_model)
@@ -35,19 +35,18 @@ function add_obj_fun!(
                 kwargs...,
             )
         end
-        message = [
-            "success",
-            "- Objective function loaded.\n- IIFs computed.\n- Standard deviations computed.\n",
-        ]
+        success!(ata_model, "Objective function loaded.")
+        success!(ata_model, "IIFs computed.")
+        success!(ata_model, "Standard deviations computed.")
+
         # open("opt/Settings.jl", "a") do f
         #     write(f, "K = $K\n\n")
         # end
 
-        push!(ata_model.output.infos, message)
+
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

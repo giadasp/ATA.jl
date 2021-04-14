@@ -33,34 +33,41 @@ function start_ata(;
     bank_file = "bank.csv",
     bank_delim = ";",
 )
-    message = ["", ""]
+
     ata_model = NoObjModel()
-    Inputs = InputSettings()
-    if size(settings.T, 1) > 0
-        Inputs = settings
-        message[2] = message[2] * "- InputSettings object loaded.\n"
-    elseif !isfile(settings_file)
-        message[1] = "danger"
-        message[2] =
-            message[2] * string(
-                "Settings file with name ",
-                settings_file,
-                " does not exist. Provide a valid InputSettings object or a name of an existing file.\n",
-            )
-        push!(ata_model.output.infos, message)
-        return ata_model
-    else
-        try
-            Inputs = read_settings_file(settings_file)
-        catch e
-            message[1] = "danger"
-            message[2] = message[2] * "- Error in reading settings file.\n"
-            push!(ata_model.output.infos, message)
-            return ata_model
-        end
-        message[2] = message[2] * "- Settings file loaded.\n"
-    end
+
     try
+        #LOAD INPUT SETTINGS, if error return ata_model
+        Inputs = InputSettings()
+        if size(settings.T, 1) > 0
+            Inputs = settings
+            success!(ata_model, "InputSettings object loaded.")
+        elseif !isfile(settings_file)
+            error!(
+                ata_model,
+                string(
+                    "Settings file with name ",
+                    settings_file,
+                    " does not exist. Provide a valid InputSettings object or a name of an existing file.",
+                ),
+            )
+        else
+            try
+                Inputs = read_settings_file(settings_file)
+            catch e
+                error!(
+                    ata_model,
+                    string(
+                        "Error in reading the input settings file:\n  ",
+                        sprint(showerror, e),
+                        ".",
+                    ),
+                )
+            end
+            success!(ata_model, "Settings file loaded.")
+        end
+
+        #SELECT MODEL TYPE
         infos = ata_model.output.infos
         if Inputs.obj_type != ""
             if Inputs.obj_type == "maximin"
@@ -82,43 +89,29 @@ function start_ata(;
                     "Only \"maximin\", \"minimax\", \"cc_maximin\", \"soyster_maximin\", \"de_jong_maximin\", \"custom\" and \"\" objective types are supported.",
                 )
             end
-            message[2] =
-                message[2] * string("- ", ata_model.obj.name, " model initialized.\n")
-        else
-            ata_model = NoObjModel()
+            success!(ata_model, string(ata_model.obj.name, " model initialized."))
         end
         ata_model.output.infos = infos
-        #load bank
-        if size(bank, 1) > 0
-            ata_model.settings.bank = bank
-            message[2] = message[2] * "- Item bank dataframe loaded.\n"
-        elseif isfile(bank_file)
-            try
-                ata_model.settings.bank =
-                    CSV.read(bank_file, DataFrames.DataFrame, delim = bank_delim)
-            catch e
-                message[1] = "danger"
-                message[2] = message[2] * "- Error in reading the item bank file.\n"
-                return nothing
-            end
-            message[2] = message[2] * "- Item bank file loaded.\n"
+
+        #START ASSIGNING SETTINGS
+        if Inputs.n_groups > 0
+            ata_model.settings.n_groups = Inputs.n_groups
         else
-            push!(
-                ata_model.output.infos,
-                [
-                    "danger",
-                    "Item bank file with name ",
-                    bank_file,
-                    " does not exist. Provide a valid item bank dataframe or a name of an existing file.",
-                ],
-            )
-            return nothing
+            success!(ata_model, "n_groups has been set to 1.")
         end
-        ata_model.settings.n_groups = Inputs.n_groups
-        ata_model.settings.n_items = Inputs.n_items
-        ata_model.settings.T = Int(sum(Inputs.T))
-        ata_model.settings.Tg = Inputs.T
-        #initialize constraints
+        if Inputs.n_items > 0
+            ata_model.settings.n_items = Inputs.n_items
+        else
+            error!(ata_model, "n_items must be grater than 0.")
+        end
+        if Int(sum(Inputs.T)) > 0
+            ata_model.settings.T = Int(sum(Inputs.T))
+            ata_model.settings.Tg = Inputs.T
+        else
+            error!(ata_model, "Sum of T must be grater than 0.")
+        end
+
+        #INITIALIZE CONSTRAINTS
         ata_model.constraints = [Constraint() for t = 1:ata_model.settings.T]
         ata_model.settings.n_groups = size(Inputs.T, 1)
         x_forced0 = Vector{Vector{Bool}}(undef, ata_model.settings.T)
@@ -131,34 +124,23 @@ function start_ata(;
         if !isdir("opt")
             mkdir("opt")
         end
+
+        #ADD BANK
+        add_bank!(ata_model, bank = bank, bank_file = bank_file, bank_delim = bank_delim)
         #open("opt/Settings.jl", "w") do f
-        #write(f, "#Settings \n\n")
+        #write(f, "#Settings \n")
+
         #IRT
-        if Inputs.irt_model != ""
+        if (Inputs.irt_model != "")
             ata_model.settings.irt.model = Inputs.irt_model
-            ata_model.settings.irt.parameters = DataFrames.DataFrame(
-                ata_model.settings.bank[!, Symbol.(Inputs.irt_parameters)],
-            )
             ata_model.settings.irt.parametrization = Inputs.irt_parametrization
             ata_model.settings.irt.D = Inputs.irt_D
-
-            if ata_model.settings.irt.model == "1PL"
-                DataFrames.rename!(ata_model.settings.irt.parameters, [:b])#nqp values in interval\r\n",
-            elseif ata_model.settings.irt.model == "2PL"
-                DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b]) #nqp values in interval\r\n",
-            elseif ata_model.settings.irt.model == "3PL"
-                DataFrames.rename!(ata_model.settings.irt.parameters, [:a, :b, :c]) #nqp values in interval\r\n",
-            else
-                push!(
-                    ata_model.output.infos,
-                    ["danger", "Only 1PL, 2PL and 3PL IRT models are allowed."],
-                )
-                return nothing
+            if (size(ata_model.settings.bank, 1) == ata_model.settings.n_items)
+                _add_irt!(ata_model)
             end
-            CSV.write("opt/irt_parameters.csv", ata_model.settings.irt.parameters)
-            message[2] = message[2] * "- IRT item parameters loaded.\n"
         end
-        #test length
+
+        #TEST LENGTH
         if Inputs.length_min != Int64[]
             lengthmin = zeros(Int64, ata_model.settings.T)
             lengthweight = ones(Int64, ata_model.settings.T)
@@ -177,8 +159,8 @@ function start_ata(;
                     vcat(ata_model.constraints[t].constr_b, -lengthmin[t] * lengthweight[t])
                 ata_model.constraints[t].length_min = lengthmin[t]
             end
-            #write(f, "length_min = $lengthmin\n")
-            message[2] = message[2] * "- Minimum length of tests constrained.\n"
+            #write(f, "length_min = $lengthmin")
+            success!(ata_model, "Minimum length of tests constrained.")
         end
 
         if Inputs.length_max != Int64[]
@@ -199,32 +181,54 @@ function start_ata(;
                     vcat(ata_model.constraints[t].constr_b, lengthmax[t] * lengthweight[t])
                 ata_model.constraints[t].length_max = lengthmax[t]
             end
-            #write(f, "length_max = $lengthmax\n")
-            message[2] = message[2] * "- Maximum length of tests constrained.\n"
+            #write(f, "length_max = $lengthmax")
+            success!(ata_model, "Maximum length of tests constrained.")
         end
-        #fictiuos friend sets
+
+
+        #FICTIOUS FRIEND SETS
         ata_model.settings.n_fs = ata_model.settings.n_items
         ata_model.settings.fs.counts = ones(ata_model.settings.n_items)
         ata_model.settings.fs.sets = string.(collect(1:ata_model.settings.n_items))
         ata_model.settings.fs.items = [[i] for i = 1:ata_model.settings.n_items]
         ata_model.settings.forced0 = x_forced0
+
+
         if Inputs.friend_sets_var != String[]
             ata_model.settings.fs.var = Symbol.(Inputs.friend_sets_var)
-            val = Symbol.(Inputs.friend_sets_var)
-            _add_friends!(ata_model)
-            #write(f, "ata_model.settings.fs.var = $val\n\n")
-            message[2] = message[2] * "- Variable for Friend sets loaded.\n"
+            if size(ata_model.settings.bank, 1) == ata_model.settings.n_items
+                val = Symbol.(ata_model.settings.fs.var)
+                _add_friends!(ata_model)
+            else
+                error!(
+                    ata_model,
+                    string(
+                        "Variable for Friend sets NOT loaded because the provided item bank has length not equal to ",
+                        ata_model.settings.n_items,
+                        ".",
+                    ),
+                )
+            end
         end
         #enemy sets
         if Inputs.enemy_sets_var != String[]
             ata_model.settings.es.var = Symbol.(Inputs.enemy_sets_var)
-            val = Symbol.(Inputs.enemy_sets_var)
-            _add_enemies!(ata_model)
-            ##write(f, "enemy_sets_var = $val\n\n")
-            message[2] = message[2] * "- Variable for Enemy sets loaded.\n"
+            if size(ata_model.settings.bank, 1) == ata_model.settings.n_items
+                val = Symbol.(Inputs.enemy_sets_var)
+                _add_enemies!(ata_model)
+            else
+                error!(
+                    ata_model,
+                    string(
+                        "Variable for Enemy sets NOT loaded because the provided item bank has length not equal to ",
+                        ata_model.settings.n_items,
+                        ".",
+                    ),
+                )
+            end
         end
 
-        #expected score
+        #EXPECTED SCORE
         if Inputs.expected_score_var != String[]
             t1 = 1
             for g = 1:ata_model.settings.n_groups, t = 1:ata_model.settings.Tg[g]
@@ -232,7 +236,7 @@ function start_ata(;
                     Symbol.(Inputs.expected_score_var[g])
                 t1 += 1
             end
-            message[2] = message[2] * "- Expected score variable loaded.\n"
+            success!(ata_model, "Expected score variable loaded.")
         end
         if Inputs.expected_score_pts != Float64[]
             t1 = 1
@@ -246,7 +250,7 @@ function start_ata(;
                 ata_model.constraints[t1].expected_score.pts = [0.0]
                 t1 += 1
             end
-            message[2] = message[2] * "- Expected score points loaded.\n"
+            success!(ata_model, "Expected score points loaded.")
         end
         min_exp_score = false
         max_exp_score = false
@@ -259,7 +263,7 @@ function start_ata(;
                         Inputs.expected_score_min[g]
                     t1 += 1
                 end
-                message[2] = message[2] * "- Lower bounds for expected score loaded.\n"
+                success!(ata_model, "Lower bounds for expected score loaded.")
             end
         end
         if size(Inputs.expected_score_max, 1) > 0
@@ -271,68 +275,32 @@ function start_ata(;
                         Inputs.expected_score_max[g]
                     t1 += 1
                 end
-                message[2] = message[2] * "- Upper bounds for expected score loaded.\n"
+                success!(ata_model, "Upper bounds for expected score loaded.")
             end
         end
-        if max_exp_score || min_exp_score
-            _add_exp_score!(ata_model)
-            message[2] = message[2] * "- Expected scores (ICFs) computed.\n"
-        end
-        #sum vars
-        if Inputs.sum_vars != Vector{Vector{String}}(undef, 0)
-            t1 = 1
-            for g = 1:ata_model.settings.n_groups
-                if !ismissing(sum_vars_min[g])
-                    for v = 1:length(Inputs.sum_vars[g])
-                        var = ata_model.settings.bank[Symbol(Inputs.sum_vars[g][v])]
-                        var[ismissing.(var)] .= zero(Float64)
-                        #min
-                        if !ismissing(sum_vars_min[g][v])
-                            for t = 1:ata_model.settings.Tg[g]
-                                if g > 1
-                                    t1 = (g - 1) * Tg[g-1] + t
-                                else
-                                    t1 = copy(t)
-                                end
-                                ata_model.constraints[t1].constr_A =
-                                    vcat(ata_model.constraints[t1].constr_A, .-var')
-                                ata_model.constraints[t1].constr_b = vcat(
-                                    ata_model.constraints[t1].constr_b,
-                                    -sum_vars_min[g],
-                                )
-                            end
-                        end
-                        #min
-                        if !ismissing(sum_vars_max[g][v])
-                            for t = 1:ata_model.settings.Tg[g]
-                                if g > 1
-                                    t1 = (g - 1) * Tg[g-1] + t
-                                else
-                                    t1 = copy(t)
-                                end
-                                ata_model.constraints[t1].constr_A =
-                                    vcat(ata_model.constraints[t1].constr_A, var')
-                                ata_model.constraints[t1].constr_b = vcat(
-                                    ata_model.constraints[t1].constr_b,
-                                    sum_vars_max[g],
-                                )
-                            end
-                        end
-                    end
-                end
+        if (max_exp_score || min_exp_score)
+            if size(ata_model.settings.bank, 1) == ata_model.settings.n_items
+                _add_exp_score!(ata_model)
+            else
+                error!(
+                    ata_model,
+                    string(
+                        "Expected scores (ICFs) based on IRT parameters NOT computed because the provided item bank has length not equal to ",
+                        ata_model.settings.n_items,
+                        ".",
+                    ),
+                )
             end
-            message[2] =
-                message[2] *
-                string("- Sum of variables", Inputs.sum_vars, " constrained.\n")
         end
+
+        #ITEM USE
         if size(Inputs.item_use_min, 1) > 0
             if any(Inputs.item_use_min .> 0)
                 ata_model.settings.iu.min = Inputs.item_use_min
                 ata_model.settings.to_apply[2] = true
-                message[2] = message[2] * "- Minimum item use constrained.\n"
+                success!(ata_model, "Minimum item use constrained.")
             end
         end
-        #item use
         if size(Inputs.item_use_max, 1) > 0
             if any(Inputs.item_use_max .< ata_model.settings.T)
                 ata_model.settings.iu.max = Inputs.item_use_max
@@ -340,10 +308,11 @@ function start_ata(;
                     x_forced0[v][findall(ata_model.settings.iu.max .< 1)] .= false
                 end
                 ata_model.settings.to_apply[1] = true
-                message[2] = message[2] * "- Maximum item use constrained.\n"
+                success!(ata_model, "Maximum item use constrained.")
             end
         end
-        #obj_fun
+
+        #OBJECTIVE FUNCTION
         if Inputs.obj_type in ["maximin"]
             ata_model.obj.cores =
                 [MaximinObjectiveCore() for t = 1:sum(ata_model.settings.Tg)]
@@ -353,14 +322,11 @@ function start_ata(;
                     ata_model.obj.cores[t1].points = Inputs.obj_points[g]
                     t1 += 1
                 end
-                message[2] = message[2] * "- Optimization points loaded.\n"
+                success!(ata_model, "Optimization points loaded.")
             else
-                push!(
-                    ata_model.output.infos,
-                    [
-                        "danger",
-                        "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
-                    ],
+                error!(
+                    ata_model,
+                    "maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.",
                 )
                 return nothing
             end
@@ -375,21 +341,20 @@ function start_ata(;
                     t1 += 1
                 end
                 ata_model.obj.R = Inputs.obj_aux_int
-                message[2] =
-                    message[2] * string(
-                        "- Optimization points, number of samples (",
+                success!(
+                    ata_model,
+                    string(
+                        "Optimization points, number of samples (",
                         ata_model.obj.R,
                         "), and alpha (",
                         Inputs.obj_aux_float,
-                        ") loaded.\n",
-                    )
+                        ") loaded.",
+                    ),
+                )
             else
-                push!(
-                    ata_model.output.infos,
-                    [
-                        "danger",
-                        "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
-                    ],
+                error!(
+                    ata_model,
+                    "maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.",
                 )
                 return nothing
             end
@@ -403,16 +368,14 @@ function start_ata(;
                     t1 += 1
                 end
                 ata_model.obj.R = Inputs.obj_aux_int
-                message[2] =
-                    message[2] *
-                    "- Optimization points and number of replications loaded.\n"
+                success!(
+                    ata_model,
+                    "Optimization points and number of replications loaded.",
+                )
             else
-                push!(
-                    ata_model.output.infos,
-                    [
-                        "danger",
-                        "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
-                    ],
+                error!(
+                    ata_model,
+                    "maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.",
                 )
                 return nothing
             end
@@ -427,21 +390,20 @@ function start_ata(;
                 end
                 ata_model.obj.R = Inputs.obj_aux_int
                 ata_model.obj.Gamma = Inputs.obj_aux_float
-                message[2] =
-                    message[2] * string(
-                        "- Optimization points, number of samples (",
+                success!(
+                    ata_model,
+                    string(
+                        "Optimization points, number of samples (",
                         ata_model.obj.R,
                         "), and Gamma (",
                         ata_model.obj.Gamma,
-                        ") loaded.\n",
-                    )
+                        ") loaded.",
+                    ),
+                )
             else
-                push!(
-                    ata_model.output.infos,
-                    [
-                        "danger",
-                        "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
-                    ],
+                error!(
+                    ata_model,
+                    "maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.",
                 )
                 return nothing
             end
@@ -454,14 +416,11 @@ function start_ata(;
                     ata_model.obj.cores[t1].points = Inputs.obj_points[g]
                     t1 += 1
                 end
-                message[2] = message[2] * "- Optimization points loaded.\n"
+                success!(ata_model, "Optimization points loaded.")
             else
-                push!(
-                    ata_model.output.infos,
-                    [
-                        "danger",
-                        "- maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.\n",
-                    ],
+                error!(
+                    ata_model,
+                    "maximin, cc_maximin, soyster_maximin, de_jong_maximin, robust_maximin, and minimax objective functions require optimization points. Use obj_points field in input settings.",
                 )
                 return nothing
             end
@@ -469,20 +428,17 @@ function start_ata(;
                 t1 = 1
                 for g = 1:ata_model.settings.n_groups
                     if size(Inputs.obj_targets[g], 1) != size(Inputs.obj_points[g], 1)
-                        push!(
-                            ata_model.output.infos,
-                            [
-                                "danger",
-                                string(
-                                    "- For group ",
-                                    g,
-                                    " size of obj_targets (",
-                                    size(Inputs.obj_targets[g], 1),
-                                    ") is not the same as size of obj_points (",
-                                    size(Inputs.obj_points[g], 1),
-                                    ").\n",
-                                ),
-                            ],
+                        error!(
+                            ata_model,
+                            string(
+                                "For group ",
+                                g,
+                                " size of obj_targets (",
+                                size(Inputs.obj_targets[g], 1),
+                                ") is not the same as size of obj_points (",
+                                size(Inputs.obj_points[g], 1),
+                                ").",
+                            ),
                         )
                         return nothing
                     end
@@ -491,14 +447,11 @@ function start_ata(;
                         t1 += 1
                     end
                 end
-                message[2] = message[2] * "- Targets loaded.\n"
+                success!(ata_model, "Targets loaded.")
             else
-                push!(
-                    ata_model.output.infos,
-                    [
-                        "danger",
-                        "- minimax objective function requires targets. Use obj_targets field in input settings.\n",
-                    ],
+                error!(
+                    ata_model,
+                    "minimax objective function requires targets. Use obj_targets field in input settings.",
                 )
                 return nothing
             end
@@ -507,30 +460,28 @@ function start_ata(;
         if Inputs.categories != String[]
             val = Symbol.(Inputs.categories)
             ata_model.output.categories = copy(val)
-            #write(f, "categories = $val\n\n")
-            message[2] = message[2] * "- Categories for output loaded.\n"
+            #write(f, "categories = $val\n")
+            success!(ata_model, "Categories for output loaded.")
         end
 
         #overlap matrix
         ata_model.settings.ol_max =
             zeros(Float64, ata_model.settings.T, ata_model.settings.T)
         #end
-        message[2] =
-            message[2] * string(
+        success!(
+            ata_model,
+            string(
                 "ASSEMBLE ",
                 ata_model.settings.T,
                 " FORMS DIVIDED INTO ",
                 ata_model.settings.n_groups,
-                " GROUPS.\n",
-            )
+                " GROUPS.",
+            ),
+        )
         #update model
         JLD2.@save "opt/ata_model.jld2" ata_model
-        message[1] = "success"
-        push!(ata_model.output.infos, message)
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
     end
     return ata_model
 end

@@ -6,9 +6,6 @@ mutable struct Constraint
     mean_vars::Vector{Symbol} # constrain the mean to be
     mean_vars_min::Vector{Float64}
     mean_vars_max::Vector{Float64}
-    sum_vars::Vector{Symbol}# constrain the sum to be
-    sum_vars_min::Vector{Float64}
-    sum_vars_max::Vector{Float64}
     constr_A::Matrix{Float64}
     constr_b::Vector{Float64}
     # ol_max::Matrix{Int64}
@@ -19,9 +16,6 @@ mutable struct Constraint
         mean_vars,
         mean_vars_min,
         mean_vars_max,
-        sum_vars,
-        sum_vars_min,
-        sum_vars_max,
         constr_A,
         constr_b,
     ) = new(
@@ -31,9 +25,6 @@ mutable struct Constraint
         mean_vars,
         mean_vars_min,
         mean_vars_max,
-        sum_vars,
-        sum_vars_min,
-        sum_vars_max,
         constr_A,
         constr_b,
     )
@@ -41,9 +32,6 @@ mutable struct Constraint
         zero(Int64),
         10000000,
         ExpectedScore(),
-        Vector{Symbol}(undef, 0),
-        Vector{Float64}(undef, 0),
-        Vector{Float64}(undef, 0),
         Vector{Symbol}(undef, 0),
         Vector{Float64}(undef, 0),
         Vector{Float64}(undef, 0),

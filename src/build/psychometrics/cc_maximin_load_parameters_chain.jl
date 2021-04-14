@@ -4,7 +4,7 @@ function cc_maximin_load_parameters_chain!(
     items::Vector{Psychometrics.Item} = Psychometrics.Item[],
     kwargs...,
 )
-    message = ["", ""]
+
 
     try
         T = ata_model.settings.T
@@ -16,11 +16,12 @@ function cc_maximin_load_parameters_chain!(
         R = ata_model.obj.R
         n_items = ata_model.settings.n_items
         if !isfile(items_file) || (size(items, 1) > 0)
-            error(
+            error!(
+                ata_model,
                 string(
-                    "- ",
+                    "",
                     items_file,
-                    " does not exist.\nProvide a `Psychometrics.Item` vector through the `items` argument, or the name of a file which can be loaded by `FileIO` that contains that vector through the `items_file` argument.\n",
+                    " does not exist.\nProvide a `Psychometrics.Item` vector through the `items` argument, or the name of a file which can be loaded by `FileIO` that contains that vector through the `items_file` argument.",
                 ),
             )
         elseif isfile(items_file)
@@ -88,9 +89,8 @@ function cc_maximin_load_parameters_chain!(
         JLD2.@save "opt/IIF_CC.jld2" IIF
         JLD2.@save "opt/ICF_CC.jld2" ICF
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

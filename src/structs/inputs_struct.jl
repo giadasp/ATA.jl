@@ -4,7 +4,6 @@ mutable struct InputSettings
     n_groups::Int64
     groups::Vector{String}
     irt_model::String
-    irt_parameters::Vector{String}
     irt_parametrization::String
     irt_D::Float64
     enemy_sets_var::Vector{String}
@@ -21,9 +20,6 @@ mutable struct InputSettings
     mean_vars::Vector{Vector{String}}
     mean_vars_min::Vector{Vector{Float64}}
     mean_vars_max::Vector{Vector{Float64}}
-    sum_vars::Vector{Vector{String}}
-    sum_vars_min::Vector{Vector{Float64}}
-    sum_vars_max::Vector{Vector{Float64}}
     obj_type::String
     obj_points::Vector{Vector{Float64}}
     obj_targets::Vector{Vector{Float64}}
@@ -36,7 +32,6 @@ mutable struct InputSettings
         n_groups,
         groups,
         irt_model,
-        irt_parameters,
         irt_parametrization,
         irt_D,
         enemy_sets_var,
@@ -53,9 +48,6 @@ mutable struct InputSettings
         mean_vars,
         mean_vars_min,
         mean_vars_max,
-        sum_vars,
-        sum_vars_min,
-        sum_vars_max,
         obj_type,
         obj_points,
         obj_targets,
@@ -68,7 +60,6 @@ mutable struct InputSettings
         n_groups,
         groups,
         irt_model,
-        irt_parameters,
         irt_parametrization,
         irt_D,
         enemy_sets_var,
@@ -85,9 +76,6 @@ mutable struct InputSettings
         mean_vars,
         mean_vars_min,
         mean_vars_max,
-        sum_vars,
-        sum_vars_min,
-        sum_vars_max,
         obj_type,
         obj_points,
         obj_targets,
@@ -101,7 +89,6 @@ mutable struct InputSettings
         n_groups = zero(Int64),
         groups = String[],
         irt_model = "",
-        irt_parameters = String[],
         irt_parametrization = "at-b",
         irt_D = 1.0,
         enemy_sets_var = String[],
@@ -118,9 +105,6 @@ mutable struct InputSettings
         mean_vars = Vector{Vector{String}}(undef, 0),
         mean_vars_min = Vector{Vector{Float64}}(undef, 0),
         mean_vars_max = Vector{Vector{Float64}}(undef, 0),
-        sum_vars = Vector{Vector{String}}(undef, 0),
-        sum_vars_min = Vector{Vector{Float64}}(undef, 0),
-        sum_vars_max = Vector{Vector{Float64}}(undef, 0),
         obj_type = "",
         obj_points = Vector{Vector{Float64}}(undef, 0),
         obj_targets = Vector{Vector{Float64}}(undef, 0),
@@ -134,7 +118,6 @@ mutable struct InputSettings
             n_groups,
             groups,
             irt_model,
-            irt_parameters,
             irt_parametrization,
             irt_D,
             enemy_sets_var,
@@ -151,9 +134,6 @@ mutable struct InputSettings
             mean_vars,
             mean_vars_min,
             mean_vars_max,
-            sum_vars,
-            sum_vars_min,
-            sum_vars_max,
             obj_type,
             obj_points,
             obj_targets,

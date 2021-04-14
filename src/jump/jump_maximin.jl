@@ -12,47 +12,44 @@ function jump!(
     optimizer_attributes = [("tm_lim", 500000), ("msg_lev", 3)],
     kwargs...,
 )
-    message = ["", ""]
+
     try
         if !isdir(results_folder)
             mkdir(results_folder)
         else
-            message[2] =
-                message[2] * string(
-                    "- There is already a folder with this name, files in ",
+            success!(
+                ata_model,
+                string(
+                    "There is already a folder with this name, files in ",
                     results_folder,
-                    " will be overwritten.\n",
-                )
+                    " will be overwritten.",
+                ),
+            )
         end
         n_items = ata_model.settings.n_items
         if ata_model.obj.name in
            ["maximin", "minimax", "soyster_maximin", "de_jong_maximin"]
             if any([size(ata_model.obj.cores[t].IIF, 1) > 0 for t = 1:ata_model.settings.T])
                 IIF = [ata_model.obj.cores[t].IIF for t = 1:ata_model.settings.T]
-                message[2] =
-                    message[2] * string(
-                        "- Assembling tests with ",
-                        ata_model.obj.name,
-                        " objective...\n",
-                    )
+                success!(
+                    ata_model,
+                    string("Assembling tests with ", ata_model.obj.name, " objective..."),
+                )
             else
-                message[1] = "danger"
-                message[2] =
-                    message[2] *
-                    "- IIFs have not been computed. Run add_obj_fun!() first.\n"
-                push!(ata_model.output.infos, message)
+                error!(ata_model, "IIFs have not been computed. Run add_obj_fun!() first.")
+
                 return nothing
             end
         elseif ata_model.obj.name == "cc_maximin"
-            message[1] = "danger"
-            message[2] =
-                message[2] *
-                "- You must use the siman solver to assemble tests with chance-constrained MAXIMIN objective function.\n"
-            push!(ata_model.output.infos, message)
+            error!(
+                ata_model,
+                "You must use the siman solver to assemble tests with chance-constrained MAXIMIN objective function.",
+            )
+
             return nothing
         elseif ata_model.obj.name == ""
             IIF = []
-            message[2] = message[2] * "- Assembling tests with NO objective function...\n"
+            success!(ata_model, "Assembling tests with NO objective function...")
         end
 
         if ata_model.settings.n_fs == 0
@@ -215,10 +212,8 @@ function jump!(
                     size(starting_design, 1) != ata_model.settings.n_fs ||
                     size(starting_design, 2) != ata_model.settings.T
                 )
-                    message[1] = "danger"
-                    message[2] =
-                        message[2] * "- Starting design must be of size: (n_fs x T).\n"
-                    push!(ata_model.output.infos, message)
+                    error!(ata_model, "Starting design must be of size: (n_fs x T).")
+
                     return nothing
                 end
             else
@@ -226,17 +221,14 @@ function jump!(
                     size(starting_design, 1) != ata_model.settings.n_items ||
                     size(starting_design, 2) != ata_model.settings.T
                 )
-                    message[1] = "danger"
-                    message[2] =
-                        message[2] * "- Starting design must be of size: (I x T).\n"
-                    push!(ata_model.output.infos, message)
+                    error!(ata_model, "Starting design must be of size: (I x T).")
+
                     return nothing
                 end
             end
             if any((ata_model.output.design .!= 0.0) .& (ata_model.output.design .!= 1.0))
-                message[1] = "danger"
-                message[2] = message[2] * "- Starting design must contain only 1s or 0s.\n"
-                push!(ata_model.output.infos, message)
+                error!(ata_model, "Starting design must contain only 1s or 0s.")
+
                 return nothing
             end
         else
@@ -409,20 +401,19 @@ function jump!(
             JuMP.@objective(m, Min, epsilon)
         end
         JuMP.optimize!(m)
-        message[1] = "success"
-        message[2] =
-            message[2] *
-            string("- The model has termination status:", JuMP.termination_status(m), "\n.")
+        success!(
+            ata_model,
+            string("The model has termination status:", JuMP.termination_status(m), "."),
+        )
         #println(string("The model has termination status:", JuMP.termination_status(m)))
         design = abs.(round.(JuMP.value.(x)))
         DelimitedFiles.writedlm(string(results_folder, "/design.csv"), design)
         ata_model.output.design = design
         JLD2.@save string(results_folder, "/ata_model.jld2") ata_model
-        push!(ata_model.output.infos, message)
+
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end

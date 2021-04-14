@@ -27,7 +27,7 @@ function add_obj_fun!(
     items_file = "",
     kwargs...,
 )
-    message = ["", ""]
+
     try
         if psychometrics
             soyster_load_parameters_chain!(
@@ -36,13 +36,12 @@ function add_obj_fun!(
                 items = items,
                 kwargs...,
             )
-            message = ["success", "- IIFs for all item parameters samples computed.\n"]
-            push!(ata_model.output.infos, message)
+            success!(ata_model, "IIFs for all item parameters samples computed.")
+
         end
     catch e
-        message[1] = "danger"
-        message[2] = message[2] * string("- ", sprint(showerror, e), "\n")
-        push!(ata_model.output.infos, message)
+        error!(ata_model, string(sprint(showerror, e)))
+
     end
     return nothing
 end
