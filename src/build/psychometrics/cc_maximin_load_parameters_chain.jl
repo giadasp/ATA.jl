@@ -37,17 +37,17 @@ function cc_maximin_load_parameters_chain!(
             ICF[t] = zeros(K[t], n_items, R)
             #check if chain has length R
             if size(items[1].parameters.chain, 1) != R
-                error("Item 1 does not have R=", R, " chains.")
+                error!(ata_model,string("Item 1 does not have R=", R, " chains."))
             end
             for r = 1:R
                 if irt_model == "1PL"
                     if !(items[1].parameters isa Psychometrics.Parameters1PL)
-                        error("Item 1 is not of type ", irt_model, ".")
+                        error!(ata_model, string("Item 1 is not of type ", irt_model, "."))
                     end
                     df = DataFrames.DataFrame(b = map(i -> i.parameters.chain[r], items))
                 elseif irt_model == "2PL"
                     if !(items[1].parameters isa Psychometrics.Parameters2PL)
-                        error("Item 1 is not of type ", irt_model, ".")
+                        error!(ata_model, string("Item 1 is not of type ", irt_model, "."))
                     end
                     df = DataFrames.DataFrame(
                         a = map(i -> i.parameters.chain[r][1], items),
@@ -55,7 +55,7 @@ function cc_maximin_load_parameters_chain!(
                     )
                 elseif irt_model == "3PL"
                     if !(items[1].parameters isa Psychometrics.Parameters3PL)
-                        error("Item 1 is not of type ", irt_model, ".")
+                        error!(ata_model, string("Item 1 is not of type ", irt_model, "."))
                     end
                     df = DataFrames.DataFrame(
                         a = map(i -> i.parameters.chain[r][1], items),

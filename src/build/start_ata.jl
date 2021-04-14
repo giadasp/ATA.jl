@@ -85,8 +85,8 @@ function start_ata(;
             elseif Inputs.obj_type == "custom"
                 ata_model = CustomModel()
             else
-                error(
-                    "Only \"maximin\", \"minimax\", \"cc_maximin\", \"soyster_maximin\", \"de_jong_maximin\", \"custom\" and \"\" objective types are supported.",
+                error!(ata_model,
+                    "Only \"maximin\", \"minimax\", \"cc_maximin\", \"soyster_maximin\", \"de_jong_maximin\", \"custom\" and \"\" objective types are supported."
                 )
             end
             success!(ata_model, string(ata_model.obj.name, " model initialized."))

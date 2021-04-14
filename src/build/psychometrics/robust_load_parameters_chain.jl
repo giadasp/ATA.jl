@@ -39,16 +39,16 @@ function robust_load_parameters_chain!(
         for i = 1:n_items
             item = items[i]
             if size(item.parameters.chain, 1) != R
-                error("Item 1 does not have R=", R, " chains.")
+                error!(ata_model, string("Item 1 does not have R=", R, " chains."))
             end
             if irt_model == "1PL"
                 if !(item.parameters isa Psychometrics.Parameters1PL)
-                    error("Item 1 is not of type ", irt_model, ".")
+                    error!(ata_model, string("Item 1 is not of type ", irt_model, "."))
                 end
                 df = DataFrames.DataFrame(b = [item.parameters.chain[r][1]])
             elseif irt_model == "2PL"
                 if !(item.parameters isa Psychometrics.Parameters2PL)
-                    error("Item 1 is not of type ", irt_model, ".")
+                    error!(ata_model, string("Item 1 is not of type ", irt_model, "."))
                 end
                 df = DataFrames.DataFrame(
                     a = [item.parameters.chain[r][1] for r = 1:R],
@@ -56,7 +56,7 @@ function robust_load_parameters_chain!(
                 )
             elseif irt_model == "3PL"
                 if !(item.parameters isa Psychometrics.Parameters3PL)
-                    error("Item 1 is not of type ", irt_model, ".")
+                    error!(ata_model, string("Item 1 is not of type ", irt_model, "."))
                 end
                 df = DataFrames.DataFrame(
                     a = [item.parameters.chain[r][1] for r = 1:R],
