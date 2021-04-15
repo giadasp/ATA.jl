@@ -371,21 +371,20 @@ function jump!(
                     m,
                     sum(
                         (
-                            round(IIF_new[t][k, i]; digits = 4) -
-                            (first_Gamma_plus_one_d_i_gamma[i] .- d_l)
+                            max(0.0, round(IIF_new[t][k, i]; digits = 4) -
+                            (first_Gamma_plus_one_d_i_gamma[i] .- d_l))
                         ) * x[i, t] for i = 1:ata_model.settings.n_fs
-                    ) - (ata_model.obj.Gamma * d_l) >= w
+                    ) >= w
                 )
                 #end
-                println(d_l)
-                println(ata_model.obj.Gamma * d_l)
-                println(first_Gamma_plus_one_d_i_gamma)
-
             end
+            println(d_l)
+            println(ata_model.obj.Gamma * d_l)
+            println(first_Gamma_plus_one_d_i_gamma .- d_l)
             JuMP.@objective(m, Min, (-w))
             JuMP.optimize!(m)
             design_gamma[gamma] = abs.(round.(JuMP.value.(x)))
-            f_gamma[gamma] = JuMP.value(w)
+            f_gamma[gamma] = JuMP.value(w) - (ata_model.obj.Gamma * d_l)
             success!(
                 ata_model,
                 string(
@@ -393,7 +392,7 @@ function jump!(
                     gamma,
                     " the model had termination status:",
                     JuMP.termination_status(m),
-                    ".",
+                    " and f* = ", f_gamma[gamma]
                 ),
             )
         end
