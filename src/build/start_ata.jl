@@ -214,7 +214,6 @@ function start_ata(;
         if Inputs.enemy_sets_var != String[]
             ata_model.settings.es.var = Symbol.(Inputs.enemy_sets_var)
             if size(ata_model.settings.bank, 1) == ata_model.settings.n_items
-                val = Symbol.(Inputs.enemy_sets_var)
                 _add_enemies!(ata_model)
             else
                 error!(

@@ -169,9 +169,6 @@ function jump!(
         design_gamma = Vector{Matrix{Float64}}(undef, ata_model.obj.Gamma + 1)
         d_i = ata_model.obj.cores[1].standard_deviation[1, :]
         order_d_i = sortperm(d_i; rev = true)
-        first_Gamma_plus_one = order_d_i[1:(ata_model.obj.Gamma+1)]
-        # first_Gamma_plus_one_d_i = copy(d_i)
-        # first_Gamma_plus_one_d_i[set_to_zero] .= 0.0
         for gamma = 1:(ata_model.obj.Gamma+1)
             m = JuMP.Model()
             if optimizer_constructor == "GLPK"
@@ -360,8 +357,6 @@ function jump!(
             end
 
             #! works only when K=1 and when obj_points_t = obj_points_t' for all t != t'
-            set_to_zero =
-                order_d_i[min(ata_model.settings.n_fs, (ata_model.obj.Gamma + 2)):end]
             d_l = d_i[order_d_i[gamma]]
             first_Gamma_plus_one_d_i_gamma = copy(d_i)
             first_Gamma_plus_one_d_i_gamma[order_d_i[gamma:end]] .= d_l
@@ -379,9 +374,13 @@ function jump!(
                             round(IIF_new[t][k, i]; digits = 4) -
                             (first_Gamma_plus_one_d_i_gamma[i] .- d_l)
                         ) * x[i, t] for i = 1:ata_model.settings.n_fs
-                    ) - ata_model.obj.Gamma * d_l >= w
+                    ) - (ata_model.obj.Gamma * d_l) >= w
                 )
                 #end
+                println(d_l)
+                println(ata_model.obj.Gamma * d_l)
+                println(first_Gamma_plus_one_d_i_gamma)
+
             end
             JuMP.@objective(m, Min, (-w))
             JuMP.optimize!(m)
