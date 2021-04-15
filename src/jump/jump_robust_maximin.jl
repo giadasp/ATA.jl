@@ -389,9 +389,9 @@ function jump!(
                 )
                 #end
             end
-            println(d_l)
-            println(ata_model.obj.Gamma * d_l)
-            println(first_Gamma_plus_one_d_i_gamma .- d_l)
+            # println(d_l)
+            # println(ata_model.obj.Gamma * d_l)
+            # println(first_Gamma_plus_one_d_i_gamma .- d_l)
             JuMP.@objective(m, Min, (-w))
             JuMP.optimize!(m)
             design_gamma[gamma] = abs.(round.(JuMP.value.(x)))
