@@ -358,8 +358,10 @@ function jump!(
 
             #! works only when K=1 and when obj_points_t = obj_points_t' for all t != t'
             d_l = d_i[order_d_i[gamma]]
-            first_Gamma_plus_one_d_i_gamma = copy(d_i)
-            first_Gamma_plus_one_d_i_gamma[order_d_i[gamma:end]] .= d_l
+            ones_gamma = ones(Float64, size(d_i, 1))
+            ones_gamma[order_d_i[gamma:end]] .= 0.0
+            # first_Gamma_plus_one_d_i_gamma = copy(d_i)
+            # first_Gamma_plus_one_d_i_gamma[order_d_i[gamma:end]] .= d_l
             #Objective bound
             JuMP.@variable(m, w >= 0)
 
@@ -367,14 +369,23 @@ function jump!(
 
                 #for k = 1:size(ata_model.obj.cores[t].points, 1)
                 k = 1
+                # JuMP.@constraint(
+                #     m,
+                #     sum(
+                #         (
+                #             max(0.0, round(IIF_new[t][k, i]; digits = 4) -
+                #             (first_Gamma_plus_one_d_i_gamma[i] .- d_l))
+                #         ) * x[i, t] for i = 1:ata_model.settings.n_fs
+                #     ) >= w
+                # )
                 JuMP.@constraint(
                     m,
                     sum(
-                        (
-                            max(0.0, round(IIF_new[t][k, i]; digits = 4) -
-                            (first_Gamma_plus_one_d_i_gamma[i] .- d_l))
-                        ) * x[i, t] for i = 1:ata_model.settings.n_fs
-                    ) >= w
+                            max(0.0, round(IIF_new[t][k, i]; digits = 4) - 
+                                (d_i[i]*ones_gamma[i]) + 
+                                (d_l * (ones_gamma[i] - (ata_model.obj.Gamma /size(d_i, 1))))
+                            ) * x[i, t] for i = 1:ata_model.settings.n_fs
+                        ) >= w
                 )
                 #end
             end
@@ -384,7 +395,14 @@ function jump!(
             JuMP.@objective(m, Min, (-w))
             JuMP.optimize!(m)
             design_gamma[gamma] = abs.(round.(JuMP.value.(x)))
-            f_gamma[gamma] = JuMP.value(w) - (ata_model.obj.Gamma * d_l)
+            f_gamma[gamma] = JuMP.value(w) #- (ata_model.obj.Gamma * d_l)
+            println(string(
+                "With l =",
+                gamma,
+                " the model had termination status:",
+                JuMP.termination_status(m),
+                " and f* = ", f_gamma[gamma]
+            ))
             success!(
                 ata_model,
                 string(
