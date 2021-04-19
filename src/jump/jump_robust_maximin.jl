@@ -167,8 +167,8 @@ function jump!(
         ################################################################################
         f_gamma = zeros(ata_model.obj.Gamma + 1)
         design_gamma = Vector{Matrix{Float64}}(undef, ata_model.obj.Gamma + 1)
-        d_i = ata_model.obj.cores[1].standard_deviation[1, :]
-        order_d_i = sortperm(d_i; rev = true)
+        d_i = [min.(ata_model.obj.cores[t].standard_deviation[1, :], IIF_new[t][1, :]) for t=1:ata_model.settings.T]
+        order_d_i = [sortperm(d_i[t]; rev = true) for t=1:ata_model.settings.T]
         for gamma = 1:(ata_model.obj.Gamma+1)
             m = JuMP.Model()
             if optimizer_constructor == "GLPK"
@@ -357,9 +357,11 @@ function jump!(
             end
 
             #! works only when K=1 and when obj_points_t = obj_points_t' for all t != t'
-            d_l = d_i[order_d_i[gamma]]
-            ones_gamma = ones(Float64, size(d_i, 1))
-            ones_gamma[order_d_i[gamma:end]] .= 0.0
+            d_l = [d_i[t][order_d_i[t][gamma]] for t=1:ata_model.settings.T]
+            ones_gamma = [ones(Float64, size(d_i[t], 1)) for t=1:ata_model.settings.T]
+            for t=1:ata_model.settings.T
+                ones_gamma[t][order_d_i[t][gamma:end]] .= 0.0
+            end
             # first_Gamma_plus_one_d_i_gamma = copy(d_i)
             # first_Gamma_plus_one_d_i_gamma[order_d_i[gamma:end]] .= d_l
             #Objective bound
@@ -381,10 +383,9 @@ function jump!(
                 JuMP.@constraint(
                     m,
                     sum(
-                            max(0.0, round(IIF_new[t][k, i]; digits = 4) - 
-                                (d_i[i]*ones_gamma[i]) + 
-                                (d_l * (ones_gamma[i] - (ata_model.obj.Gamma /size(d_i, 1))))
-                            ) * x[i, t] for i = 1:ata_model.settings.n_fs
+                            (round(IIF_new[t][k, i]; digits = 4) + 
+                                (d_i[t][i] - d_l[t]) * ones_gamma[t][i]) * x[i, t] - (d_l[t] * ata_model.obj.Gamma)
+                                 for i = 1:ata_model.settings.n_fs
                         ) >= w
                 )
                 #end
