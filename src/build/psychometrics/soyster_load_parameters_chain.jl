@@ -88,7 +88,7 @@ function soyster_load_parameters_chain!(
                     #     1,
                     # ]
                     IIF[t][k, i] = max(
-                        0.0,
+                        0.01,
                         StatsBase.mean(IIF_i[:, k]) - 3 * StatsBase.std(IIF_i[:, k]),
                     )
                     # ICF[t][k, i] = StatsBase.mean(IIF_i[:, k]) - StatsBase.std(IIF_i[:, k])

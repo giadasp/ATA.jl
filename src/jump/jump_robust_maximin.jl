@@ -365,7 +365,7 @@ function jump!(
             # first_Gamma_plus_one_d_i_gamma = copy(d_i)
             # first_Gamma_plus_one_d_i_gamma[order_d_i[gamma:end]] .= d_l
             #Objective bound
-            JuMP.@variable(m, w >= 0)
+            JuMP.@variable(m, w >= - maximum(d_l))
 
             for t = 1:ata_model.settings.T
 
@@ -390,13 +390,12 @@ function jump!(
                 )
                 #end
             end
-            println(d_l)
-            println(d_i[1] .- d_l[1])
+
             # println(first_Gamma_plus_one_d_i_gamma .- d_l)
-            JuMP.@objective(m, Min, (-w))
+            JuMP.@objective(m, Max, w)
             JuMP.optimize!(m)
             design_gamma[gamma] = abs.(round.(JuMP.value.(x)))
-            f_gamma[gamma] = JuMP.value(w) #- (ata_model.obj.Gamma * d_l)
+            f_gamma[gamma] = JuMP.value(w) #- (ata_model.obj.Gamma * d_l[1])
             println(string(
                 "With l =",
                 gamma,
