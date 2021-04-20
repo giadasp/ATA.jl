@@ -167,7 +167,7 @@ function jump!(
         ################################################################################
         f_gamma = zeros(ata_model.obj.Gamma + 1)
         design_gamma = Vector{Matrix{Float64}}(undef, ata_model.obj.Gamma + 1)
-        d_i = [min.(ata_model.obj.cores[t].standard_deviation[1, :], IIF_new[t][1, :]) for t=1:ata_model.settings.T]
+        d_i = [min.(ata_model.obj.cores[t].standard_deviation[1, :] , IIF_new[t][1, :] .- 0.01) for t=1:ata_model.settings.T]
         order_d_i = [sortperm(d_i[t]; rev = true) for t=1:ata_model.settings.T]
         for gamma = 1:(ata_model.obj.Gamma+1)
             m = JuMP.Model()
@@ -390,8 +390,8 @@ function jump!(
                 )
                 #end
             end
-            # println(d_l)
-            # println(ata_model.obj.Gamma * d_l)
+            println(d_l)
+            println(d_i[1] .- d_l[1])
             # println(first_Gamma_plus_one_d_i_gamma .- d_l)
             JuMP.@objective(m, Min, (-w))
             JuMP.optimize!(m)
