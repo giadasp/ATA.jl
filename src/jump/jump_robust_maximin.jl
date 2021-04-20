@@ -365,7 +365,7 @@ function jump!(
             # first_Gamma_plus_one_d_i_gamma = copy(d_i)
             # first_Gamma_plus_one_d_i_gamma[order_d_i[gamma:end]] .= d_l
             #Objective bound
-            JuMP.@variable(m, w >= - maximum(d_l))
+            JuMP.@variable(m, w >= - maximum(d_l)*ata_model.obj.Gamma)
 
             for t = 1:ata_model.settings.T
 
