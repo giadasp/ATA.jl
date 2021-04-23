@@ -53,10 +53,11 @@ jobs:
         env:
           API_TOKEN_GITHUB: $GITHUB_TOKEN
         with:
+          personal_token: ${{ secrets.GITHUB_TOKEN }}
           source_file: docs/googlea96c519c1cc72ec1.html
+          src_branch: master
+          dst_owner: giadasp
           destination_folder: docs
-          destination_repo: ${{ github.repository }}
-          destination_branch: gh-pages
-          user_name: $GITHUB_ACTOR
-          user_email: ${GITHUB_ACTOR}@users.noreply.github.com
+          destination_repo: ATA.jl
+          dst_branch: gh-pages
 
