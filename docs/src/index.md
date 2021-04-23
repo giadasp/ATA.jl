@@ -6,7 +6,7 @@ end
 ```
 # ATA.jl: Automated Test Assembly Made Easy
 
-Version 0.13.0
+Version 0.16.0
 
 A package for automated test assembly (ATA) written in Julia.
 Simulated Annealing algorithm is available for large scale ATA models.
@@ -54,7 +54,7 @@ Add [`ATAPlot`](https://github.com/giadasp/ATAPlot.jl) to plot the Test Informat
 
 If you want to play with this package:
 
-Install Julia-1.6.0-rc1 at `https://julialang.org/downloads/`
+Install Julia-1.6.0 at `https://julialang.org/downloads/`
 
 run `Julia.exe` and type:
 

@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        julia-version: [1.6.0-rc1]
+        julia-version: [1.6.0]
         julia-arch: [x86]
         os: [ubuntu-latest]
 
@@ -48,4 +48,14 @@ jobs:
         env:
           REPO: ${{ env.REPO }}
           DEVBRANCH: ${{ env.DEVBRANCH }}
+      - name: Add google html file to docs
+        uses: andstor/copycat-action@v3
+        with:
+          personal_token: ${{ secrets.GITHUB_TOKEN }}
+          src_path: docs/googlea96c519c1cc72ec1.html
+          src_branch: master
+          dst_path: /docs/
+          dst_owner: giadasp
+          dst_repo_name: ${{ env.GITHUB_REPOSITORY }}
+          dst_branch: gh-pages
 

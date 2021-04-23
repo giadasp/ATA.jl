@@ -1,6 +1,6 @@
 """
     print_results(
-        ata_model::Union{MaximinModel, SoysterMaximinModel, DeJongMaximinModel,RobustMaximinModel};
+        ata_model::Union{MaximinModel, SoysterMaximinModel, DeJongMaximinModel, RobustMaximinModel, MinimaxModel};
         results_folder = "results",
         sim_pool::DataFrames.DataFrame = DataFrame(),
     )
@@ -21,6 +21,7 @@ function print_results(
         SoysterMaximinModel,
         DeJongMaximinModel,
         RobustMaximinModel,
+        MinimaxModel
     };
     results_folder = "results",
     sim_pool::DataFrames.DataFrame = DataFrame(),
