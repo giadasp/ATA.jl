@@ -53,12 +53,10 @@ jobs:
         env:
           API_TOKEN_GITHUB: $GITHUB_TOKEN
         with:
-          personal_token: ${{ secrets.GITHUB_TOKEN }}
           source_file: docs/googlea96c519c1cc72ec1.html
-          src_branch: master
           destination_folder: docs
           destination_repo: ${{ github.repository }}
           destination_branch: gh-pages
           user_name: ${{ env.GITHUB_ACTOR }}
-          user_email: '@users.noreply.github.com'
+          user_email: ${{ join([env.GITHUB_ACTOR, '@users.noreply.github.com'], '') }}
 
