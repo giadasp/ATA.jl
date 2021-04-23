@@ -58,5 +58,5 @@ jobs:
           destination_repo: ${{ github.repository }}
           destination_branch: gh-pages
           user_name: ${{ env.GITHUB_ACTOR }}
-          user_email: ${{ join([env.GITHUB_ACTOR, '@users.noreply.github.com'], '') }}
+          user_email: ${{ env.GITHUB_ACTOR }}@users.noreply.github.com
 
