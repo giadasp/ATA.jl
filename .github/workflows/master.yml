@@ -55,7 +55,7 @@ jobs:
           src_path: docs/googlea96c519c1cc72ec1.html
           src_branch: master
           dst_path: /docs/
-          dst_owner: giadasp
-          dst_repo_name: ${{ env.GITHUB_REPOSITORY }}
+          dst_owner: ${{ github.repository.name }}
+          dst_repo_name: ${{ github.repository_owner }}
           dst_branch: gh-pages
 
