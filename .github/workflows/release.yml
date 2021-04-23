@@ -44,7 +44,7 @@ jobs:
           echo "IS_SNAPSHOT=${IS_SNAPSHOT}" >> $GITHUB_ENV
 
       - name: Build, deploy and upload docs
-        run: julia --project=docs --color=yes docs/make.jl
+        run: julia --project=docs --color=yes docs/make_release.jl
         env:
           REPO: ${{ env.REPO }}
           DEVBRANCH: ${{ env.DEVBRANCH }}
@@ -62,3 +62,15 @@ jobs:
           title: v${{ env.VERSION }}
           files: |
             ATA.zip
+      - name: Add google html file to docs
+        uses: andstor/copycat-action@v3
+        env:
+          API_TOKEN_GITHUB: $GITHUB_TOKEN
+        with:
+          personal_token: ${{ secrets.GITHUB_TOKEN }}
+          source_file: docs/googlea96c519c1cc72ec1.html
+          src_branch: master
+          dst_owner: giadasp
+          destination_folder: docs
+          destination_repo: giadasp/ATA.jl
+          dst_branch: gh-pages

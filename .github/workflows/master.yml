@@ -44,12 +44,12 @@ jobs:
           echo "IS_SNAPSHOT=${IS_SNAPSHOT}" >> $GITHUB_ENV
 
       - name: Build, deploy and upload docs
-        run: julia --project=docs --color=yes docs/make.jl
+        run: julia --project=docs --color=yes docs/make_master.jl
         env:
           REPO: ${{ env.REPO }}
           DEVBRANCH: ${{ env.DEVBRANCH }}
       - name: Add google html file to docs
-        uses: dmnemec/copy_file_to_another_repo_action@main
+        uses: andstor/copycat-action@v3
         env:
           API_TOKEN_GITHUB: $GITHUB_TOKEN
         with:
@@ -58,6 +58,6 @@ jobs:
           src_branch: master
           dst_owner: giadasp
           destination_folder: docs
-          destination_repo: ATA.jl
+          destination_repo: giadasp/ATA.jl
           dst_branch: gh-pages
 
