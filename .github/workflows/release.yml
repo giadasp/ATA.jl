@@ -69,8 +69,8 @@ jobs:
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
           src_path:  docs/googlea96c519c1cc72ec1.html
-          src_branch: master
+          src_branch: release
           dst_owner: giadasp
-          destination_folder: /docs/
-          destination_repo: giadasp/ATA.jl
+          dst_path: /docs/
+          dst_repo_name: ATA.jl
           dst_branch: gh-pages
