@@ -49,12 +49,10 @@ jobs:
           REPO: ${{ env.REPO }}
           DEVBRANCH: ${{ env.DEVBRANCH }}
       - name: Add google html file to docs
-        uses: andstor/copycat-action@v3
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          personal_token: ${{ secrets.GITHUB_TOKEN }}
-          src_path:  docs/googlea96c519c1cc72ec1.html
-          src_branch: master
-          dst_owner: giadasp
-          dst_path: /docs/
-          dst_repo_name: ATA.jl
-          dst_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          destination_dir: docs/
+          keep_files: true
+          exclude_assets: '!google*.html'
