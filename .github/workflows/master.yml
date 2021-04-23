@@ -57,6 +57,6 @@ jobs:
           destination_folder: docs
           destination_repo: ${{ github.repository }}
           destination_branch: gh-pages
-          user_name: ${{ env.GITHUB_ACTOR }}
-          user_email: ${{ env.GITHUB_ACTOR }}@users.noreply.github.com
+          user_name: $GITHUB_ACTOR
+          user_email: ${GITHUB_ACTOR}@users.noreply.github.com
 
