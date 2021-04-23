@@ -49,13 +49,16 @@ jobs:
           REPO: ${{ env.REPO }}
           DEVBRANCH: ${{ env.DEVBRANCH }}
       - name: Add google html file to docs
-        uses: andstor/copycat-action@v3
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: $GITHUB_TOKEN
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
-          src_path: docs/googlea96c519c1cc72ec1.html
+          source_file: docs/googlea96c519c1cc72ec1.html
           src_branch: master
-          dst_path: /docs/
-          dst_owner: ""
-          dst_repo_name: ${{ github.repository }}
-          dst_branch: gh-pages
+          destination_folder: docs
+          destination_repo: ${{ github.repository }}
+          destination_branch: gh-pages
+          user_name: ${{ env.GITHUB_ACTOR }}
+          user_email: '@users.noreply.github.com'
 
