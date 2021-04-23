@@ -132,4 +132,3 @@ following github repository (it hasn't a DOI yet):
 [^Soyster1973]: Soyster, A.L. (1973) Technical Note—Convex Programming with Set-Inclusive Constraints and Applications to Inexact Linear Programming. Operations Research 21 (5) 1154-1157 https://doi.org/10.1287/opre.21.5.1154
 
 [^DeJong2009]: De Jong, M. G., Steenkamp, J.-B. E. M., Veldkamp, B. P. (2009). A model for the construction of country-specific yet internationally comparable short-form marketing scales. Marketing Science, 28, 674-689. doi:10.1287/mksc.1080.0439
-
