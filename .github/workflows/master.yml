@@ -50,8 +50,6 @@ jobs:
           DEVBRANCH: ${{ env.DEVBRANCH }}
       - name: Add google html file to docs
         uses: andstor/copycat-action@v3
-        env:
-          API_TOKEN_GITHUB: $GITHUB_TOKEN
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
           src_path:  docs/googlea96c519c1cc72ec1.html
