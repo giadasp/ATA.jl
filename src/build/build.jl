@@ -14,3 +14,5 @@ include("add_obj_fun_soyster_maximin.jl")
 include("add_obj_fun_de_jong_maximin.jl")
 include("add_obj_fun_robust_maximin.jl")
 include("_group_by_friends.jl")
+include("load_design.jl")
+
