@@ -94,13 +94,6 @@ As a remind, to plot the TIFs and ICTs you must install (add) and load (using) t
 It requires to have `PGFPlotsX.jl` and Miktex installed. 
 A new version of `ATAPlot.jl` which use the package `Plots` and the backend `GR` is under development. 
 
-## Documentation Contents
-
-```@contents
-Pages = ["build.md", "opt.md", "compact.md", "print_and_plot.md", "structs.md", "utils.md", "examples.md"]
-Depth = 3
-```
-
 ## Bug reports
 
 Please report any issues via the Github [issue tracker]. All types of issues 
