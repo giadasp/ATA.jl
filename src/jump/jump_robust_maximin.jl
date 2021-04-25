@@ -365,7 +365,7 @@ function jump!(
             # first_Gamma_plus_one_d_i_gamma = copy(d_i)
             # first_Gamma_plus_one_d_i_gamma[order_d_i[gamma:end]] .= d_l
             #Objective bound
-            JuMP.@variable(m, w)
+            JuMP.@variable(m, w >= - maximum(d_l) * ata_model.obj.Gamma)
 
             for t = 1:ata_model.settings.T
 
@@ -384,9 +384,9 @@ function jump!(
                     m,
                     sum(
                             (round(IIF_new[t][k, i]; digits = 4) + 
-                                (d_i[t][i] - d_l[t]) * ones_gamma[t][i]) * x[i, t] - (d_l[t] * ata_model.obj.Gamma)
+                                (d_i[t][i] - d_l[t]) * ones_gamma[t][i]) * x[i, t] 
                                  for i = 1:ata_model.settings.n_fs
-                        ) >= w
+                        ) - (d_l[t] * ata_model.obj.Gamma) >= w
                 )
                 #end
             end
