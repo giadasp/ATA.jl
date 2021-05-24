@@ -9,7 +9,7 @@ makedocs(
     format = Documenter.HTML(),
     modules = [ATA],
     doctest = true,
-    pages = ["index.md", "build.md", "opt.md", "compact.md", "print_and_plot.md", "structs.md", "utils.md", "examples.md"],
+    pages = ["index.md", "model_build.md", "opt.md", "compact.md", "print_and_plot.md", "structs.md", "utils.md", "examples.md"],
 )
 
 deploydocs(repo = "github.com/giadasp/ATA.jl.git", devurl = "docs", devbranch = "master")

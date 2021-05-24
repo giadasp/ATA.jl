@@ -103,7 +103,7 @@ A new version of `ATAPlot.jl` which use the package `Plots` and the backend `GR`
 ## Documentation Contents
 
 ```@contents
-Pages = ["build.md", "opt.md", "compact.md", "print_and_plot.md", "structs.md", "utils.md", "examples.md"]
+Pages = ["model_build.md", "opt.md", "compact.md", "print_and_plot.md", "structs.md", "utils.md", "examples.md"]
 Depth = 3
 ```
 
